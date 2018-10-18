@@ -4802,6 +4802,52 @@ namespace WowAI.Modules
             }
         }
 
+        public bool MyUseSpellClick(Entity entity)
+        {
+            try
+            {
+                if (entity != null)
+                {
+                    if (entity.Type == EBotTypes.Unit && (entity as Unit).IsSpellClick ||
+                        entity.Type == EBotTypes.Vehicle && (entity as Vehicle).IsSpellClick)
+                    {
+                        if (!Host.CommonModule.MoveTo(entity, 2, 2))
+                            return false;
+                        if (Host.SpellManager.UseSpellClick(entity as Unit))
+                        {
+                            Host.log("Использовал SpellClick ", Host.LogLvl.Ok);
+                            while (Host.Me.IsMoving)
+                                Thread.Sleep(50);
+                            while (Host.SpellManager.IsCasting)
+                                Thread.Sleep(50);
+                            while (Host.SpellManager.IsChanneling)
+                                Thread.Sleep(50);
+                        }
+                        else
+                        {
+                            Host.log("Не смог использовать SpellClick " + Host.GetLastError(), Host.LogLvl.Error);
+                            Host.CanselForm();
+                        }
+                    }
+                    else
+                    {
+                        Host.log("Тип Entity не известен " + entity.Type);
+                    }
+                }
+                else
+                {
+                    Host.log("Не нашел НПС для использования скила ", Host.LogLvl.Error);
+                }
+                Thread.Sleep(5000);
+                return false;
+            }
+            catch (Exception e)
+            {
+                Host.log("" + e);
+                return false;
+            }
+        }
+
 
         public bool MyUseSpellClick(uint mobId)
         {
@@ -4830,6 +4876,7 @@ namespace WowAI.Modules
                         else
                         {
                             Host.log("Не смог использовать SpellClick " + Host.GetLastError(), Host.LogLvl.Error);
+                            Host.CanselForm();
                         }
                     }
                     else
@@ -5381,9 +5428,30 @@ namespace WowAI.Modules
                 if (!isCanAttack && findNpc)
                 {
                     Host.log("Указанного НПС нельзя атаковать " + questObjective.ObjectID);
-                    foreach (var farmMobId in farmMobIds)
+
+
+                    if (quest.Id == 50739)
                     {
-                        Host.log("НПС " + farmMobId);
+
+                        while (quest.State == EQuestState.None)
+                        {
+                            Thread.Sleep(100);
+                            quest = Host.GetQuest(quest.Id);
+                            var step = 0;
+                            foreach (var questCount in quest.Counts)
+                                step = step + questCount;
+                            if (step >= 7)
+                                return false;
+
+                            if (!Host.MainForm.On)
+                                return false;
+                            if (Host.GetAgroCreatures().Count > 0)
+                                continue;
+                            Host.FarmSpellClick(farmMobIds);
+                        }
+
+
+                        return false;
                     }
 
                     if (quest.Id == 13557) //13557 State:None LogTitle:Неожиданная удача 
@@ -5804,6 +5872,17 @@ namespace WowAI.Modules
                     mobId = 9523;
                 }
 
+                if (quest.Id == 51574)
+                {
+                    mobId = 138107;
+                }
+
+                if (quest.Id == 47319)
+                {
+                    mobId = 122678;
+                }
+
+
                 var farmMobIds = new List<uint>();
                 var sw = new Stopwatch();
                 if (Host.AdvancedLog)
@@ -5983,6 +6062,8 @@ namespace WowAI.Modules
                     if (!Host.CommonModule.MoveTo(-1336.34, -5183.75, 3.26))
                         return false;
 
+
+
                 if (quest.Id == 13558)
                 {
                     if (!Host.CommonModule.MoveTo(6455.36, 654.66, 21.64))
@@ -5995,17 +6076,50 @@ namespace WowAI.Modules
                     Thread.Sleep(30000);
                     return false;
                 }
+                farmMobIds.Add(mobId);
 
+                switch (quest.Id)
+                {
+                    case 51574:
+                        {
+                            if (!Host.CommonModule.MoveTo(2041.83, 3014.50, 48.99))
+                                return false;
+                            while (quest.State == EQuestState.None)
+                            {
+                                Thread.Sleep(100);
+                                quest = Host.GetQuest(quest.Id);
+                                var step = 0;
+                                foreach (var questCount in quest.Counts)
+                                    step = step + questCount;
+                                if (step >= 16)
+                                    return false;
+
+                                if (!Host.MainForm.On)
+                                    return false;
+                                if (Host.GetAgroCreatures().Count > 0)
+                                    continue;
+                                Host.FarmSpellClick(farmMobIds);
+                            }
+
+                        }
+                        break;
+                    default:
+                        {
+                            if (!Host.CommonModule.MoveTo(farmLoc, dist, dist))
+                                return false;
+                        }
+                        break;
+                }
 
                 // if (!zone.ObjInZone(Host.Me))
-                if (!Host.CommonModule.MoveTo(farmLoc, dist, dist))
-                    return false;
 
 
 
 
 
-                farmMobIds.Add(mobId);
+
+
+               
                 if (addMobId != 0)
                     farmMobIds.Add(addMobId);
 

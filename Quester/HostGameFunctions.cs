@@ -222,7 +222,7 @@ namespace WowAI
                         if (resultForm != ESpellCastError.SUCCESS)
                         {
                             log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
-                            if(resultForm == ESpellCastError.NOT_MOUNTED)
+                            if (resultForm == ESpellCastError.NOT_MOUNTED)
                                 CommonModule.MyUnmount();
                         }
                         else
@@ -532,6 +532,39 @@ namespace WowAI
         public double DistanceNoZ(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2));
+        }
+
+
+        public void FarmSpellClick(List<uint> farmMobIds)
+        {
+            Thread.Sleep(100);
+            if (!MainForm.On)
+                return;
+            if (GetAgroCreatures().Count > 0)
+                return;
+
+            
+
+            var entitylist = GetEntities();
+            Entity needEntity = null;
+            foreach (var entity in entitylist.OrderBy(i => Me.Distance(i)))
+            {
+                if (!farmMobIds.Contains(entity.Id))
+                    continue;
+                if (Me.Distance(entity) < 20)
+                    continue;
+                if(FarmModule.IsBadTarget(entity, ComboRoute.TickTime))
+                    continue;
+                needEntity = entity;
+                break;
+            }
+
+            if (needEntity != null)
+            {
+               FarmModule.SetBadTarget(needEntity, 120000);
+                AutoQuests.MyUseSpellClick(needEntity);
+            }
+           
         }
 
         /// <summary>
@@ -2077,7 +2110,7 @@ namespace WowAI
                     && GameState == EGameState.Ingame
                     // && IsAlive(Me)
                     && FarmModule.readyToActions
-                    &&   MyGetAura(269824) == null
+                    && MyGetAura(269824) == null
                     //&& Me.ConditionPhase != EConditionPhase.Spirit
                     //&& Me.ConditionPhase != EConditionPhase.Dead
 
