@@ -3228,7 +3228,7 @@ namespace WowAI.Modules
                                 if (!Host.CommonModule.MoveTo(npcLoc, 5, 5))
                                     return false;
                             }
-                                
+
                             npc = Host.GetNpcById(questCoordSettings.NpcId);
                             if (npc != null)
                             {
@@ -4562,6 +4562,41 @@ namespace WowAI.Modules
                     }
 
                     if (step == 3)
+                        MyComliteQuest(quest);
+
+                    return false;
+                }
+
+                if (quest.Id == 51364)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(2768.88, 2592.97, 42.05))
+                            return false;
+
+                    }
+
+                    if (step == 1)
+                    {
+                        if (!Host.CommonModule.MoveTo(2768.88, 2592.97, 42.05))
+                            return false;
+                        MyUseSpellClick(137492);
+                    }
+
+                    while (step == 2 || step == 3)
+                    {
+                        if (!Host.MainForm.On)
+                            return false;
+                        Thread.Sleep(5000);
+                        step = 0;
+                        quest = Host.GetQuest(quest.Id);
+                        foreach (var questCount in quest.Counts)
+                        {
+                            step = step + questCount;
+                        }
+                    }
+
+                    if (step == 4)
                         MyComliteQuest(quest);
 
                     return false;
