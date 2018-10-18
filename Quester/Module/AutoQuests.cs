@@ -5429,6 +5429,13 @@ namespace WowAI.Modules
                 {
                     Host.log("Указанного НПС нельзя атаковать " + questObjective.ObjectID);
 
+                    if (quest.Id == 47320)
+                    {
+                        if (!Host.CommonModule.MoveTo(2043.82, 2818.25, 50.42))
+                            return false;
+                        var item = Host.MyGetItem(150759);
+                        Host.MyUseItemAndWait(item);
+                    }
 
                     if (quest.Id == 50739)
                     {

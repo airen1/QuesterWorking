@@ -1687,6 +1687,11 @@ namespace WowAI
         {
             try
             {
+                if (item == null)
+                {
+                    log("Нет предмета");
+                    return false;
+                }
                 CanselForm();
                 Thread.Sleep(1000);
                 if (SpellManager.GetItemCooldown(item.Id) > 0)
