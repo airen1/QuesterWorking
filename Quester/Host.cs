@@ -192,7 +192,7 @@ namespace WowAI
                     AdvancedLog = true;
                 }
 
-                 foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
+                /* foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
                  {
                      if (gameDbQuestTemplate.Value.QuestObjectives == null)
                          continue;
@@ -200,12 +200,12 @@ namespace WowAI
                      {
                          if (valueQuestObjective.Type != EQuestRequirementType.Item)
                              continue;
-
-                         File.AppendAllText("D:\\test1.txt", gameDbQuestTemplate.Key.ToString() + Environment.NewLine);
+                        
+                         File.AppendAllText("D:\\test1.txt", valueQuestObjective.ObjectID.ToString() + Environment.NewLine);
                          break;
                      }
 
-                 }
+                 }*/
 
 
                 ClearLogs(GetCurrentAccount().Name);
@@ -646,7 +646,7 @@ namespace WowAI
                                     continue;
                                 log("questCount: " + index + ") " + questCount);
                             }
-
+                           
                             foreach (var templateQuestObjective in quest.Template.QuestObjectives)
                             {
                                 log(templateQuestObjective.Type + " " + templateQuestObjective.Amount + " " + templateQuestObjective.Description, LogLvl.Important);

@@ -2808,10 +2808,19 @@ namespace WowAI.Modules
                 //break;
             }
 
+           
+
+
+            //  }
+
             switch (id)
             {
-
-
+                case 47513:
+                {
+                    if (!MyStartAdventure(id, npc))
+                        return false;
+                }
+                    break;
                 default:
                     {
                         if (!isQuestFound)
@@ -2821,16 +2830,40 @@ namespace WowAI.Modules
                             Thread.Sleep(1000);
                             return false;
                         }
+
+                        var quest = Host.GetQuest(id);
+                        if (quest == null)
+                            if (!Host.StartQuest(id))
+                            {
+                                Host.log("Не смог начать квест " + id + " Всего диалогов у НПС " + Host.GetNpcQuestDialogs().Count + "   " + Host.GetLastError(), Host.LogLvl.Error);
+                                Host.SendKeyPress(0x1b);
+                                if (Host.GetLastError() == ELastError.InvalidParam)
+                                {
+                                    MyMoveFromNpc(npc as Unit);
+                                }
+                                else
+                                {
+
+                                }
+                                Thread.Sleep(500);
+                                return false;
+                            }
                     }
                     break;
             }
 
 
-            //  }
+            if (id == 52131)
+                Host.Wait(60000);
+            Thread.Sleep(500);
+            return true;
+        }
 
+        public bool MyStartAdventure(uint id, Entity npc)
+        {
             var quest = Host.GetQuest(id);
             if (quest == null)
-                if (!Host.StartQuest(id))
+                if (!Host.StartAdventureJournalQuest(id))
                 {
                     Host.log("Не смог начать квест " + id + " Всего диалогов у НПС " + Host.GetNpcQuestDialogs().Count + "   " + Host.GetLastError(), Host.LogLvl.Error);
                     Host.SendKeyPress(0x1b);
@@ -2845,9 +2878,7 @@ namespace WowAI.Modules
                     Thread.Sleep(500);
                     return false;
                 }
-            if (id == 52131)
-                Host.Wait(60000);
-            Thread.Sleep(500);
+
             return true;
         }
 
@@ -2891,14 +2922,14 @@ namespace WowAI.Modules
                        return false;*/
 
 
-            var npc = Host.GetNpcById(revardNpcId);
+          
             if (quest.Id == 47314)
             {
                 if (!Host.CommonModule.MoveTo(-851.29, 804.63, 324.37))
                     return false;
                 Host.Wait(40000);
             }
-
+            var npc = Host.GetNpcById(revardNpcId);
             if (questPoi != null && npc == null)
             {
                 var z = Host.GetNavMeshHeight(questPoi.Points[0].X, questPoi.Points[0].Y);
@@ -5342,9 +5373,14 @@ namespace WowAI.Modules
                 {
                     farmMobIds.Clear();
                     farmMobIds.Add(32890);
-
                 }
 
+                if (quest.Id == 47327)
+                {
+                    farmMobIds.Add(123775);
+                    farmMobIds.Add(123774);
+                    farmMobIds.Add(123773);
+                }
 
 
 
@@ -5434,7 +5470,9 @@ namespace WowAI.Modules
                         if (!Host.CommonModule.MoveTo(2043.82, 2818.25, 50.42))
                             return false;
                         var item = Host.MyGetItem(150759);
-                        Host.MyUseItemAndWait(item);
+                        var npc = Host.GetNpcById(122741);
+                        Host.MyUseItemAndWait(item, npc);
+                        return false;
                     }
 
                     if (quest.Id == 50739)
@@ -6126,7 +6164,7 @@ namespace WowAI.Modules
 
 
 
-               
+
                 if (addMobId != 0)
                     farmMobIds.Add(addMobId);
 

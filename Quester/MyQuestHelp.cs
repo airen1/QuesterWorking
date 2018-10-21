@@ -102,8 +102,11 @@ namespace WowAI
                     var findPoint = farmLoc;
                     if (questPoiPoints.Count > 0)
                         findPoint = questPoiPoints[host.RandGenerator.Next(0, questPoiPoints.Count)];
-                    host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
-                    host.CommonModule.MoveTo(findPoint);
+                    if (host.Me.Distance(findPoint) > 5)
+                    {
+                        host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
+                        host.CommonModule.MoveTo(findPoint);
+                    }
                 }
 
             }
@@ -130,8 +133,12 @@ namespace WowAI
                     var findPoint = farmLoc;
                     if (questPoiPoints.Count > 0)
                         findPoint = questPoiPoints[host.RandGenerator.Next(0, questPoiPoints.Count)];
-                    host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
-                    host.CommonModule.MoveTo(findPoint);
+                    if (host.Me.Distance(findPoint) > 5)
+                    {
+                        host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
+                        host.CommonModule.MoveTo(findPoint);
+                    }
+                   
                 }
             }
 

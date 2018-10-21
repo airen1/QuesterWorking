@@ -473,6 +473,8 @@ namespace WowAI.Modules
                         isNeedChangeForm = false;
                     if (i.SpellId == 783 && skillGather.Id == 265831) //Походный облик
                         isNeedChangeForm = false;
+                    if (i.SpellId == 783 && skillGather.Id == 2366) //Походный облик
+                        isNeedChangeForm = false;
                 }
 
 
