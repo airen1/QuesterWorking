@@ -305,7 +305,7 @@ namespace WowAI.Modules
 
                 if (Host.CharacterSettings.Mode == EMode.Questing)
                 {
-                    uint spellId = 0;
+                   /* uint spellId = 0;
                     if (prop.Id == 3189 || prop.Id == 3190 || prop.Id == 3192 || prop.Id == 3236 || prop.Id == 3290 || prop.Id == 175708 || prop.Id == 3640 || prop.Id == 207346
                         || prop.Id == 1673 || prop.Id == 195240 || prop.Id == 195007)
                     {
@@ -324,48 +324,47 @@ namespace WowAI.Modules
                     {
                         Host.log("Нет скила для сбора " + prop.Name + " [" + prop.Id + "] " + prop.RequiredGatheringSkill, Host.LogLvl.Error);
                         return false;
-                    }
+                    }*/
 
 
-                    var isNeedUnmount2 = true;
-
-
-                    foreach (var aura in Host.Me.GetAuras())
+                    if (Host.Me.MountId != 0)
                     {
-                        if (aura.SpellId == 209563)
-                            isNeedUnmount2 = false;
-                        if (aura.SpellId == 267560)
-                            isNeedUnmount2 = false;
-                        /* if (aura.SpellId == 134359 && prop.RequiredGatheringSkill.Contains(182))
-                             isNeedUnmount2 = false;*/
-
+                        Host.log("Отзываю маунта для сбора");
+                        Host.CommonModule.MyUnmount();
                     }
 
-
-
-                    if (isNeedUnmount2)
-                        if (Host.Me.MountId != 0)
-                        {
-                            Host.log("Отзываю маунта для сбора");
-                            Host.CommonModule.MyUnmount();
-                        }
                     Host.CanselForm();
                     while (Host.Me.IsMoving)
                     {
                         Thread.Sleep(100);
                     }
-                    var result2 = Host.SpellManager.CastSpell(spellId, prop);
-                    Thread.Sleep(500);
-                    if (result2 != ESpellCastError.SUCCESS)//8613 Skinning
+                    if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                     {
-                        /* host.CommonModule.ForceMoveTo(m.Location, 1, 1);
-                         if (!m.PickUp())
-                         {*/
+                        if (!prop.Use())
+                        {
+                            Host.log("Не смог собрать " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
+                            Thread.Sleep(1000);
+                            if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
+                            {
+                                if (!prop.Use())
+                                {
+                                    Host.log("Не смог собрать скилом 2 " + +Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
 
-                        Host.log("Не смог собрать скилом " + "  [" + spellId + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  " + result2, Host.LogLvl.Error);
-                        SetBadProp(prop, 300000);
-                        //   }
+                                }
+                            }
+                            SetBadProp(prop, 300000);
+                        }
                     }
+                    /*   var result2 = Host.SpellManager.CastSpell(spellId, prop);
+                       Thread.Sleep(500);
+                       if (result2 != ESpellCastError.SUCCESS)//8613 Skinning
+                       {
+
+
+                           Host.log("Не смог собрать скилом " + "  [" + spellId + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  " + result2, Host.LogLvl.Error);
+                           SetBadProp(prop, 300000);
+                           //   }
+                       }*/
 
                     while (Host.SpellManager.IsCasting)
                         Thread.Sleep(100);
@@ -2023,8 +2022,8 @@ namespace WowAI.Modules
 
                     if (Host.CharacterSettings.Mode != EMode.Questing)
                     {
-                        
-                        if(obj.Victim != null && obj.Victim != Host.Me && obj.Victim != Host.Me.GetPet())
+
+                        if (obj.Victim != null && obj.Victim != Host.Me && obj.Victim != Host.Me.GetPet())
                             continue;
                     }
 

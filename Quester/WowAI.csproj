@@ -170,7 +170,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "D:\GoogleDrive\WOW\Plugins\Quester"
-copy /Y "$(TargetDir)$(ProjectName).pdb" "D:\GoogleDrive\WOW\Plugins\Quester"</PostBuildEvent>
+copy /Y "$(TargetDir)$(ProjectName).pdb" "D:\GoogleDrive\WOW\Plugins\Quester"
+copy /Y "$(TargetDir)$(ProjectName).dll" "D:\WowShare"
+copy /Y "$(TargetDir)$(ProjectName).pdb" "D:\WowShare"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

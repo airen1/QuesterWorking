@@ -7,7 +7,7 @@ using WoWBot.Core;
 
 namespace WowAI
 {
-    internal class MyQuestHelp 
+    internal class MyQuestHelp
     {
         public Dictionary<uint, uint> QuestRevardDruid = new Dictionary<uint, uint>
         {
@@ -40,6 +40,12 @@ namespace WowAI
             {52428, 159906},//Vest of the Champion[159906]
            // {13576, 52587},
             {49676 , 159983},
+            {47322  , 155412},
+            {48550   , 155403},
+            {48554    , 155392},
+            {48993    , 159979},
+            {49005    , 161270},
+            {48996    , 155405},
             
         };
 
@@ -138,7 +144,7 @@ namespace WowAI
                         host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
                         host.CommonModule.MoveTo(findPoint);
                     }
-                   
+
                 }
             }
 

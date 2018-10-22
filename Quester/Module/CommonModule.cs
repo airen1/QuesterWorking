@@ -1338,6 +1338,14 @@ namespace WowAI.Modules
                                 Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 5, 5);
                             }
                         }
+                        if (gameObject.Id == 289694)
+                        {
+                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
+                            {
+                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
+                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 5, 5);
+                            }
+                        }
 
                         if (gameObject.Id == 195146)
                         {
@@ -2176,7 +2184,10 @@ namespace WowAI.Modules
                 doneDist = Host.Me.RunSpeed / 5.0;
                 if (loc.Distance(-986.00, -3797.00, 0.11) < 5)
                     loc.Z = (float)5.2;
-                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
+                if (Host.Me.Distance(713.81, 3128.34, 133.02) < 30 && Host.Me.Distance(loc) > 300)
+                    Host.MoveTo(749.13, 3099.93, 133.11);
+
+                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(loc.X, loc.Y));
                 var result = Host.ComeTo(loc, dist, doneDist);
                 //  Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 

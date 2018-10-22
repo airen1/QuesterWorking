@@ -417,8 +417,8 @@ namespace WowAI
                 MainForm.NeedApplyDungeonSettings = true;
                 MainForm.NeedApplyQuestSettings = true;
 
-
-
+                
+                
 
                 MainForm.Dispatcher.BeginInvoke(new Action(() =>
                     {

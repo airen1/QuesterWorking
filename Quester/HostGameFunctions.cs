@@ -543,7 +543,7 @@ namespace WowAI
             if (GetAgroCreatures().Count > 0)
                 return;
 
-            
+
 
             var entitylist = GetEntities();
             Entity needEntity = null;
@@ -551,9 +551,9 @@ namespace WowAI
             {
                 if (!farmMobIds.Contains(entity.Id))
                     continue;
-                if (Me.Distance(entity) < 20)
+                if (Me.Distance(entity) < 10)
                     continue;
-                if(FarmModule.IsBadTarget(entity, ComboRoute.TickTime))
+                if (FarmModule.IsBadTarget(entity, ComboRoute.TickTime))
                     continue;
                 needEntity = entity;
                 break;
@@ -561,10 +561,10 @@ namespace WowAI
 
             if (needEntity != null)
             {
-               FarmModule.SetBadTarget(needEntity, 120000);
+               
                 AutoQuests.MyUseSpellClick(needEntity);
             }
-           
+
         }
 
         /// <summary>
@@ -2081,7 +2081,20 @@ namespace WowAI
             var go = GetNpcById(id);
             if (go != null)
             {
-                CommonModule.MoveTo(go);
+                switch (id)
+                {
+
+                    case 273992:
+
+                        break;
+                    case 291008:
+                        break;
+                    default:
+                        CommonModule.MoveTo(go);
+                        break;
+                }
+
+
                 while (Me.IsMoving)
                 {
                     Thread.Sleep(100);
