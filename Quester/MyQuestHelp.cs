@@ -39,14 +39,17 @@ namespace WowAI
             {53372, 163527},
             {52428, 159906},//Vest of the Champion[159906]
            // {13576, 52587},
-            {49676 , 159983},
-            {47322  , 155412},
-            {48550   , 155403},
-            {48554    , 155392},
-            {48993    , 159979},
-            {49005    , 161270},
-            {48996    , 155405},
-            
+            {49676, 159983},
+            {47322, 155412},
+            {48550, 155403},
+            {48554, 155392},
+            {48993, 159979},
+            {49005, 161270},
+            {48996, 155405},
+            {50561, 159991},
+            {49334, 155457},
+            {50550, 155440},
+            {50702, 155399},
         };
 
 
@@ -126,6 +129,7 @@ namespace WowAI
         {
             int badRadius = 0;
             host.FarmModule.SetFarmMobs(zone, farmMobIds);
+           
 
             while (!host.AutoQuests.IsQuestComplite(quest.Id, objectiveindex) && host.FarmModule.readyToActions && host.FarmModule.farmState == FarmState.FarmMobs)
             {

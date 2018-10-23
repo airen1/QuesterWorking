@@ -24,6 +24,7 @@ namespace WowAI.Modules
             {
                 Host.onUserNavMeshPreMoveFull -= NavMeshPreMoveFull;
                 Host.onUserNavMeshPreMove -= NavMeshPreMove;
+                Host.onMoveTick -= MyonMoveTick;
                 // host.onCreatureAttacked -= MyCreatureAttacked;
                 // host.onSkillLaunched -= MeSkillLaunched;
                 // host.onChatNotify -= OnChatNotify;
@@ -69,6 +70,7 @@ namespace WowAI.Modules
                 // host.onCreatureAttacked += MyCreatureAttacked;
                 host.onUserNavMeshPreMoveFull += NavMeshPreMoveFull;
                 Host.onUserNavMeshPreMove += NavMeshPreMove;
+                Host.onMoveTick += MyonMoveTick;
                 //  host.onChatNotify += OnChatNotify;
                 //  host.onPartyInvite += MyonPartyInvite;
                 // host.onGuildInvite += MyonGuildInvite;
@@ -208,21 +210,22 @@ namespace WowAI.Modules
                 if (Host.FarmModule.BestMob != null)
                     return;
 
-                if (Host.FarmModule.farmState == FarmState.AttackOnlyAgro)
-                {
-                    foreach (var entity in Host.GetEntities<Unit>())
+                if (Host.CharacterSettings.Mode == EMode.Script)
+                    if (Host.FarmModule.farmState == FarmState.AttackOnlyAgro)
                     {
-                        if (Host.Me.Level > 10 && entity.Level == 1)
-                            continue;
-                        if (Host.Me.Distance(entity) > 50)
-                            continue;
-                        if (!entity.IsAlive)
-                            continue;
-                        if (!Host.CanAttack(entity, Host.CanSpellAttack))
-                            continue;
-                        return;
+                        foreach (var entity in Host.GetEntities<Unit>())
+                        {
+                            if (Host.Me.Level > 10 && entity.Level == 1)
+                                continue;
+                            if (Host.Me.Distance(entity) > 50)
+                                continue;
+                            if (!entity.IsAlive)
+                                continue;
+                            if (!Host.CanAttack(entity, Host.CanSpellAttack))
+                                continue;
+                            return;
+                        }
                     }
-                }
 
                 if (Host.MapID == 1904 || Host.MapID == 1929)
                 {
@@ -724,10 +727,31 @@ namespace WowAI.Modules
 
         }
 
+        public bool UseObject = false;
+
+        private void MyonMoveTick(Vector3F loc)
+        {
+            if (Host.CharacterSettings.Mode == EMode.Questing)
+            {
+                var list = Host.GetEntities();
+                foreach (var entity in list.OrderBy(i => Host.Me.Distance(i)))
+                {
+                    if (entity.Id == 135983 && Host.Me.Distance(entity) < 15 && !Host.CommonModule.IsMovementSuspended && !UseObject)
+                    {
+                        Host.CommonModule.SuspendMove();
+                        Host.ComeTo(entity);
+                        Host.CommonModule.ResumeMove();
+                        break;
+                    }
+                }
+            }
+        }
         private void NavMeshPreMoveFull(Vector3F[] points)
         {
             try
             {
+
+               
 
                 /*  if (host.GetUnixTime() < _navUpdate + 1000)
                       return true;*/
@@ -737,7 +761,7 @@ namespace WowAI.Modules
 
                 if (Host.FarmModule.farmState == FarmState.Disabled)
                     return;
-                if(Host.MapID == 1904)
+                if (Host.MapID == 1904)
                     return;
                 //  Host.log("Тест");
 
@@ -1941,6 +1965,9 @@ namespace WowAI.Modules
 
                 IsMoveToNow = true;
                 doneDist = Host.Me.RunSpeed / 5.0;
+
+                
+
                 var result = Host.ComeTo(x, y, z, dist, doneDist);
 
                 CheckMoveFailed(result);

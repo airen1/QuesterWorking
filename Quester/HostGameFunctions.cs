@@ -2105,11 +2105,30 @@ namespace WowAI
                     Thread.Sleep(5000);
                     return;
                 }
+                else
+                {
+                    log("Использовал " + go.Name, LogLvl.Ok);
+                }
 
                 while (SpellManager.IsCasting)
                 {
                     Thread.Sleep(100);
                 }
+                Thread.Sleep(500);
+                if (CanPickupLoot())
+                {
+                    if (!PickupLoot())
+                    {
+                        /* host.CommonModule.ForceMoveTo(m.Location, 1, 1);
+                         if (!m.PickUp())
+                         {*/
+
+                        log("Не смог поднять дроп " +GetLastError(),Host.LogLvl.Error);
+                        
+                        //   }
+                    }
+                }
+
             }
         }
 

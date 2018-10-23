@@ -486,7 +486,7 @@ namespace WowAI.ComboRoutes
 
         public virtual void UseRegenItems()
         {
-            if(host.MyGetAura(269824) != null)//стан
+            if (host.MyGetAura(269824) != null)//стан
                 return;
 
             if (host.GetAgroCreatures().Count == 0 && host.Me.HpPercents < 80)
@@ -531,84 +531,98 @@ namespace WowAI.ComboRoutes
                 {
                     for (var i = 0; i < SpecialItems?.Length; i++)
                     {
-
-                        if (host.Me.Target != null && host.Me.Target.IsAlive)
+                        switch (host.AutoQuests.BestQuestId)
                         {
-                            if (host.Me.Distance(host.Me.Target) > specialDist)
-                                if (!host.CommonModule.ForceMoveTo(host.Me.Target, specialDist, specialDist + 2))
+                            case 49666:
                                 {
-                                    if (_failMoveUseSpecialSkill > 4)
-                                    {
-                                        //Плохая цель
-                                        host.log("Плохая цель 4 :" + host.FarmModule.BestMob.Name, Host.LogLvl.Error);
-                                        host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
-                                        host.FarmModule.BestMob = null;
-                                        _failMoveUseSpecialSkill = 0;
-                                        // host.SetTarget(null);
-                                        return;
-                                    }
-                                    _failMoveUseSpecialSkill++;
-
-                                    continue;
+                                    if (host.Me.Target == null || host.Me.Target.IsAlive)
+                                        continue;
                                 }
-                                else
+                                break;
+                            default:
                                 {
-                                    _failMoveUseSpecialSkill = 0;
+                                    if (host.Me.Target == null || !host.Me.Target.IsAlive)
+                                        continue;
                                 }
+                                break;
+                        }
 
-                            host.TurnDirectly(host.Me.Target);
-                            Item spItem = host.MyGetItem(Convert.ToUInt32(SpecialItems[i]));
 
-                            if (spItem != null)
+                        if (host.Me.Distance(host.Me.Target) > specialDist)
+                            if (!host.CommonModule.ForceMoveTo(host.Me.Target, specialDist, specialDist + 2))
                             {
-                                if (host.SpellManager.GetItemCooldown(spItem.Id) > 0)
+                                if (_failMoveUseSpecialSkill > 4)
                                 {
-                                    /*   if (host.AdvancedLog)
-                                           host.log(spItem.Name + " UseSpecialSkills GetItemCooldown:" + host.SpellManager.GetItemCooldown(spItem.Id));*/
-                                    continue;
+                                    //Плохая цель
+                                    host.log("Плохая цель 4 :" + host.FarmModule.BestMob.Name, Host.LogLvl.Error);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
+                                    host.FarmModule.BestMob = null;
+                                    _failMoveUseSpecialSkill = 0;
+                                    // host.SetTarget(null);
+                                    return;
                                 }
-                                else
-                                {
-                                    while (host.Me.IsMoving)
-                                        Thread.Sleep(50);
-                                    while (host.SpellManager.IsCasting)
-                                        Thread.Sleep(50);
-                                    while (host.SpellManager.IsChanneling)
-                                        Thread.Sleep(50);
+                                _failMoveUseSpecialSkill++;
 
-                                    Thread.Sleep(500);
-                                    var result = host.SpellManager.UseItem(spItem);
-                                    if (result == EInventoryResult.OK)
-                                    {
-                                        host.log("Использую " + spItem.Name + "[" + spItem.Id + "] " + spItem.Place,
-                                            Host.LogLvl.Ok);
-                                        host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
-                                        host.FarmModule.BestMob = null;
-                                    }
-
-                                    else
-                                    {
-                                        host.log("Не получилось использовать " + spItem.Name + "[" + SpecialItems[i] + "]  " + result + "  " + host.GetLastError() + "  " + host.FarmModule.BestMob.Guid, Host.LogLvl.Error);
-                                        host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
-                                        host.FarmModule.BestMob = null;
-                                    }
-
-                                    Thread.Sleep(1000);
-                                    while (host.Me.IsMoving)
-                                        Thread.Sleep(50);
-                                    while (host.SpellManager.IsCasting)
-                                        Thread.Sleep(50);
-                                    while (host.SpellManager.IsChanneling)
-                                        Thread.Sleep(50);
-                                }
+                                continue;
                             }
                             else
                             {
-                                host.log("Не нашел указанный айтем " + SpecialItems[i]);
+                                _failMoveUseSpecialSkill = 0;
                             }
 
+                        host.TurnDirectly(host.Me.Target);
+                        Item spItem = host.MyGetItem(Convert.ToUInt32(SpecialItems[i]));
 
+                        if (spItem != null)
+                        {
+                            if (host.SpellManager.GetItemCooldown(spItem.Id) > 0)
+                            {
+                                /*   if (host.AdvancedLog)
+                                       host.log(spItem.Name + " UseSpecialSkills GetItemCooldown:" + host.SpellManager.GetItemCooldown(spItem.Id));*/
+                                continue;
+                            }
+                            else
+                            {
+                                while (host.Me.IsMoving)
+                                    Thread.Sleep(50);
+                                while (host.SpellManager.IsCasting)
+                                    Thread.Sleep(50);
+                                while (host.SpellManager.IsChanneling)
+                                    Thread.Sleep(50);
+
+                                Thread.Sleep(500);
+                                var result = host.SpellManager.UseItem(spItem);
+                                if (result == EInventoryResult.OK)
+                                {
+                                    host.log("Использую " + spItem.Name + "[" + spItem.Id + "] " + spItem.Place,
+                                        Host.LogLvl.Ok);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
+                                    host.FarmModule.BestMob = null;
+                                }
+
+                                else
+                                {
+                                    host.log("Не получилось использовать " + spItem.Name + "[" + SpecialItems[i] + "]  " + result + "  " + host.GetLastError() + "  " + host.FarmModule.BestMob.Guid, Host.LogLvl.Error);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
+                                    host.FarmModule.BestMob = null;
+                                }
+
+                                Thread.Sleep(1000);
+                                while (host.Me.IsMoving)
+                                    Thread.Sleep(50);
+                                while (host.SpellManager.IsCasting)
+                                    Thread.Sleep(50);
+                                while (host.SpellManager.IsChanneling)
+                                    Thread.Sleep(50);
+                            }
                         }
+                        else
+                        {
+                            host.log("Не нашел указанный айтем " + SpecialItems[i]);
+                        }
+
+
+
 
                     }
                 }
@@ -931,6 +945,19 @@ namespace WowAI.ComboRoutes
                                 if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 13576 && m.Id == 32999)
                                 {
                                     var item = host.MyGetItem(44959);
+                                    if (item != null)
+                                        host.MyUseItemAndWait(item, m);
+                                }
+
+                                if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 49666 && m.Id == 134560)
+                                {
+                                    var item = host.MyGetItem(158884);
+                                    if (item != null)
+                                        host.MyUseItemAndWait(item, m);
+                                }
+                                if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 49666 && m.Id == 134558)
+                                {
+                                    var item = host.MyGetItem(158884);
                                     if (item != null)
                                         host.MyUseItemAndWait(item, m);
                                 }

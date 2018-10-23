@@ -947,7 +947,7 @@ namespace WowAI
                 }
 
 
-
+               
 
                 if (Me.Name == "")
                 {

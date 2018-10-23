@@ -305,26 +305,26 @@ namespace WowAI.Modules
 
                 if (Host.CharacterSettings.Mode == EMode.Questing)
                 {
-                   /* uint spellId = 0;
-                    if (prop.Id == 3189 || prop.Id == 3190 || prop.Id == 3192 || prop.Id == 3236 || prop.Id == 3290 || prop.Id == 175708 || prop.Id == 3640 || prop.Id == 207346
-                        || prop.Id == 1673 || prop.Id == 195240 || prop.Id == 195007)
-                    {
-                        spellId = 6478;
-                    }
+                    /* uint spellId = 0;
+                     if (prop.Id == 3189 || prop.Id == 3190 || prop.Id == 3192 || prop.Id == 3236 || prop.Id == 3290 || prop.Id == 175708 || prop.Id == 3640 || prop.Id == 207346
+                         || prop.Id == 1673 || prop.Id == 195240 || prop.Id == 195007)
+                     {
+                         spellId = 6478;
+                     }
 
-                    if (prop.Id == 202648 || prop.Id == 194107 || prop.Id == 194179)
-                        spellId = 6247;
+                     if (prop.Id == 202648 || prop.Id == 194107 || prop.Id == 194179)
+                         spellId = 6247;
 
-                    if (prop.Id == 195074 || prop.Id == 194208 || prop.Id == 194263)
-                        spellId = 3365;
-                    if (prop.Id == 126158 || prop.Id == 195211 || prop.Id == 194145)
-                        spellId = 6477;
+                     if (prop.Id == 195074 || prop.Id == 194208 || prop.Id == 194263)
+                         spellId = 3365;
+                     if (prop.Id == 126158 || prop.Id == 195211 || prop.Id == 194145)
+                         spellId = 6477;
 
-                    if (spellId == 0)
-                    {
-                        Host.log("Нет скила для сбора " + prop.Name + " [" + prop.Id + "] " + prop.RequiredGatheringSkill, Host.LogLvl.Error);
-                        return false;
-                    }*/
+                     if (spellId == 0)
+                     {
+                         Host.log("Нет скила для сбора " + prop.Name + " [" + prop.Id + "] " + prop.RequiredGatheringSkill, Host.LogLvl.Error);
+                         return false;
+                     }*/
 
 
                     if (Host.Me.MountId != 0)
@@ -354,6 +354,10 @@ namespace WowAI.Modules
                             }
                             SetBadProp(prop, 300000);
                         }
+                        else
+                        {
+                            Thread.Sleep(500);
+                        }
                     }
                     /*   var result2 = Host.SpellManager.CastSpell(spellId, prop);
                        Thread.Sleep(500);
@@ -368,7 +372,7 @@ namespace WowAI.Modules
 
                     while (Host.SpellManager.IsCasting)
                         Thread.Sleep(100);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     if (Host.CanPickupLoot())
                     {
                         if (!Host.PickupLoot())
@@ -394,8 +398,9 @@ namespace WowAI.Modules
                         Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), Host.LogLvl.Error);
                         if (Host.CharacterSettings.FightIfMobs && farmState == FarmState.Disabled)
                             farmState = FarmState.AttackOnlyAgro;
-                        if (GatherCount > 1)
-                            SetBadProp(prop, 300000);
+                        // if (GatherCount > 1)
+                        if (Host.GetAgroCreatures().Count == 0)
+                            SetBadProp(prop, 60000);
                         GatherCount++;
                     }
                     return true;
@@ -829,7 +834,7 @@ namespace WowAI.Modules
                                 {
                                     if (Host.SpellManager.CheckCanCast(spell.Id, Host.Me) != ESpellCastError.SUCCESS)
                                     {
-                                        //  if (useskilllog) Host.log("IsSpellReady сообщает что скилл не готов [" + skill.Id + "] " + skill.Name, Host.LogLvl.Error);
+                                        if (useskilllog) Host.log("CheckCanCast сообщает что скилл не готов [" + spell.Id + "] " + spell.Name + " " + Host.SpellManager.CheckCanCast(spell.Id, Host.Me), Host.LogLvl.Error);
                                         return false;
                                     }
 
