@@ -1720,7 +1720,7 @@ namespace WowAI.Modules
                         var y1 = yc + radius * Math.Sin(u);
                         // log(" " + i + " x:" + x + " y:" + y);
                         u = u + a;
-                        var z1 = Host.GetNavMeshHeight(x1, y1);
+                        var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1,0));
                         if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
                             safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
                     }
@@ -2171,7 +2171,7 @@ namespace WowAI.Modules
                 }
 
                 if (Host.CharacterSettings.Mode == EMode.Questing)
-                    if (Host.GetNavMeshHeight(loc.X, loc.Y) == 0 && Host.Me.Distance(loc) > 300)
+                    if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
                     {
                         var x0 = Host.Me.Location.X;
                         var y0 = Host.Me.Location.Y;
@@ -2193,7 +2193,7 @@ namespace WowAI.Modules
                         //находим точку
                         var resX = dirX + x0;
                         var resY = dirY + y0;
-                        var z = Host.GetNavMeshHeight(resX, resY);
+                        var z = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
                         if (z > 0)
                         {
                             Host.log("Точка в мешах");
@@ -2214,7 +2214,7 @@ namespace WowAI.Modules
                 if (Host.Me.Distance(713.81, 3128.34, 133.02) < 30 && Host.Me.Distance(loc) > 300)
                     Host.MoveTo(749.13, 3099.93, 133.11);
 
-                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(loc.X, loc.Y));
+                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y,0)));
                 var result = Host.ComeTo(loc, dist, doneDist);
                 //  Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 

@@ -2720,7 +2720,7 @@ namespace WowAI.Modules
                 var y1 = yc + radius * Math.Sin(u);
                 // log(" " + i + " x:" + x + " y:" + y);
                 u = u + a;
-                var z1 = Host.GetNavMeshHeight(x1, y1);
+                var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1, 0));
                 if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
                     safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
             }
@@ -2950,7 +2950,7 @@ namespace WowAI.Modules
             var npc = Host.GetNpcById(revardNpcId);
             if (questPoi != null && npc == null)
             {
-                var z = Host.GetNavMeshHeight(questPoi.Points[0].X, questPoi.Points[0].Y);
+                var z = Host.GetNavMeshHeight(new Vector3F(questPoi.Points[0].X, questPoi.Points[0].Y, 0));
                 if (z == 0)
                     Host.log("Z координата  = 0");
                 Vector3F locRevard = new Vector3F(questPoi.Points[0].X, questPoi.Points[0].Y, (float)z);
@@ -3077,7 +3077,7 @@ namespace WowAI.Modules
                             var y1 = yc + radius * Math.Sin(u);
                             // log(" " + i + " x:" + x + " y:" + y);
                             u = u + a;
-                            var z1 = Host.GetNavMeshHeight(x1, y1);
+                            var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1, 0));
                             if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
                                 safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
                         }
@@ -5737,7 +5737,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(questPoiPoint.X, questPoiPoint.Y);
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0));
                             if (quest.Id == 25173 && objectiveindex == 2)
                             {
                                 z = 42;
@@ -6884,7 +6884,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(questPoiPoint.X, questPoiPoint.Y);
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y,0));
 
                             if (questPoiPoint.X == -1175.00 && questPoiPoint.Y == -4923.00)
                                 continue;
@@ -7048,7 +7048,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(questPoiPoint.X, questPoiPoint.Y);
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0));
                             if (Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z)) > bestDist)
                                 continue;
                             bestDist = Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z));
@@ -7162,7 +7162,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(questPoiPoint.X, questPoiPoint.Y);
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y,0));
                             if (Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z)) > bestDist)
                                 continue;
                             bestDist = Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z));
