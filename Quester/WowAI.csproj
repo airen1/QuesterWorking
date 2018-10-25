@@ -169,8 +169,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "D:\GoogleDrive\WOW\Plugins\Quester"
-copy /Y "$(TargetDir)$(ProjectName).pdb" "D:\GoogleDrive\WOW\Plugins\Quester"
+    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "G:\GoogleDrive\WOW\Plugins\Quester"
+copy /Y "$(TargetDir)$(ProjectName).pdb" "G:\GoogleDrive\WOW\Plugins\Quester"
 copy /Y "$(TargetDir)$(ProjectName).dll" "D:\WowShare"
 copy /Y "$(TargetDir)$(ProjectName).pdb" "D:\WowShare"</PostBuildEvent>
   </PropertyGroup>

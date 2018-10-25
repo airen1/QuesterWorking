@@ -677,6 +677,18 @@ namespace WowAI.Modules
                     return false;
                 }
 
+                if (BestMob.Id == 122666)
+                {
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if(!entity.IsAlive)
+                            continue;
+                        if(entity.Id != 126654)
+                            continue;
+                        BestMob = entity;
+                        
+                    }
+                }
 
 
                 if (Host.GetAgroCreatures().Count > 0 && !Host.GetAgroCreatures().Contains(BestMob) || (Host.GetAgroCreatures().Count > 1))

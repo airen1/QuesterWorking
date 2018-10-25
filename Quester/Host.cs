@@ -19,6 +19,7 @@ using WoWBot.Core;
 using Out.Internal.Core;
 using Newtonsoft.Json.Linq;
 using System.Windows.Data;
+using Out.Navigation;
 using Out.Utility;
 
 
@@ -29,7 +30,7 @@ namespace WowAI
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once InconsistentNaming
-        public static bool isReleaseVersion = true;
+        public static bool isReleaseVersion = false;
 
         public Random RandGenerator { get; private set; }
         private const string Version = "v0.14";
@@ -222,6 +223,8 @@ namespace WowAI
 
 
                 FormInitialized = false;
+
+                
 
 
                 if (!Directory.Exists(AssemblyDirectory + "\\Configs"))

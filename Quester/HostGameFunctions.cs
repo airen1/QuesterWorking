@@ -152,6 +152,21 @@ namespace WowAI
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
             }
 
+            if(npc.Id == 127128)
+            foreach (var gossipOptionsData in GetNpcDialogs())
+            {
+                if (gossipOptionsData.ClientOption == index)
+                {
+
+                    if (!SelectNpcDialog(gossipOptionsData))
+                        log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
+                    // Thread.Sleep(1000);
+                    result = true;
+                }
+                log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+            }
+
+
             return result;
         }
 

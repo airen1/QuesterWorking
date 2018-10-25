@@ -526,6 +526,8 @@ namespace WowAI.ComboRoutes
                     return;
                 if (host.AutoQuests.BestQuestId == 13576)//:  13576 State:None LogTitle:Взаимная помощь 
                     return;
+                if (host.AutoQuests.BestQuestId == 48573)//: :  Жизни кроколисков[48573
+                    return;
 
                 if (SpecialItems != null)
                 {
@@ -533,6 +535,13 @@ namespace WowAI.ComboRoutes
                     {
                         switch (host.AutoQuests.BestQuestId)
                         {
+                            case 47130:
+                            {
+                                if (host.GetAgroCreatures().Count > 0)
+                                    continue;
+                            }
+                                break;
+
                             case 49666:
                                 {
                                     if (host.Me.Target == null || host.Me.Target.IsAlive)
@@ -958,6 +967,13 @@ namespace WowAI.ComboRoutes
                                 if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 49666 && m.Id == 134558)
                                 {
                                     var item = host.MyGetItem(158884);
+                                    if (item != null)
+                                        host.MyUseItemAndWait(item, m);
+                                }
+
+                                if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 48573 && m.Id == 126723)
+                                {
+                                    var item = host.MyGetItem(152596);
                                     if (item != null)
                                         host.MyUseItemAndWait(item, m);
                                 }

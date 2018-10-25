@@ -209,6 +209,11 @@ namespace WowAI.Modules
                     return;
                 if (Host.FarmModule.BestMob != null)
                     return;
+                if (Host.CharacterSettings.Mode == EMode.Questing)
+                {
+                    if(Host.AutoQuests.BestQuestId == 47880)
+                        return;
+                }
 
                 if (Host.CharacterSettings.Mode == EMode.Script)
                     if (Host.FarmModule.farmState == FarmState.AttackOnlyAgro)

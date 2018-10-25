@@ -2744,8 +2744,26 @@ namespace WowAI.Modules
 
         private bool MyApplyQuest(Entity npc, uint id)
         {
-            if (!Host.CommonModule.MoveTo(npc, 2, 2))
-                return false;
+
+            switch (npc.Id)
+            {
+                case 122688:
+                    {
+                        if (!Host.CommonModule.MoveTo(2666.69, 1364.10, 11.17))
+                            return false;
+                    }
+                    break;
+
+
+                default:
+                    {
+                        if (!Host.CommonModule.MoveTo(npc, 2, 2))
+                            return false;
+                    }
+                    break;
+            }
+
+
 
             if (npc.Guid == Host.CurrentInteractionGuid)
             {
@@ -2920,6 +2938,11 @@ namespace WowAI.Modules
             if (quest.Id == 29021)
                 revardNpcId = 4141;
 
+            if (quest.Id == 47264)
+                revardNpcId = 121241;
+            if (quest.Id == 47130)
+                revardNpcId = 121241;
+
             if (quest.Id == 50550)
             {
                 revardNpcId = 138519;
@@ -2944,7 +2967,7 @@ namespace WowAI.Modules
                 Host.Wait(40000);
             }
 
-            
+
 
 
             var npc = Host.GetNpcById(revardNpcId);
@@ -3000,9 +3023,14 @@ namespace WowAI.Modules
                     locRevard = new Vector3F(-1453, -3819, 21);
                 }
 
-                switch (quest.Id)
+                switch (revardNpcId)
                 {
-
+                    case 122688:
+                        {
+                            if (!Host.CommonModule.MoveTo(2666.69, 1364.10, 11.17))
+                                return false;
+                        }
+                        break;
                     default:
                         {
                             if (Host.Me.Distance2D(locRevard) > 20)
@@ -3021,8 +3049,23 @@ namespace WowAI.Modules
 
             if (npc != null)
             {
-                if (!Host.CommonModule.MoveTo(npc, 3, 3))
-                    return false;
+                switch (npc.Id)
+                {
+                    case 122688:
+                        {
+                            if (!Host.CommonModule.MoveTo(2666.69, 1364.10, 11.17))
+                                return false;
+                        }
+                        break;
+
+                    default:
+                        {
+                            if (!Host.CommonModule.MoveTo(npc, 3, 3))
+                                return false;
+                        }
+                        break;
+                }
+
                 Thread.Sleep(500);
                 if (quest.Id == 29021)
                 {
@@ -5302,6 +5345,346 @@ namespace WowAI.Modules
                 }
 
 
+                if (quest.Id == 48535)
+                {
+                    if (step == 0)
+                    {
+                        var npc = Host.GetNpcById(122689);
+                        Host.MyDialog(npc, 1);
+                        Host.Wait(40000);
+                        return false;
+                    }
+
+                    if (step == 1)
+                    {
+                        if (!Host.CommonModule.MoveTo(510.82, 1184.22, 39.61))
+                            return false;
+                    }
+
+                    if (step == 2)
+                        MyComliteQuest(quest);
+
+                    return false;
+                }
+
+                if (quest.Id == 47105)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(713.31, 990.17, 0.71))
+                            return false;
+                    }
+
+                    if (step == 1)
+                        MyComliteQuest(quest);
+
+                    return false;
+
+                }
+
+                if (quest.Id == 47263)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1117.49, 1055.71, 22.99))
+                            return false;
+                        Host.Wait(10000);
+                        var npc = Host.GetNpcById(131146);
+                        Host.MyDialog(npc, 0);
+                    }
+
+                    if (step == 1)
+                    {
+                        if (Host.Me.Distance(842.61, 1376.16, 14.89) > 30)
+                            Host.Wait(5000);
+                        MyComliteQuest(quest);
+                    }
+
+                    return false;
+                }
+
+                if (quest.Id == 47188)
+                {
+                    if (step == 0)
+                    {
+                        var npc = Host.GetNpcById(121288);
+                        Host.MyDialog(npc, 0);
+                        while (step == 0)
+                        {
+                            if (!Host.MainForm.On)
+                                return false;
+                            quest = Host.GetQuest(id);
+                            step = 0;
+                            foreach (var questCount in quest.Counts)
+                            {
+                                step = step + questCount;
+                            }
+                            Thread.Sleep(5000);
+                        }
+                    }
+
+                    if (step == 1)
+                    {
+                        MyComliteQuest(quest);
+                    }
+
+                    return false;
+                }
+
+                if (quest.Id == 48669)
+                {
+                    if (step == 0)
+                    {
+                        var npc = Host.GetNpcById(126713);
+                        Host.MyDialog(npc, 0);
+                        while (step == 0)
+                        {
+                            if (!Host.MainForm.On)
+                                return false;
+                            quest = Host.GetQuest(id);
+                            step = 0;
+                            foreach (var questCount in quest.Counts)
+                            {
+                                step = step + questCount;
+                            }
+                            Thread.Sleep(5000);
+                        }
+                    }
+
+                    return false;
+                }
+
+                if (quest.Id == 48573)
+                {
+                    if (step > 15)
+                    {
+
+                        MyComliteQuest(quest);
+                        return false;
+                    }
+                }
+
+                if (quest.Id == 47241)
+                {
+                    if (step == 1 || step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1231.10, 1362.19, 21.97))
+                            return false;
+                        Host.MyUseGameObject(270902);
+                    }
+
+                    if (step == 2)
+                    {
+                        if (!Host.CommonModule.MoveTo(1317.91, 1473.72, 28.81))
+                            return false;
+                        Host.MyUseGameObject(271170);
+                    }
+
+                    if (step == 3)
+                    {
+                        if (!Host.CommonModule.MoveTo(1476.72, 1570.94, 36.12))
+                            return false;
+                        MyUseSpellClick(122094);
+                        Thread.Sleep(2000);
+                    }
+
+                    if (step == 4 || step == 5)
+                        MyComliteQuest(quest);
+
+                    return false;
+                }
+
+                if (quest.Id == 49278)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1989.58, 1392.82, 16.94))
+                            return false;
+                        MyUseSpellClick(134363);
+                    }
+                    if (step == 2)
+                    {
+                        if (!Host.CommonModule.MoveTo(2003.35, 1402.47, 17.66))
+                            return false;
+                        MyUseSpellClick(128898);
+                    }
+                    if (step == 4)
+                    {
+                        if (!Host.CommonModule.MoveTo(2002.46, 1301.76, 18.57))
+                            return false;
+                        MyUseSpellClick(128875);
+                    }
+
+                    if (step == 6)
+                        MyComliteQuest(quest);
+                    return false;
+                }
+
+                if (quest.Id == 49440)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1994.17, 1368.71, 16.06))
+                            return false;
+                        MyUseSpellClick(129223);
+                        Thread.Sleep(1000);
+                    }
+                    if (step == 1)
+                    {
+                        if (!Host.CommonModule.MoveTo(2002.73, 1373.81, 16.06))
+                            return false;
+                        MyUseSpellClick(129223);
+                        Thread.Sleep(1000);
+                    }
+                    if (step == 2)
+                    {
+                        if (!Host.CommonModule.MoveTo(2002.17, 1359.78, 16.06))
+                            return false;
+                        MyUseSpellClick(129223);
+                        Thread.Sleep(1000);
+                    }
+
+                    if (step == 3)
+                    {
+                        var npc = Host.GetNpcById(122795);
+                        Host.MyDialog(npc, 0);
+                        Thread.Sleep(5000);
+                    }
+
+                    if (step == 4)
+                    {
+                        Thread.Sleep(5000);
+                        MyComliteQuest(quest);
+                    }
+
+                    return false;
+                }
+
+                if (quest.Id == 48699)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1909.88, 1740.92, 12.04))
+                            return false;
+                        var npc = Host.GetNpcById(127128);
+                        Host.MyDialog(npc, 0);
+                        Thread.Sleep(5000);
+
+                    }
+                    if (step == 1)
+                    {
+                        MyComliteQuest(quest);
+                    }
+                    return false;
+                }
+
+
+                if (quest.Id == 48890)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(1974.45, 1720.33, 9.93))
+                            return false;
+                        MyUseSpellClick(126933);
+                        Thread.Sleep(1000);
+                    }
+                    if (step == 1)
+                    {
+                        if (!Host.CommonModule.MoveTo(1985.15, 1728.20, 9.96))
+                            return false;
+                        MyUseSpellClick(126933);
+                        Thread.Sleep(1000);
+                    }
+                    if (step == 2)
+                    {
+                        if (!Host.CommonModule.MoveTo(2004.62, 1748.72, 9.92))
+                            return false;
+                        MyUseSpellClick(126933);
+                        Thread.Sleep(1000);
+                    }
+
+                    if (step == 3)
+                    {
+                        if (!Host.CommonModule.MoveTo(1941.55, 1736.61, 10.24))
+                            return false;
+                        MyUseSpellClick(126933);
+                        Thread.Sleep(1000);
+                    }
+                    if (step == 4)
+                    {
+                        if (!Host.CommonModule.MoveTo(1918.17, 1786.43, 8.96))
+                            return false;
+                        MyUseSpellClick(126933);
+                        Thread.Sleep(1000);
+                    }
+
+                    if (step == 5)
+                        MyComliteQuest(quest);
+                    return false;
+                }
+
+                if (quest.Id == 48801)
+                {
+                    if (step == 0)
+                    {
+                        if (!Host.CommonModule.MoveTo(2011.04, 1790.47, 33.94))
+                            return false;
+                        var npc = Host.GetNpcById(127999);
+                        Host.MyDialog(npc, 0);
+
+                    }
+
+                    if (step == 1)
+                    {
+                        if (!Host.CommonModule.MoveTo(1885.80, 1593.39, 46.26))
+                            return false;
+                        var npc = Host.GetNpcById(129380);
+                        Host.MyDialog(npc, 0);
+
+                    }
+
+                    if (step == 2)
+                    {
+                        if (!Host.CommonModule.MoveTo(1786.67, 1808.81, 33.45))
+                            return false;
+                        var npc = Host.GetNpcById(129381);
+                        Host.MyDialog(npc, 0);
+
+                    }
+
+                    if (step == 3)
+                        MyComliteQuest(quest);
+
+                    return false;
+                }
+
+                if (quest.Id == 47880)
+                {
+                    if (step == 0)
+                    {
+                        Host.CommonModule.MoveTo(2390.58 + Host.RandGenerator.Next(0, 2), 1366.87 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2391.78 + Host.RandGenerator.Next(0, 2), 1365.41 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2398.78 + Host.RandGenerator.Next(0, 2), 1362.48 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2400.81 + Host.RandGenerator.Next(0, 2), 1368.61 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2396.90 + Host.RandGenerator.Next(0, 2), 1371.98 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2392.22 + Host.RandGenerator.Next(0, 2), 1369.14 + Host.RandGenerator.Next(0, 2), 10.35);
+                        Host.CommonModule.MoveTo(2397.65 + Host.RandGenerator.Next(0, 2), 1368.09 + Host.RandGenerator.Next(0, 2), 10.35);
+                    }
+
+                    if (step == 1)
+                    {
+                        Host.MyUseGameObject(272250);
+                        Thread.Sleep(20000);
+                    }
+
+                    if (step == 2)
+                    {
+                        Host.CommonModule.MoveTo(2661.50, 1366.62, 10.91);
+                        MyComliteQuest(quest);
+                    }
+                    return false;
+                }
+
                 var curentObjectiveType = EQuestRequirementType.PlayerKills;
                 QuestObjective questObjective = new QuestObjective();
                 var objectiveindex = -1;
@@ -5318,13 +5701,37 @@ namespace WowAI.Modules
 
                     switch (quest.Id)
                     {
-                        case 50702:
+                        case 47247:
                             {
-                            if (quest?.Counts[index + 2] >= templateQuestObjective.Amount)
-                                continue;
-                        }
+                                if (index == 0)
+                                    if (quest?.Counts[index] >= templateQuestObjective.Amount)
+                                        continue;
+
+                                if (index == 1)
+                                    if (quest?.Counts[index + 1] >= templateQuestObjective.Amount)
+                                        continue;
+                            }
                             break;
 
+                        case 47262:
+                            {
+                                if (quest?.Counts[index + 5] >= templateQuestObjective.Amount)
+                                    continue;
+                            }
+                            break;
+
+                        case 50702:
+                            {
+                                if (quest?.Counts[index + 2] >= templateQuestObjective.Amount)
+                                    continue;
+                            }
+                            break;
+                        case 47244:
+                            {
+                                if (quest?.Counts[index + 4] >= templateQuestObjective.Amount)
+                                    continue;
+                            }
+                            break;
                         case 49327:
                             {
                                 if (quest?.Counts[index + 3] >= templateQuestObjective.Amount)
@@ -5590,7 +5997,8 @@ namespace WowAI.Modules
                     {
                         if (!Host.CommonModule.MoveTo(unit, 2, 2))
                             return false;
-
+                        while (Host.Me.IsMoving)
+                            Thread.Sleep(50);
                         if (Host.SpellManager.UseSpellClick(unit as Unit))
                         {
                             Host.log("Использовал SpellClick ", Host.LogLvl.Ok);
@@ -5638,6 +6046,27 @@ namespace WowAI.Modules
             var curCount = quest.Counts[index];
             if (id == 50641 || id == 50748)
                 curCount = quest.Counts[index + 1];
+            if (id == 48573)
+            {
+                curCount = quest.Counts[index];
+                var count = 0;
+                foreach (var questCount in quest.Counts)
+                {
+                    count = count + questCount;
+                }
+
+                if (count > 15)
+                    return true;
+            }
+
+            if (id == 47247)
+            {
+                if (index == 1)
+                {
+                    curCount = quest.Counts[index + 1];
+                }
+            }
+
             if (id == 49327)
             {
                 curCount = quest.Counts[index + 3];
@@ -5646,7 +6075,11 @@ namespace WowAI.Modules
             {
                 curCount = quest.Counts[index + 2];
             }
-            
+            if (id == 47262)
+            {
+                curCount = quest.Counts[index + 5];
+            }
+
             var needCount = quest.Template.QuestObjectives[index].Amount;
             Host.MainForm.SetQuestStateText(quest.Template.QuestObjectives[index].Type + "(" + index + "): " + curCount + "/" + needCount + "  " + QuestType);
             // Host.log(curCount + "/" + needCount);
@@ -5947,18 +6380,20 @@ namespace WowAI.Modules
 
                 if (quest.Id == 48988)
                 {
-
                     isSpellOnUnit = true;
-
                     mobIdSpell = 122683;
                 }
 
                 if (quest.Id == 29087)
                 {
-
                     isSpellOnUnit = true;
-
                     mobIdSpell = 52171;
+                }
+
+                if (quest.Id == 49348)
+                {
+                    isSpellOnUnit = true;
+                    mobIdSpell = 129086;
                 }
 
                 if (isSpellOnUnit)
@@ -6091,6 +6526,7 @@ namespace WowAI.Modules
 
 
 
+
                 var mobId = questObjective.ObjectID;
                 if (quest.Id == 25165)
                     mobId = 3125;
@@ -6193,6 +6629,13 @@ namespace WowAI.Modules
                     farmMobIds.Add(134560);
                 }
 
+                if (quest.Id == 48573)
+                {
+                    isCanAttack = false;
+                    findNpc = true;
+                    farmMobIds.Add(126723);
+                }
+
 
                 // Host.log("Можно ли атаковать НПС " + isCanAttack + " " + findNpc);
 
@@ -6205,6 +6648,8 @@ namespace WowAI.Modules
                 if (!isCanAttack && findNpc)
                 {
                     Host.log("Указанного НПС нельзя атаковать " + questObjective.ObjectID);
+
+
 
                     if (quest.Id == 47320)
                     {
@@ -6314,7 +6759,6 @@ namespace WowAI.Modules
                         useSpellOnCreatureId = 34287;
                         useSpellOnCreatureSpellId = 8386;
                     }
-
                     //Испоьлзовать скилл на НПС
                     if (useSpellOnCreature)
                     {
@@ -6362,6 +6806,8 @@ namespace WowAI.Modules
                         || quest.Id == 13576
                         || quest.Id == 13613
                         || quest.Id == 49666
+                        || quest.Id == 47130
+                        || quest.Id == 48573
                         || (quest.Id == 13565 && objectiveindex == 1)
                         )
                     {
@@ -6378,6 +6824,8 @@ namespace WowAI.Modules
                         {
                             var dist = 5;
                             if (quest.Id == 13613)
+                                dist = 0;
+                            if (quest.Id == 47130)
                                 dist = 0;
                             Host.FarmModule.SetFarmMobs(zone, farmMobIds, Convert.ToInt32(item.Id), dist);
 
@@ -6696,6 +7144,11 @@ namespace WowAI.Modules
                     mobId = 122153;
                 }
 
+                if (quest.Id == 48574)
+                {
+                    mobId = 126689;
+                }
+
                 uint spellid = 0;
                 var isSpellOnUnit = false;
                 if (quest.Id == 13527)
@@ -6726,6 +7179,11 @@ namespace WowAI.Modules
                 if (quest.Id == 47319)
                 {
                     mobId = 122678;
+                }
+
+                if (quest.Id == 47491)
+                {
+                    mobId = 122684;
                 }
 
                 var farmMobIds = new List<uint>();
@@ -6884,7 +7342,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y,0));
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0));
 
                             if (questPoiPoint.X == -1175.00 && questPoiPoint.Y == -4923.00)
                                 continue;
@@ -7162,7 +7620,7 @@ namespace WowAI.Modules
                         double bestDist = 999999;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y,0));
+                            var z = Host.GetNavMeshHeight(new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0));
                             if (Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z)) > bestDist)
                                 continue;
                             bestDist = Host.Me.Distance(new Vector3F(questPoiPoint.X, questPoiPoint.Y, (float)z));
