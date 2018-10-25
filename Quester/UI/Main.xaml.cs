@@ -232,7 +232,7 @@ namespace WowAI.UI
         private List<Quest> _collectionQuest;
         private List<LFGStatus> _collectionLfg = new List<LFGStatus>();
         private List<LFGProposal> _collectionLfgProposals = new List<LFGProposal>();
-        private IList<Unit> _collectionEntities = new List<Unit>();
+        private IList<Transport> _collectionEntities = new List<Transport>();
         private List<Scenario> _collectionScenarios = new List<Scenario>();
         private List<ScenarioCriteria> _collectionCriterias = new List<ScenarioCriteria>();
         private List<Item> _collectionItems = new List<Item>();
@@ -2535,7 +2535,7 @@ namespace WowAI.UI
 
                     _collectionLfgProposals.Add(Host.LFGStatus.Proposal);
                     DataGridLfg_Copy.ItemsSource = _collectionLfgProposals;
-                    _collectionEntities = Host.GetEntities<Unit>();
+                    _collectionEntities = Host.GetEntities<Transport>();
                     DataGridEntity.ItemsSource = _collectionEntities;
 
                     _collectionScenarios.Add(Host.Scenario);

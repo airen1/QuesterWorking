@@ -51,7 +51,10 @@ namespace WowAI
             {50550, 155440},
             {50702, 155399},
             {47130, 155319},
-            {47247, 155339}
+            {47247, 155339},
+            {47249, 155365},
+            {48800, 159075},
+            {49081, 155326},
         };
 
 
@@ -131,7 +134,7 @@ namespace WowAI
         {
             int badRadius = 0;
             host.FarmModule.SetFarmMobs(zone, farmMobIds);
-           
+
 
             while (!host.AutoQuests.IsQuestComplite(quest.Id, objectiveindex) && host.FarmModule.readyToActions && host.FarmModule.farmState == FarmState.FarmMobs)
             {

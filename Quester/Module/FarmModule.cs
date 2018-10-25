@@ -677,6 +677,53 @@ namespace WowAI.Modules
                     return false;
                 }
 
+
+                //17130 ураган
+                //18313 меч
+                List<uint> listArea = new List<uint>{17130, 18313};
+                foreach (var areaTrigger in Host.GetEntities<AreaTrigger>())
+                {
+                    if (listArea.Contains(areaTrigger.Id) && Host.Me.Distance(areaTrigger) < 4)
+                    {
+                        var safePoint = new List<Vector3F>();
+                        var xc = Host.Me.Location.X;
+                        var yc = Host.Me.Location.Y;
+
+                        var radius = 5;
+                        const double a = Math.PI / 16;
+                        double u = 0;
+                        for (var i = 0; i < 32; i++)
+                        {
+                            var x1 = xc + radius * Math.Cos(u);
+                            var y1 = yc + radius * Math.Sin(u);
+                            // log(" " + i + " x:" + x + " y:" + y);
+                            u = u + a;
+                           
+                            var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1, 0));
+                            var nextpoint = false;
+                            foreach (var trigger in Host.GetEntities<AreaTrigger>())
+                            {
+                                if(!listArea.Contains(trigger.Id))
+                                    continue;
+                                if (trigger.Distance(x1, y1, z1) < 4)
+                                    nextpoint = true;
+                            }
+                            if(nextpoint)
+                                continue;
+
+                            if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
+                                safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
+                        }
+                        Host.log("Пытаюсь отойти от тригера" + safePoint.Count);
+                        if (safePoint.Count > 0)
+                        {
+                            var bestPoint = safePoint[Host.RandGenerator.Next(safePoint.Count)];
+                            Host.ForceMoveToWithLookTo(bestPoint, Host.Me.Target.Location); 
+                        }
+
+                    }
+                }
+
                 if (BestMob.Id == 122666)
                 {
                     foreach (var entity in Host.GetEntities<Unit>())

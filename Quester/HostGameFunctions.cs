@@ -594,6 +594,8 @@ namespace WowAI
                 var listEntity = GetEntities();
                 foreach (var npc in listEntity.OrderBy((i => Me.Distance(i))))
                 {
+                    if(npc.Distance(2475.74, 1130.51, 5.97) < 10)
+                        continue;
                     /*if (!npc.IsVisible)
                         continue;*/
                     if (npc.Id == id)
@@ -914,6 +916,8 @@ namespace WowAI
                 int itemsCount = 0;
                 while (itemsCount < MinimumCheckingCount[firstItem.ItemQuality])
                 {
+                    if(!MainForm.On)
+                        return;
                     var aucItems = GetAuctionBuyList(req);
                     if (aucItems == null || aucItems.Count == 0)
                         break;
@@ -949,6 +953,8 @@ namespace WowAI
                     log("можем продать " + count);
                     while (count > 0)
                     {
+                        if (!MainForm.On)
+                            return;
                         var countToSell = Math.Min(count, MinimumCountForProcess[item.ItemQuality]);
                         count -= countToSell;
                         ulong sellPrice = Averages[item.Id] * countToSell;

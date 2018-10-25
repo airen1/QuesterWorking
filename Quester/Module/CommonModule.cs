@@ -325,10 +325,20 @@ namespace WowAI.Modules
                         {
                             if (spell.Id == formId)
                             {
+                                var i = 0;
+                                while (Host.SpellManager.IsSpellReady(spell.Id))
+                                {
+                                    if(!Host.MainForm.On)
+                                        return;
+                                    Thread.Sleep(100);
+                                    i++;
+                                    if(i > 10)
+                                        break;
+                                }
                                 var resultForm = Host.SpellManager.CastSpell(spell.Id, Host.Me);
                                 if (resultForm != ESpellCastError.SUCCESS)
                                 {
-                                    Host.log("Не удалось поменять форму 1" + spell.Name + "  " + resultForm, Host.LogLvl.Error);
+                                    Host.log("Не удалось поменять форму 1 " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
                                 }
                                 else
                                     Host.log("Поменял форму " + spell.Name, Host.LogLvl.Ok);

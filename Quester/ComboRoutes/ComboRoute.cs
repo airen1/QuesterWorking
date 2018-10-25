@@ -294,6 +294,8 @@ namespace WowAI.ComboRoutes
 
 
                     FarmState = FarmState.Disabled;
+                    if (host.CharacterSettings.Mode == EMode.Questing)
+                        FarmState = FarmState.AttackOnlyAgro;
                 }
 
 
@@ -496,21 +498,29 @@ namespace WowAI.ComboRoutes
                 {
                     if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
                         return;
+                    host.CommonModule.SuspendMove();
+                    try
+                    {                    
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
+                        while (host.Me.IsMoving)
+                            Thread.Sleep(200);
+                        var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
+                        if (result != ESpellCastError.SUCCESS)
+                        {
+                            host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
+                            Thread.Sleep(2000);
 
-                    while (host.SpellManager.IsCasting)
-                        Thread.Sleep(200);
-                    while (host.Me.IsMoving)
-                        Thread.Sleep(200);
-                    var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
-                    if (result != ESpellCastError.SUCCESS)
-                    {
-                        host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
-                        Thread.Sleep(2000);
-
+                        }
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
                     }
-                    while (host.SpellManager.IsCasting)
-                        Thread.Sleep(200);
+                    finally
+                    {
+                        host.CommonModule.ResumeMove();
+                    }
                 }
+
             }
         }
 
@@ -529,6 +539,9 @@ namespace WowAI.ComboRoutes
                 if (host.AutoQuests.BestQuestId == 48573)//: :  Жизни кроколисков[48573
                     return;
 
+                if (host.AutoQuests.BestQuestId == 49078 && host.Me.Target?.Id != 128071)
+                    return;
+
                 if (SpecialItems != null)
                 {
                     for (var i = 0; i < SpecialItems?.Length; i++)
@@ -536,10 +549,10 @@ namespace WowAI.ComboRoutes
                         switch (host.AutoQuests.BestQuestId)
                         {
                             case 47130:
-                            {
-                                if (host.GetAgroCreatures().Count > 0)
-                                    continue;
-                            }
+                                {
+                                    if (host.GetAgroCreatures().Count > 0)
+                                        continue;
+                                }
                                 break;
 
                             case 49666:
@@ -600,7 +613,22 @@ namespace WowAI.ComboRoutes
                                     Thread.Sleep(50);
 
                                 Thread.Sleep(500);
-                                var result = host.SpellManager.UseItem(spItem);
+                                EInventoryResult result;
+                                switch (spItem.Id)
+                                {
+                                    case 153012:
+                                        {
+                                            result = host.SpellManager.UseItem(spItem, host.Me.Target);
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            result = host.SpellManager.UseItem(spItem);
+                                        }
+                                        break;
+                                }
+
+
                                 if (result == EInventoryResult.OK)
                                 {
                                     host.log("Использую " + spItem.Name + "[" + spItem.Id + "] " + spItem.Place,
