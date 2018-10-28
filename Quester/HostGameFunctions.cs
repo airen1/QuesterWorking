@@ -152,19 +152,40 @@ namespace WowAI
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
             }
 
-            if(npc.Id == 127128)
-            foreach (var gossipOptionsData in GetNpcDialogs())
+            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929)
             {
-                if (gossipOptionsData.ClientOption == index)
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
                 {
+                    if (gossipOptionsData.ClientOption == index)
+                    {
 
-                    if (!SelectNpcDialog(gossipOptionsData))
-                        log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
-                    // Thread.Sleep(1000);
-                    result = true;
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
+                        // Thread.Sleep(1000);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
                 }
-                log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
             }
+
+            if (npc.Id == 130905 || npc.Id == 130929)
+            {
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    if (gossipOptionsData.ClientOption == index)
+                    {
+
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
+                        // Thread.Sleep(1000);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+                }
+            }
+
 
 
             return result;
@@ -411,7 +432,7 @@ namespace WowAI
         public bool NeedAuk = false;
         public bool MyUseStone(bool auk = false)
         {
-            FarmModule.farmState = FarmState.AttackOnlyAgro;
+           
             Thread.Sleep(2000);
             while (GetAgroCreatures().Count > 0)
             {
@@ -444,11 +465,9 @@ namespace WowAI
                             {
                                 NeedAuk = false;
                             }
-
-
                         }
                     }
-
+                    FarmModule.farmState = FarmState.AttackOnlyAgro;
                     if (GetAgroCreatures().Count != 0)
                         return false;
                     CommonModule.MyUnmount();
@@ -576,7 +595,7 @@ namespace WowAI
 
             if (needEntity != null)
             {
-               
+
                 AutoQuests.MyUseSpellClick(needEntity);
             }
 
@@ -594,7 +613,7 @@ namespace WowAI
                 var listEntity = GetEntities();
                 foreach (var npc in listEntity.OrderBy((i => Me.Distance(i))))
                 {
-                    if(npc.Distance(2475.74, 1130.51, 5.97) < 10)
+                    if (npc.Distance(2475.74, 1130.51, 5.97) < 10)
                         continue;
                     /*if (!npc.IsVisible)
                         continue;*/
@@ -916,7 +935,7 @@ namespace WowAI
                 int itemsCount = 0;
                 while (itemsCount < MinimumCheckingCount[firstItem.ItemQuality])
                 {
-                    if(!MainForm.On)
+                    if (!MainForm.On)
                         return;
                     var aucItems = GetAuctionBuyList(req);
                     if (aucItems == null || aucItems.Count == 0)
@@ -2144,8 +2163,8 @@ namespace WowAI
                          if (!m.PickUp())
                          {*/
 
-                        log("Не смог поднять дроп " +GetLastError(),Host.LogLvl.Error);
-                        
+                        log("Не смог поднять дроп " + GetLastError(), Host.LogLvl.Error);
+
                         //   }
                     }
                 }

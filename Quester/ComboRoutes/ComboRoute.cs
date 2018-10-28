@@ -409,7 +409,7 @@ namespace WowAI.ComboRoutes
                 foreach (var mybuff in host.CharacterSettings.MyBuffSettings)
                 {
                     var aura = MyGetAura(mybuff.SkillId);
-                    if (aura == null)
+                    if (aura == null || aura?.Remaining < 60000)
                     {
                         Item buffItem = null;
                         foreach (var item in host.ItemManager.GetItems())
