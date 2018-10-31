@@ -1999,7 +1999,7 @@ namespace WowAI.Modules
         public bool MoveToBadLoc(Vector3F loc)
         {
 
-            if (Host.Me.Distance(-1130.89, 805.10, 500.08) < 20 && Host.Me.Location.Z > 480 && loc.Distance(-1130.89, 805.10, 500.08) > 30)
+            if (Host.Me.Distance(-1130.89, 805.10, 500.08) < 20 && Host.Me.Location.Z > 480 && loc.Distance(-1130.89, 805.10, 500.08) > 30 && Host.AutoQuests.BestQuestId != 46930)
             {
                 Host.log("Прыгаю вниз");
                 if (!Host.ForceComeTo(-1046.30, 769.34, 435.33))
@@ -2232,13 +2232,13 @@ namespace WowAI.Modules
                         }
                     }
 
-                doneDist = Host.Me.RunSpeed / 5.0;
+                doneDist = Host.Me.RunSpeed / 6.0;
                 if (loc.Distance(-986.00, -3797.00, 0.11) < 5)
                     loc.Z = (float)5.2;
                 if (Host.Me.Distance(713.81, 3128.34, 133.02) < 30 && Host.Me.Distance(loc) > 300)
                     Host.MoveTo(749.13, 3099.93, 133.11);
 
-                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
+              //  Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
                 var result = Host.ComeTo(loc, dist, doneDist);
                 //  Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
@@ -2322,7 +2322,25 @@ namespace WowAI.Modules
             MySitMount(loc);
             doneDist = Host.Me.RunSpeed / 5.0;
             // Host.log("Начал бег");
-            var result = Host.ComeTo(loc, dist, doneDist);
+            bool result;
+            if (Host.CharacterSettings.Mode == EMode.Script)
+            {
+                Host.log("Бегу без учета застреваний");
+                MoveParams.Location = loc;
+                MoveParams.Obj = null;
+                MoveParams.Dist = dist;
+                MoveParams.DoneDist = doneDist;
+                MoveParams.IgnoreStuckCheck = true;
+                MoveParams.ForceRandomJumps = false;
+                MoveParams.UseNavCall = true;
+                result = Host.MoveTo(MoveParams);
+            }
+            else
+            {
+                result = Host.ComeTo(loc, dist, doneDist);
+            }
+
+         
             // Host.log("Закончил бег");
             CheckMoveFailed(result);
             return result;
@@ -2355,11 +2373,13 @@ namespace WowAI.Modules
             bool result;
             if (Host.CharacterSettings.Mode == EMode.Script)
             {
+                Host.log("Бегу без учета застреваний");
                 MoveParams.Obj = obj;
                 MoveParams.Dist = dist;
                 MoveParams.DoneDist = doneDist;
                 MoveParams.IgnoreStuckCheck = true;
                 MoveParams.ForceRandomJumps = false;
+                MoveParams.UseNavCall = true;
                 result = Host.MoveTo(MoveParams);
             }
             else

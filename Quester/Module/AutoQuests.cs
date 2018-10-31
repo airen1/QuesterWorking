@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Navigation;
 using WoWBot.Core;
 using Out.Utility;
 using WowAI.ComboRoutes;
@@ -277,7 +278,7 @@ namespace WowAI.Modules
                                          Thread.Sleep(5000);
                                          continue;
                                      }*/
-                                    if (Host.Me.Class != EClass.Druid && Host.Me.Class != EClass.Hunter && Host.Me.Class != EClass.Monk)
+                                    if (Host.Me.Class != EClass.Druid && Host.Me.Class != EClass.Hunter && Host.Me.Class != EClass.Monk && Host.Me.Class != EClass.Shaman)
                                     {
                                         Host.log("Класс не поддверживается  " + Host.Me.Class, Host.LogLvl.Error);
                                         Thread.Sleep(5000);
@@ -767,7 +768,14 @@ namespace WowAI.Modules
 
                                         if (ListQuest.Count == 0)
                                         {
-                                            Host.log("Нет квестов, начинаю фарм мобов, до левелапа");
+                                            Host.log("Нет квестов");
+
+                                            if (Host.Me.Level > 100)
+                                            {
+                                                Host.log("Отключаюсь");
+                                                Host.MainForm.On = false;
+                                                continue;
+                                            }
 
                                             if (Host.Me.Level > 12 && Host.Me.Race == ERace.Troll)
                                             {
@@ -2378,7 +2386,7 @@ namespace WowAI.Modules
                                             {
                                                 Thread.Sleep(1000);
                                             }
-                                            Host.Wait(60000);
+                                            Host.Wait(10000);
                                         }
 
                                     }
@@ -2410,7 +2418,7 @@ namespace WowAI.Modules
                                             {
                                                 Thread.Sleep(1000);
                                             }
-                                            Host.Wait(60000);
+                                            Host.Wait(10000);
                                         }
                                     }
 
@@ -3035,30 +3043,44 @@ namespace WowAI.Modules
                 {
                     case 120740:
                         {
-                            if (Host.Me.Location.Z < 470)
+                            if (quest.Id == 46930)
                             {
-                                if (!Host.CommonModule.MoveTo(-1126.50, 851.96, 443.32))
-                                    return false;
-                                while (Host.Me.Location.Z < 485)
-                                {
-                                    Thread.Sleep(2000);
-                                    Host.Jump();
-                                }
-                                Host.Wait(10000);
-                                Host.TurnDirectly(new Vector3F(-1126.19, 842.21, 487.86));
-                                Host.SetMoveStateForClient(true);
-                                Host.MoveForward(true);
-                                Thread.Sleep(2000);
-                                Host.SetMoveStateForClient(false);
-                                Host.MoveForward(false);
-                                if (!Host.CommonModule.ForceMoveTo2(new Vector3F(-1126.19, 842.21, 487.86)))
-                                    return false;
+                                if (Host.Me.Distance2D(locRevard) > 20)
+                                    if (!Host.CommonModule.MoveTo(locRevard, 20, 20))
+                                        return false;
                             }
                             else
                             {
-                                if (!Host.CommonModule.MoveTo(-1129.67, 805.26, 500.14))
-                                    return false;
+                                if (Host.Me.Location.Z < 470)
+                                {
+                                    if (!Host.CommonModule.MoveTo(-1126.50, 851.96, 443.32))
+                                        return false;
+                                    while (Host.Me.Location.Z < 485)
+                                    {
+                                        Thread.Sleep(2000);
+                                        Host.Jump();
+                                    }
+                                    Host.Wait(10000);
+                                    Host.TurnDirectly(new Vector3F(-1126.19, 842.21, 487.86));
+                                    Host.SetMoveStateForClient(true);
+                                    Host.MoveForward(true);
+                                    Thread.Sleep(2000);
+                                    Host.SetMoveStateForClient(false);
+                                    Host.MoveForward(false);
+                                    if (!Host.CommonModule.ForceMoveTo2(new Vector3F(-1126.19, 842.21, 487.86)))
+                                        return false;
+                                }
+                                else
+                                {
+                                    if (!Host.CommonModule.MoveTo(-1129.67, 805.26, 500.14))
+                                        return false;
+                                }
                             }
+
+                          
+
+
+
                         }
                         break;
                     case 122688:
@@ -3082,7 +3104,7 @@ namespace WowAI.Modules
             if (quest.Id == 51443)
                 Host.Wait(10000);
             if (quest.Id == 49492)
-                Host.Wait(10000);
+                Host.Wait(20000);
 
 
             if (npc != null)
@@ -3091,30 +3113,39 @@ namespace WowAI.Modules
                 {
                     case 120740:
                         {
-                            if (Host.Me.Location.Z < 470)
+                            if (quest.Id == 46930)
                             {
-                                if (!Host.CommonModule.MoveTo(-1126.50, 851.96, 443.32))
-                                    return false;
-                                while (Host.Me.Location.Z < 485)
-                                {
-                                    Thread.Sleep(2000);
-                                    Host.Jump();
-                                }
-                                Host.Wait(10000);
-                                Host.TurnDirectly(new Vector3F(-1126.19, 842.21, 487.86));
-                                Host.SetMoveStateForClient(true);
-                                Host.MoveForward(true);
-                                Thread.Sleep(2000);
-                                Host.SetMoveStateForClient(false);
-                                Host.MoveForward(false);
-                                if (!Host.CommonModule.ForceMoveTo2(new Vector3F(-1126.19, 842.21, 487.86)))
+                                if (!Host.CommonModule.MoveTo(npc, 3, 3))
                                     return false;
                             }
                             else
                             {
-                                if (!Host.CommonModule.MoveTo(-1134.96, 805.29, 500.93))
-                                    return false;
+                                if (Host.Me.Location.Z < 470)
+                                {
+                                    if (!Host.CommonModule.MoveTo(-1126.50, 851.96, 443.32))
+                                        return false;
+                                    while (Host.Me.Location.Z < 485)
+                                    {
+                                        Thread.Sleep(2000);
+                                        Host.Jump();
+                                    }
+                                    Host.Wait(10000);
+                                    Host.TurnDirectly(new Vector3F(-1126.19, 842.21, 487.86));
+                                    Host.SetMoveStateForClient(true);
+                                    Host.MoveForward(true);
+                                    Thread.Sleep(2000);
+                                    Host.SetMoveStateForClient(false);
+                                    Host.MoveForward(false);
+                                    if (!Host.CommonModule.ForceMoveTo2(new Vector3F(-1126.19, 842.21, 487.86)))
+                                        return false;
+                                }
+                                else
+                                {
+                                    if (!Host.CommonModule.MoveTo(-1134.96, 805.29, 500.93))
+                                        return false;
+                                }
                             }
+                           
                         }
                         break;
 
@@ -3280,6 +3311,14 @@ namespace WowAI.Modules
                         revard = 159906;
                     if (quest.Id == 53372)
                         revard = 163528;
+                }
+
+                if (Host.Me.Class == EClass.Shaman)
+                {
+                    if (quest.Id == 52428)
+                        revard = 159907;
+                    if (quest.Id == 53372)
+                        revard = 163529;
                 }
 
 
@@ -4062,6 +4101,7 @@ namespace WowAI.Modules
                                 return false;
                             Thread.Sleep(5000);
                             Host.log("Ожидаю полет");
+                            Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
                         }
 
                         if (Host.Scenario.CurrentStep == 3719)
@@ -4091,6 +4131,7 @@ namespace WowAI.Modules
 
                         if (Host.Scenario.CurrentStep == 3720)
                         {
+                            Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
                             Host.CanselForm();
                             Thread.Sleep(5000);
                             if (Host.Me.Distance(-8717.08, 1003.23, 45.40) < 30)
@@ -6752,7 +6793,7 @@ namespace WowAI.Modules
                     additionalId = 39337;
                 }
 
-               
+
 
                 var farmMobIds = new List<uint>();
 
@@ -7375,6 +7416,7 @@ namespace WowAI.Modules
                         farmMobIds.Add(194124);
 
                         farmMobIds.Add(290749);
+                        farmMobIds.Add(290748);
                         Host.FarmModule.SetFarmProps(zone, farmMobIds, Convert.ToInt32(quest.Template.StartItem), dist);
 
                         while (!IsQuestComplite(quest.Id, objectiveindex) && Host.FarmModule.readyToActions && Host.FarmModule.farmState == FarmState.FarmProps)

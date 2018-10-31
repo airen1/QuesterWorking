@@ -195,7 +195,39 @@ namespace WowAI
 
         public void FlyForm()
         {
-            while (Me.Class == EClass.Hunter || Me.Class == EClass.Monk)
+
+            if (Me.Class == EClass.Druid)
+            {
+                if (MyGetAura(783) == null)
+                    CanselForm();
+                while (MyGetAura(783) == null)
+                {
+                    if (!MainForm.On)
+                        return;
+                    foreach (var spell in SpellManager.GetSpells())
+                    {
+                        if (spell.Id == 783)
+                        {
+                            var resultForm = SpellManager.CastSpell(spell.Id);
+                            if (resultForm != ESpellCastError.SUCCESS)
+                            {
+                                log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
+                                if (resultForm == ESpellCastError.NOT_MOUNTED)
+                                    CommonModule.MyUnmount();
+                            }
+                            else
+                                log("Поменял форму " + spell.Name, Host.LogLvl.Ok);
+
+                            while (SpellManager.IsCasting)
+                                Thread.Sleep(100);
+                            Thread.Sleep(2000);
+                        }
+                    }
+
+                }
+            }
+
+            while (Me.Class != EClass.Druid)
             {
                 Thread.Sleep(1000);
 
@@ -240,37 +272,11 @@ namespace WowAI
 
                 }
 
-
-
             }
 
-            if (MyGetAura(783) == null)
-                CanselForm();
-            while (MyGetAura(783) == null)
-            {
-                if (!MainForm.On)
-                    return;
-                foreach (var spell in SpellManager.GetSpells())
-                {
-                    if (spell.Id == 783)
-                    {
-                        var resultForm = SpellManager.CastSpell(spell.Id);
-                        if (resultForm != ESpellCastError.SUCCESS)
-                        {
-                            log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
-                            if (resultForm == ESpellCastError.NOT_MOUNTED)
-                                CommonModule.MyUnmount();
-                        }
-                        else
-                            log("Поменял форму " + spell.Name, Host.LogLvl.Ok);
+           
 
-                        while (SpellManager.IsCasting)
-                            Thread.Sleep(100);
-                        Thread.Sleep(2000);
-                    }
-                }
-
-            }
+          
 
             Jump();
             Thread.Sleep(1000);

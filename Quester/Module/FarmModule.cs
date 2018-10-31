@@ -295,7 +295,7 @@ namespace WowAI.Modules
                 if (Host.Me.Distance(prop) > 6)
                 {
                     Host.log("Слишком далеко " + Host.Me.Distance(prop), Host.LogLvl.Error);
-                    if (Host.CommonModule._moveFailCount > 1)
+                    if (Host.CommonModule._moveFailCount > 2)
                     {
                         SetBadProp(prop, 300000);
                     }
