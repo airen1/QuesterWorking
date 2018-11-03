@@ -512,6 +512,67 @@ namespace WowAI
             return false;
         }
 
+        public bool MyUseStone2(bool auk = false)
+        {
+
+            Thread.Sleep(2000);
+            while (GetAgroCreatures().Count > 0)
+            {
+                if (!MainForm.On)
+                    return false;
+                Thread.Sleep(1000);
+            }
+
+            foreach (var item in ItemManager.GetItems())
+            {
+                if (item.Id == 141605)
+                {
+                    if (SpellManager.GetItemCooldown(item) != 0)
+                    {
+                        log("Свисток в КД " + SpellManager.GetItemCooldown(item));
+                        break;
+                    }
+
+                    
+                    FarmModule.farmState = FarmState.AttackOnlyAgro;
+                    if (GetAgroCreatures().Count != 0)
+                        return false;
+                    CommonModule.MyUnmount();
+                    CanselForm();
+                    while (Me.IsMoving)
+                    {
+                        Thread.Sleep(1000);
+                    }
+
+                    var result = SpellManager.UseItem(item);
+                    if (result != EInventoryResult.OK)
+                    {
+                        log("Не удалось использовать свисток " + item.Name + " " + result + " " + GetLastError(), Host.LogLvl.Error);
+                        return false;
+                    }
+                    else
+                    {
+                        log("Использовал свисток ", Host.LogLvl.Ok);
+                    }
+                    while (Me.IsMoving)
+                        Thread.Sleep(50);
+                    while (SpellManager.IsCasting)
+                        Thread.Sleep(50);
+                    while (SpellManager.IsChanneling)
+                        Thread.Sleep(50);
+                    Thread.Sleep(5000);
+                    while (GameState != EGameState.Ingame)
+                    {
+                        Thread.Sleep(200);
+                    }
+                    Thread.Sleep(1000);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void CanselForm()
         {
             foreach (var i in Me.GetAuras())

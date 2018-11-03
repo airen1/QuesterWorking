@@ -171,6 +171,9 @@ namespace WowAI.Modules
                             if (Host.CharacterSettings.UseStoneForSellAndRepair)
                                 Host.MyUseStone();
 
+                            if(Host.GetBotLogin() == "deathstar")
+                                Host.MyUseStone2();
+
                             if (NeedActionNpcSell)
                             {
                                 if (!Host.MySell())

@@ -2323,7 +2323,7 @@ namespace WowAI.Modules
             doneDist = Host.Me.RunSpeed / 5.0;
             // Host.log("Начал бег");
             bool result;
-            if (Host.CharacterSettings.Mode == EMode.Script)
+          /*  if (Host.CharacterSettings.Mode == EMode.Script)
             {
                 Host.log("Бегу без учета застреваний");
                 MoveParams.Location = loc;
@@ -2336,9 +2336,9 @@ namespace WowAI.Modules
                 result = Host.MoveTo(MoveParams);
             }
             else
-            {
+            {*/
                 result = Host.ComeTo(loc, dist, doneDist);
-            }
+          //  }
 
          
             // Host.log("Закончил бег");

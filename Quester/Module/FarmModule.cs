@@ -290,12 +290,16 @@ namespace WowAI.Modules
                 /*  if (host.GetAgroCreatures().Count > 0)
                       return false;*/
                 while (Host.SpellManager.IsCasting || Host.Me.IsMoving)
-                    Thread.Sleep(50);
+                {
+                    Thread.Sleep(100);
+                    Host.log(Host.SpellManager.IsCasting + "    " + Host.Me.IsMoving);
+                }
+                    
 
                 if (Host.Me.Distance(prop) > 6)
                 {
                     Host.log("Слишком далеко " + Host.Me.Distance(prop), Host.LogLvl.Error);
-                    if (Host.CommonModule._moveFailCount > 2)
+                    if (Host.CommonModule._moveFailCount > 3)
                     {
                         SetBadProp(prop, 300000);
                     }

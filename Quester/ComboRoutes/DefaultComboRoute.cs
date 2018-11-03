@@ -252,6 +252,12 @@ namespace WowAI.ComboRoutes
 
         public Unit  GetHightPrioritiMob()
         {
+            if (host.GetBotLogin() == "deathstar")
+            {
+                if (host.GetThreats().Count > 1)
+                    return null;
+            }
+
             foreach(var unit in host.GetEntities<Unit>())
             {
                 var zRange = Math.Abs(host.Me.Location.Z - unit.Location.Z);
