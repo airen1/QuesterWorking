@@ -171,7 +171,7 @@ namespace WowAI.Modules
                             if (Host.CharacterSettings.UseStoneForSellAndRepair)
                                 Host.MyUseStone();
 
-                            if(Host.GetBotLogin() == "deathstar")
+                            if (Host.GetBotLogin() == "deathstar")
                                 Host.MyUseStone2();
 
                             if (NeedActionNpcSell)
@@ -1771,6 +1771,39 @@ namespace WowAI.Modules
             core.AddNonUnloadableMesh(725, 31, 31);
         }
 
+        public bool CheckHerbalism()
+        {
+            try
+            {
+                if (Host.Me.Team == ETeam.Horde)
+                {
+                    if (Host.MyGetItem(160250) != null)
+                    {
+                        if (Host.GetQuest(51447) != null) //51447 State:None LogTitle:Душистый опылитель 
+                        {
+                            Host.MyUseTaxi(8499, new Vector3F(-932.67, 1006.92, 321.04));
+                            if (Host.Area.Id == 8499)
+                            {
+                                if (!Host.CommonModule.MoveTo(-932.67, 1006.92, 321.04))
+                                    return false;
+                                RunQuest(51447);
+                            }
+                            return false;
+                        }
+                    }
+                }
+              
+
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Host.log(e.ToString());
+                return true;
+            }
+        }
+
         private void Mode_86()
         {
             try
@@ -1853,7 +1886,9 @@ namespace WowAI.Modules
                     //continue;
                 }
 
-
+                if (Host.CharacterSettings.RunQuestHerbalism)
+                    if (!CheckHerbalism())
+                        return;
 
                 scriptStopwatch = new Stopwatch();
                 scriptStopwatch.Start();
@@ -1994,7 +2029,6 @@ namespace WowAI.Modules
                                     NeedActionNpcSell = true;
                                     NeedActionNpcRepair = true;
                                     return;
-
                                 }
                             }
                             break;
@@ -3080,7 +3114,7 @@ namespace WowAI.Modules
                                 }
                             }
 
-                          
+
 
 
 
@@ -3148,7 +3182,7 @@ namespace WowAI.Modules
                                         return false;
                                 }
                             }
-                           
+
                         }
                         break;
 

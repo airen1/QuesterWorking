@@ -2034,6 +2034,7 @@
                                                         <Label x:Name="labelGatherLocRadius" Content="Радиус:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
                                                         <TextBox x:Name="textBoxGatherLocRadius" TextWrapping="Wrap" Text="{Binding GatherRadius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40"/>
                                                     </WrapPanel>
+                                                    <CheckBox x:Name="CheckBoxRunQuestHerbalism" Content="Выполнять квесты на травничество" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
                                                 </StackPanel>
                                             </GroupBox>
                                         </Grid>

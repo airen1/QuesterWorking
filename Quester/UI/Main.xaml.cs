@@ -1959,7 +1959,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.FormForMove = ComboBoxFormForMove.Text;
 
                 Host.CharacterSettings.UseMountMyLoc = CheckBoxUseSMountMyLoc.IsChecked.Value;
-
+                Host.CharacterSettings.RunQuestHerbalism = CheckBoxRunQuestHerbalism.IsChecked.Value;
                 Host.CharacterSettings.QuestMode = ComboBoxSwitchQuestMode.SelectedIndex;
                 Host.CharacterSettings.RepairCount = Convert.ToInt32(textBoxRepairCount.Text);
                 Host.CharacterSettings.CheckRepair = CheckBoxCheckRepair.IsChecked.Value;
@@ -2969,7 +2969,7 @@ namespace WowAI.UI
                         //Общее
                         CheckBoxHideQuesterUI.IsChecked = Host.CharacterSettings.HideQuesterUi;
                         CheckBoxAutoEquip.IsChecked = Host.CharacterSettings.AutoEquip;
-
+                        CheckBoxRunQuestHerbalism.IsChecked = Host.CharacterSettings.RunQuestHerbalism;
                         CheckBoxUseFilterMobs.IsChecked = Host.CharacterSettings.UseFilterMobs;
                         CheckBoxCheckRepairAndSell.IsChecked = Host.CharacterSettings.CheckRepairAndSell;
                         CheckBoxUnmountMoveFail.IsChecked = Host.CharacterSettings.UnmountMoveFail;

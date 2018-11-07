@@ -30,7 +30,7 @@ namespace WowAI
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once InconsistentNaming
-        public static bool isReleaseVersion = true;
+        public static bool isReleaseVersion = false;
 
         public Random RandGenerator { get; private set; }
         private const string Version = "v0.14";

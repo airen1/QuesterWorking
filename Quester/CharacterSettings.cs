@@ -51,7 +51,7 @@ namespace WowAI
         public int PriceKK { get; set; } = 100000;
         public string Valuta { get; set; } = "USD";
 
-
+        public bool RunQuestHerbalism = false;
         public int InvFreeSlotCount { get; set; } = 5;
 
 

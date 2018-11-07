@@ -491,6 +491,46 @@ namespace WowAI.ComboRoutes
             if (host.MyGetAura(269824) != null)//стан
                 return;
 
+
+            if (host.GetThreats().Count == 0 && host.Me.HpPercents < 50)
+            {
+                var regenSpel = host.SpellManager.GetSpell(18562);
+                if (regenSpel != null)
+                {
+                    if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
+                        return;
+                    host.CommonModule.SuspendMove();
+                    try
+                    {
+
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
+                        while (host.Me.IsMoving)
+                            Thread.Sleep(200);
+                        host.CanselForm();
+                        host.CommonModule.MyUnmount();
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
+                        while (host.Me.IsMoving)
+                            Thread.Sleep(200);
+                        var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
+                        if (result != ESpellCastError.SUCCESS)
+                        {
+                            host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
+                            Thread.Sleep(2000);
+
+                        }
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
+                    }
+                    finally
+                    {
+                        host.CommonModule.ResumeMove();
+                    }
+                }
+
+            }
+
             if (host.GetAgroCreatures().Count == 0 && host.Me.HpPercents < 80)
             {
                 var regenSpel = host.SpellManager.GetSpell(8936);
