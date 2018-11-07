@@ -3485,6 +3485,14 @@ namespace WowAI.Modules
                 if (quest == null)
                 {
                     Host.log("Беру квест " + questTemplate.LogTitle + "[" + id + "]", Host.LogLvl.Important);
+                    if (id == 53372)
+                    {
+                        Host.log("Нет квеста Час расплаты, делаю релог");
+                        Host.TerminateGameClient();
+                        Thread.Sleep(2000);
+                        return false;
+                    }
+
                     QuestCoordSettings questCoordSettings = null;
                     foreach (var questSettingsQuestCoordSetting in Host.QuestSettings.QuestCoordSettings)
                     {

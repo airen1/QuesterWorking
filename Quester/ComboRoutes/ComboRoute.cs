@@ -497,9 +497,11 @@ namespace WowAI.ComboRoutes
                 var regenSpel = host.SpellManager.GetSpell(18562);
                 if (regenSpel != null)
                 {
+                    host.CommonModule.SuspendMove();
+
                     if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
                         return;
-                    host.CommonModule.SuspendMove();
+                   
                     try
                     {
 
