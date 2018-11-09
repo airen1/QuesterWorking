@@ -30,7 +30,7 @@ namespace WowAI
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once InconsistentNaming
-        public static bool isReleaseVersion = true;
+        public static bool isReleaseVersion = false;
 
         public Random RandGenerator { get; private set; }
         private const string Version = "v0.14";
@@ -526,8 +526,8 @@ namespace WowAI
                         {
                             /* if (skill.DescriptionRu == "")
                                  continue;*/
-                            if (skill.IsPassive())
-                                continue;
+                          /*  if (skill.IsPassive())
+                                continue;*/
                             
                             /*    if (skill.SkillLines.Contains(ESkillType.SKILL_MINING))
                                     continue;
@@ -551,7 +551,7 @@ namespace WowAI
 
                             //  if (skill.Id == 6795)//(skill.DescriptionRu.Contains("Можно использовать"))// (skill.DescriptionRu.Contains("ед. урона ") || skill.DescriptionRu.Contains("физический урон") || skill.DescriptionRu.Contains("физического урона"))
                             //   {
-                            //log(skill.Id + " " + "  " + skill.Name + " IsPassive =  " + skill.IsPassive() + "  RecoveryTime:" + skill.RecoveryTime + "  ChargeRecoveryTime:" + skill.ChargeRecoveryTime + "  ");
+                            log(skill.Id + " " + "  " + skill.Name + " IsPassive =  " + skill.IsPassive() );
                             /*   foreach (var i in skill.SkillLines)
                                    log(i + "  ");*/
 

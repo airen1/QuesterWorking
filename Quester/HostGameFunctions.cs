@@ -8,6 +8,7 @@ using WoWBot.Core;
 using System.Linq;
 using System.Windows.Documents;
 using Out.Utility;
+using WowAI.UI;
 using WoWBot.Database;
 
 namespace WowAI
@@ -715,111 +716,133 @@ namespace WowAI
 
         internal bool MyUseTaxi(uint areaId, Vector3F loc)
         {
-            var needArea = GetAreaById(areaId);
-
-            if (needArea == null)
+            try
             {
-                log("Не нашел зону с айди " + areaId, LogLvl.Error);
-                Thread.Sleep(10000);
-                return false;
-            }
-            log("Нужно в зону " + areaId + "    " + needArea.AreaName, LogLvl.Important);
+                var needArea = GetAreaById(areaId);
 
-            double bestDist = 9999999;
-            TaxiNode bestNode = null;
-
-            foreach (var i in GetallNodesOnMyMap())
-            {
-                if (Me.Distance(i.Location) < bestDist)
+                if (needArea == null)
                 {
-                    if (i.Id == 1839)//Настрондир  1220  0  81.2824630737305  1839
+                    log("Не нашел зону с айди " + areaId, LogLvl.Error);
+                    Thread.Sleep(10000);
+                    return false;
+                }
+                log("Нужно в зону " + areaId + "    " + needArea.AreaName, LogLvl.Important);
+
+                double bestDist = 9999999;
+                TaxiNode bestNode = null;
+
+                foreach (var i in GetallNodesOnMyMap())
+                {
+                    if (Me.Distance(i.Location) < bestDist)
+                    {
+                        if (i.Id == 1839)//Настрондир  1220  0  81.2824630737305  1839
+                            continue;
+
+                        if (i.Id == 2073 && CharacterSettings.Mode != EMode.Questing)//Throne Room, Zuldazar  1642  0  37.4401321411133  2073
+                            continue;
+
+                        if (i.Id == 2116 && CharacterSettings.Mode != EMode.Questing)//Disabled   Quest Path 6698: Horde Embassy, Zuldazar -> Throne Room, Zuldazar  1642  0  270.530822753906  2116
+                            continue;
+                        if (i.Id == 2015 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
+                            continue;
+                        if (i.Id == 1961 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
+                            continue;
+
+                        if (i.Id == 2080 && CharacterSettings.Mode != EMode.Questing && Me.Team == ETeam.Horde)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+
+                        log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id );
+                        bestNode = i;
+                        bestDist = Me.Distance(i.Location);
+                    }
+                }
+
+                if (bestNode == null)
+                {
+                    log("Не нашел ближайшее такси");
+                    Thread.Sleep(10000);
+                    return false;
+                }
+                if (Me.Distance(bestNode.Location) > 10)
+                    if (!CommonModule.MoveTo(bestNode.Location))
+                        return false;
+
+                Unit taxinpc = null;
+                foreach (var npc in GetEntities<Unit>())
+                {
+                    if (!npc.IsTaxi)
                         continue;
-                    log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
-                    bestNode = i;
-                    bestDist = Me.Distance(i.Location);
+                    taxinpc = npc;
+                    break;
                 }
-            }
-
-            if (bestNode == null)
-            {
-                log("Не нашел ближайшее такси");
-                Thread.Sleep(10000);
-                return false;
-            }
-            if (Me.Distance(bestNode.Location) > 10)
-                if (!CommonModule.MoveTo(bestNode.Location))
-                    return false;
-
-            Unit taxinpc = null;
-            foreach (var npc in GetEntities<Unit>())
-            {
-                if (!npc.IsTaxi)
-                    continue;
-                taxinpc = npc;
-                break;
-            }
-            if (taxinpc == null)
-            {
-                log("Не нашел НПС");
-                Thread.Sleep(10000);
-                return false;
-            }
-            if (!ComeTo(taxinpc, 2))
-                return false;
-
-
-            CommonModule.MyUnmount();
-            CanselForm();
-            while (Me.IsMoving)
-            {
-                Thread.Sleep(1000);
-            }
-            Thread.Sleep(1000);
-            if (!OpenTaxi(taxinpc))
-            {
-                log("Не смог использовать такси " + taxinpc.Name + "  " + GetLastError(), LogLvl.Error);
-                Thread.Sleep(10000);
-                if (GetLastError() != ELastError.ActionNotAllowed)
-                    return false;
-            }
-
-            TaxiNode node = null;
-            double bestDistnode = 99999999;
-            foreach (var canLandNode in TaxiNodesData.CanLandNodes)
-            {
-                if (Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z) < bestDistnode)
+                if (taxinpc == null)
                 {
-                    bestDistnode = Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z);
-                    node = canLandNode;
+                    log("Не нашел НПС");
+                    Thread.Sleep(10000);
+                    return false;
                 }
-            }
-            log("Выбрал точку " + node.Name + " " + node.Id + "  " + node.MapId, LogLvl.Ok);
+                if (!ComeTo(taxinpc, 2))
+                    return false;
 
 
-            if (node != null)
-            {
+                CommonModule.MyUnmount();
+                CanselForm();
+                while (Me.IsMoving)
+                {
+                    Thread.Sleep(1000);
+                }
                 Thread.Sleep(1000);
-                log(node.Id + "  " + node.Name + " " + node.MapId + "  " + node.Cost + "   " + node.Location);
-                var result = UseTaxi(node.Id);
-                Thread.Sleep(1000);
-                if (result != ETaxiError.Ok)
-                    log("Ошибка перелета " + result, LogLvl.Error);
-                Thread.Sleep(2000);
+                if (!OpenTaxi(taxinpc))
+                {
+                    log("Не смог использовать такси " + taxinpc.Name + "  " + GetLastError(), LogLvl.Error);
+                    Thread.Sleep(10000);
+                    if (GetLastError() != ELastError.ActionNotAllowed)
+                        return false;
+                }
+
+                TaxiNode node = null;
+                double bestDistnode = 99999999;
+                foreach (var canLandNode in TaxiNodesData.CanLandNodes)
+                {
+                    if (Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z) < bestDistnode)
+                    {
+                        bestDistnode = Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z);
+                        node = canLandNode;
+                    }
+                }
+                log("Выбрал точку " + node.Name + " " + node.Id + "  " + node.MapId, LogLvl.Ok);
+
+
+                if (node != null)
+                {
+                    Thread.Sleep(1000);
+                    log(node.Id + "  " + node.Name + " " + node.MapId + "  " + node.Cost + "   " + node.Location);
+                    var result = UseTaxi(node.Id);
+                    Thread.Sleep(1000);
+                    if (result != ETaxiError.Ok)
+                        log("Ошибка перелета " + result, LogLvl.Error);
+                    Thread.Sleep(2000);
+                }
+                else
+                {
+                    log("Не найдено место назначения ", LogLvl.Error);
+                }
+
+
+
+                while (Me.IsInFlight)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                Thread.Sleep(10000);
+                return false;
             }
-            else
+            catch (Exception e)
             {
-                log("Не найдено место назначения ", LogLvl.Error);
+               log(e + "");
+                return false;
             }
-
-
-
-            while (Me.IsInFlight)
-            {
-                Thread.Sleep(1000);
-            }
-
-            Thread.Sleep(10000);
-            return false;
         }
 
 

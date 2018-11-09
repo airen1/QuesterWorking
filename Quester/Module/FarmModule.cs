@@ -681,6 +681,7 @@ namespace WowAI.Modules
                     return false;
                 }
 
+       
 
                 //17130 ураган
                 //18313 меч
@@ -739,6 +740,12 @@ namespace WowAI.Modules
                         BestMob = entity;
                         
                     }
+                }
+
+                if (BestMob.Id == 131522 && Host.GetThreats().Count == 0)
+                {
+                    if (Host.SpellManager.GetSpell(8921) != null && Host.Me.Distance(BestMob) < 40)
+                        Host.SpellManager.CastSpell(8921);
                 }
 
 
@@ -1648,9 +1655,9 @@ namespace WowAI.Modules
                 GameObject bestProp = null;
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
-                    if (Host.CharacterSettings.Mode != EMode.Questing)
+                  /*  if (Host.CharacterSettings.Mode != EMode.Questing)
                         if (prop.GameObjectType != EGameObjectType.GatheringNode)
-                            continue;
+                            continue;*/
                     if (!Host.IsExists(prop))
                         continue;
                     if (IsBadProp(prop, Host.ComboRoute.TickTime))

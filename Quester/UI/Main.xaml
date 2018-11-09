@@ -2537,6 +2537,11 @@
                                     <DataGrid x:Name="DataGridBuffTarget" Margin="0"/>
                                 </Grid>
                             </TabItem>
+                            <TabItem Header="Skill">
+                                <Grid Background="#FFE5E5E5">
+                                    <DataGrid x:Name="DataGridSkill" Margin="0"/>
+                                </Grid>
+                            </TabItem>
                         </TabControl>
                     </Grid>
                 </TabItem>

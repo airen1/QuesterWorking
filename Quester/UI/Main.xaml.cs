@@ -238,6 +238,7 @@ namespace WowAI.UI
         private List<Item> _collectionItems = new List<Item>();
         private List<Aura> _collectionAuras = new List<Aura>();
         private List<Aura> _collectionAurasTarget = new List<Aura>();
+        private List<Spell> _collectionSpell = new List<Spell>();
 
         private ObservableCollection<ushort[]> _collectionCount = new ObservableCollection<ushort[]>();
 
@@ -2549,6 +2550,9 @@ namespace WowAI.UI
 
                     _collectionAuras = Host.Me.GetAuras();
                     DataGridBuff.ItemsSource = _collectionAuras;
+
+                    _collectionSpell = Host.SpellManager.GetSpells();
+                    DataGridSkill.ItemsSource = _collectionSpell;
 
                     if (Host.Me.Target != null)
                     {
