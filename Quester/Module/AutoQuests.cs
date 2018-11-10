@@ -1778,6 +1778,171 @@ namespace WowAI.Modules
         {
             try
             {
+                if (Host.Me.Team == ETeam.Alliance)
+                {
+                    if (Host.MyGetItem(159877) != null)
+                    {
+                        if (Host.GetQuest(51312) != null) //51447 State:None LogTitle:Душистый опылитель 
+                        {
+                            if (Host.Area.Id == 8717)
+                            {
+                                if (!Host.CommonModule.MoveTo(1263.38, -543.17, 33.40))
+                                    return false;
+                                RunQuest(51312);
+                            }
+                            else
+                            {
+                                Host.MyUseTaxi(8717, new Vector3F(1263.38, -543.17, 33.40));
+                            }
+                            return false;
+                        }
+                    }
+
+                    if (Host.MyGetItem(159956) != null)
+                    {
+                        if (Host.GetQuest(48758) != null) //Отвратительно слизкий цветок
+                        {
+                            if (Host.Area.Id == 8717)
+                            {
+                                if (!Host.CommonModule.MoveTo(1263.38, -543.17, 33.40))
+                                    return false;
+                                RunQuest(48758);
+                            }
+                            else
+                            {
+                                Host.MyUseTaxi(8717, new Vector3F(1263.38, -543.17, 33.40));
+                            }
+                            return false;
+                        }
+                    }
+
+                    uint id = 0;
+
+
+
+                    foreach (var hostQuestState in Host.QuestStates.QuestState)
+                    {
+                        if (hostQuestState == 51312 && Host.SpellManager.GetSpell(252418) != null)
+                            id = 51313;
+                    }
+
+                    if (id == 51313 && Host.GetQuest(id) != null)
+                    {
+                        RunQuest(id);
+                        return false;
+                    }
+
+                    foreach (var hostQuestState in Host.QuestStates.QuestState)
+                    {
+                        if (hostQuestState == 48758 && Host.SpellManager.GetSpell(252419) != null)
+                            id = 48755;
+                    }
+
+
+                    if (id == 48755 && Host.GetQuest(id) != null)
+                    {
+                        var step = 0;
+                        foreach (var iCount in Host.GetQuest(48755).Counts)
+                        {
+                            step = step + iCount;
+                        }
+
+                        if (step < 12)
+                            return true;
+                        if (step == 12)
+                        {
+                            if (!Host.CompleteQuest(48755, 0))
+                            {
+                                Host.log("Не смог завершить квест " + Host.GetLastError(), Host.LogLvl.Error);
+                                Thread.Sleep(5000);
+                            }
+                            return false;
+                        }
+                    }
+
+                    if (Host.SpellManager.GetSpell(252408) != null)//мох 2
+                        id = 48756;
+                    if (Host.SpellManager.GetSpell(252409) != null)//мох 3
+                        id = 48757;
+
+                    if (Host.SpellManager.GetSpell(252405) != null)//горох 2
+                        id = 48753;
+                    if (Host.SpellManager.GetSpell(252406) != null)//горох 3
+                        id = 48754;
+
+                    if (id == 48756 && Host.GetQuest(id) != null)
+                    {
+                        var step = 0;
+                        foreach (var iCount in Host.GetQuest(48756).Counts)
+                        {
+                            step = step + iCount;
+                        }
+
+                        if (step < 10)
+                            return true;
+                    }
+                    if (id == 48753 && Host.GetQuest(id) != null)
+                    {
+                        RunQuest(id);
+                        return false;
+                    }
+                    if (id == 48757 && Host.GetQuest(id) != null)
+                    {
+                        RunQuest(id);
+                        return false;
+                    }
+                    if (id == 48754 && Host.GetQuest(id) != null)
+                    {
+                        RunQuest(id);
+                        return false;
+                    }
+                  //  Host.log("Травничество: " + id);
+                    if (id != 0) //Речной горох
+                    {
+                        HerbQuest = true;
+                        if (Host.Area.Id == 8717)
+                        {
+                            if (Host.GetQuest(id) == null)
+                            {
+                                if (!Host.CommonModule.MoveTo(1263.38, -543.17, 33.40))
+                                    return false;
+
+                                var npc = Host.GetNpcById(136096);
+                                if (npc != null)
+                                {
+                                    if (MyApplyQuest(npc, id))
+                                        return false;
+                                }
+                            }
+                            else
+                            {
+
+                               /* if (id == 51464)
+                                {
+                                    var step = 0;
+                                    foreach (var iCount in Host.GetQuest(51464).Counts)
+                                    {
+                                        step = step + iCount;
+                                    }
+
+                                    if (step < 10)
+                                        return true;
+                                }*/
+                                RunQuest(id);
+                            }
+
+                        }
+                        else
+                        {
+                            Host.MyUseTaxi(8717, new Vector3F(1263.38, -543.17, 33.40));
+                        }
+
+                        return false;
+                    }
+
+                }
+
+
                 if (Host.Me.Team == ETeam.Horde)
                 {
                     if (Host.MyGetItem(160250) != null)
@@ -1829,6 +1994,7 @@ namespace WowAI.Modules
                     if (Host.SpellManager.GetSpell(252406) != null)//горох 3
                         id = 51243;
 
+
                     foreach (var hostQuestState in Host.QuestStates.QuestState)
                     {
                         if (hostQuestState == 51447 && Host.SpellManager.GetSpell(252418) != null)
@@ -1868,6 +2034,8 @@ namespace WowAI.Modules
                         RunQuest(id);
                         return false;
                     }
+
+                   
 
                     if (id == 51464 && Host.GetQuest(id) != null)
                     {
@@ -3120,6 +3288,10 @@ namespace WowAI.Modules
                 }
             }
 
+            if(id == 48757)
+                if (!Host.CommonModule.MoveTo(1263.38, -543.17, 33.40))
+                    return false;
+
             if (id == 51243 || id == 51478)
             {
                 if (!Host.CommonModule.MoveTo(-932.67, 1006.92, 321.04))
@@ -3611,6 +3783,8 @@ namespace WowAI.Modules
         }
 
 
+
+        public bool TryFly = false;
 
         /// <summary>
         /// Выполнение квеста
@@ -6526,6 +6700,56 @@ namespace WowAI.Modules
                 }
 
 
+                if (quest.Id == 48753)
+                {
+                    if (step == 10)
+                    {
+                        MyComliteQuest(quest);
+                        return false;
+                    }
+
+                    var farmLoc = new Vector3F(1186.62, 103.94, 11.11);
+                    var questPoiPoints = new List<Vector3F>();
+                    questPoiPoints.Add(farmLoc);
+                    questPoiPoints.Add(new Vector3F(1411.62, 355.89, 13.07));
+                    if (!Host.CommonModule.MoveTo(farmLoc))
+                        return false;
+                    var zone = new RoundZone(Host.Me.Location.X, Host.Me.Location.Y, 600);
+                    var farmmoblist = new List<uint>();
+                    farmmoblist.Add(290136);
+                    Host.FarmModule.SetFarmProps(zone, farmmoblist);
+                    int badRadius = 0;
+                    //int badRadius = 0;
+                    while (Host.MainForm.On
+                           && Host.ItemManager.GetFreeInventorySlotsCount() >= Host.CharacterSettings.InvFreeSlotCount
+                           && !IsQuestComplite(quest.Id, 0)
+                           && Host.FarmModule.readyToActions
+                           && Host.FarmModule.farmState == FarmState.FarmProps)
+                    {
+                        if (Host.MyIsNeedRepair())
+                            break;
+                        Thread.Sleep(100);
+                        if (Host.FarmModule.BestProp == null && Host.Me.HpPercents > 80)
+                            badRadius++;
+                        else
+                            badRadius = 0;
+                        if (Host.FarmModule.BestMob != null)
+                            badRadius = 0;
+
+                        if (badRadius > 50)
+                        {
+                            var findPoint = farmLoc;
+                            if (questPoiPoints.Count > 0)
+                                findPoint = questPoiPoints[Host.RandGenerator.Next(0, questPoiPoints.Count)];
+                            Host.log("Не могу найти GameObject, подбегаю в центр зоны " + Host.Me.Distance(findPoint) + "    "/* + questPoiPoints.Count*/);
+                            Host.CommonModule.MoveTo(findPoint);
+                        }
+                    }
+                    Host.FarmModule.StopFarm();
+                    return false;
+                }
+
+
                 if (quest.Id == 51230)
                 {
                     if (step == 10)
@@ -6625,6 +6849,23 @@ namespace WowAI.Modules
                 }
 
 
+                if (quest.Id == 48757)
+                {
+                    if (step == 2)
+                    {
+                        MyComliteQuest(quest);
+                        return false;
+                    }
+
+                    if (!Host.CommonModule.MoveTo(new Vector3F(714.19, -234.86, 12.10)))
+                        return false;
+                    Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
+                    var item = Host.MyGetItem(159833);
+                    Host.MyUseItemAndWait(item);
+                    Host.Wait(10000);
+                    return false;
+                }
+
                 if (quest.Id == 51478)
                 {
                     if (step == 3)
@@ -6633,13 +6874,49 @@ namespace WowAI.Modules
                         return false;
                     }
 
-                    if (!Host.CommonModule.MoveTo(-1866.61, 740.45, 53.71))
+                    if (!Host.CommonModule.MoveTo(new Vector3F(-1866.61, 740.45, 53.71)))
                         return false;
                     Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
                     var item = Host.MyGetItem(160299);
                     Host.MyUseItemAndWait(item);
                     Host.Wait(10000);
                     return false;
+                }
+
+
+                if (quest.Id == 51313)
+                {
+                    if (step == 1)
+                    {
+                        if (Host.Area.Id != 8717)
+                        {
+                            Host.MyUseTaxi(8717, new Vector3F(1263.38, -543.17, 33.40));
+                            return false;
+                        }
+
+                        MyComliteQuest(quest);
+                        return false;
+                    }
+
+                    if (step == 0)
+                    {
+                       /* if (Host.Area.Id != 8501 && !TryFly)
+                       {
+                            Host.MyUseTaxi(8501, new Vector3F(2095.05, 2808.83, 56.24));
+                            TryFly = true;
+                            Host.AutoQuests.HerbQuest = true;
+                            if (!Host.CommonModule.MoveTo(new Vector3F(2126.09, 2927.00, 42.51)))
+                                return false;
+
+                        }*/
+
+                        if (!Host.CommonModule.MoveTo(new Vector3F(2395.43, -757.84, 64.78)))
+                            return false;
+                        var item = Host.MyGetItem(159881);
+                        Host.MyUseItemAndWait(item);
+                        Host.Wait(30000);
+                        return false;
+                    }
                 }
 
                 if (quest.Id == 51448)
@@ -6658,13 +6935,17 @@ namespace WowAI.Modules
 
                     if (step == 0)
                     {
-                        if (Host.Area.Id != 8501)
+                        if (Host.Area.Id != 8501 && !TryFly)
                         {
                             Host.MyUseTaxi(8501, new Vector3F(2095.05, 2808.83, 56.24));
-                            return false;
+                            TryFly = true;
+                            Host.AutoQuests.HerbQuest = true;
+                            if (!Host.CommonModule.MoveTo(new Vector3F(2126.09, 2927.00, 42.51)))
+                                return false;
+                           
                         }
 
-                        if (!Host.CommonModule.MoveTo(2126.09, 2927.00, 42.51))
+                        if (!Host.CommonModule.MoveTo(new Vector3F(2126.09, 2927.00, 42.51)))
                             return false;
                         var item = Host.MyGetItem(160252);
                         Host.MyUseItemAndWait(item);
