@@ -208,7 +208,7 @@ namespace WowAI
 
                  }*/
 
-
+               
                 ClearLogs(GetCurrentAccount().Name);
                 RandGenerator = new Random((int)DateTime.Now.Ticks);
                 while (GameState != EGameState.Ingame)
@@ -224,7 +224,7 @@ namespace WowAI
 
                 FormInitialized = false;
 
-                
+
 
 
                 if (!Directory.Exists(AssemblyDirectory + "\\Configs"))
@@ -420,8 +420,8 @@ namespace WowAI
                 MainForm.NeedApplyDungeonSettings = true;
                 MainForm.NeedApplyQuestSettings = true;
 
-                
-                
+
+
 
                 MainForm.Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -469,7 +469,7 @@ namespace WowAI
                 }
 
 
-               
+
 
 
                 #region TestLog
@@ -488,8 +488,8 @@ namespace WowAI
                     {
                         if (entity.Type == EBotTypes.Player)
                             continue;
-                       // log(entity.Name + " " + entity.GameObjectType + "  " + entity.DynamicFlags);
-                        
+                        // log(entity.Name + " " + entity.GameObjectType + "  " + entity.DynamicFlags);
+
                         /* if(entity.Id != 20000021)
                              continue;*/
 
@@ -526,9 +526,9 @@ namespace WowAI
                         {
                             /* if (skill.DescriptionRu == "")
                                  continue;*/
-                          /*  if (skill.IsPassive())
-                                continue;*/
-                            
+                            /*  if (skill.IsPassive())
+                                  continue;*/
+
                             /*    if (skill.SkillLines.Contains(ESkillType.SKILL_MINING))
                                     continue;
                                 if (skill.SkillLines.Contains(ESkillType.SKILL_HERBALISM))
@@ -551,7 +551,7 @@ namespace WowAI
 
                             //  if (skill.Id == 6795)//(skill.DescriptionRu.Contains("Можно использовать"))// (skill.DescriptionRu.Contains("ед. урона ") || skill.DescriptionRu.Contains("физический урон") || skill.DescriptionRu.Contains("физического урона"))
                             //   {
-                            log(skill.Id + " " + "  " + skill.Name + " IsPassive =  " + skill.IsPassive() );
+                            log(skill.Id + " " + "  " + skill.Name + " IsPassive =  " + skill.IsPassive());
                             /*   foreach (var i in skill.SkillLines)
                                    log(i + "  ");*/
 
@@ -577,7 +577,7 @@ namespace WowAI
                     log("GetAuras " + Me.GetAuras().Count);
                     foreach (var i in Me.GetAuras())
                     {
-                       // log(i.SpellId + "   " + i.SpellName + "  " + i.AuraDescriptionRu);  //106829   Облик медведя  5487 аура 5487 
+                        // log(i.SpellId + "   " + i.SpellName + "  " + i.AuraDescriptionRu);  //106829   Облик медведя  5487 аура 5487 
                     }
 
 
@@ -649,7 +649,7 @@ namespace WowAI
                                     continue;
                                 log("questCount: " + index + ") " + questCount);
                             }
-                           
+
                             foreach (var templateQuestObjective in quest.Template.QuestObjectives)
                             {
                                 log(templateQuestObjective.Type + " " + templateQuestObjective.Amount + " " + templateQuestObjective.Description, LogLvl.Important);
@@ -690,7 +690,7 @@ namespace WowAI
 
                     log(CurrentInteractionGuid + " CurrentInteractionGuid");
 
-                   //CreateNewEditorGpsPoint(Me.Location);
+                    //CreateNewEditorGpsPoint(Me.Location);
                     //  log(QuestManager.FindQuestSlot(29078) + "  " + QuestManager.GetQuestSlotQuestId(0) + "  " + QuestManager.(29078));
 
 
@@ -778,7 +778,7 @@ namespace WowAI
 
 
 
-                 //   log(BindPoint.ZoneID + "  " + BindPoint.MapID + "  " + BindPoint.Location);
+                    //   log(BindPoint.ZoneID + "  " + BindPoint.MapID + "  " + BindPoint.Location);
 
 
                     //  ForceMoveTo(1572.03, -4396.03, 15.98);
@@ -794,7 +794,7 @@ namespace WowAI
                 }
 
 
-               // log(LFGStatus.Joined + "" + Scenario.GetCriterias().Count);
+                // log(LFGStatus.Joined + "" + Scenario.GetCriterias().Count);
 
                 // SetMoveStateForClient(true);
                 /*  TurnDirectly(new Vector3F(-8507.96, 672.98, 93.39));
@@ -879,7 +879,7 @@ namespace WowAI
                 AddNonUnloadableMesh(646, 31, 29);
                 AddNonUnloadableMesh(646, 31, 30);
                 AddNonUnloadableMesh(646, 31, 31);
-                
+
                 //в 85 данж 
                 AddNonUnloadableMesh(725, 29, 29);
                 AddNonUnloadableMesh(725, 29, 30);
@@ -950,7 +950,7 @@ namespace WowAI
                 }
 
 
-              
+
 
 
                 if (Me.Name == "")
@@ -964,10 +964,10 @@ namespace WowAI
                     SendKeyPress(0x1b);
                 }
 
-               // CommonModule.MoveTo(1636.14, -4445.57, 17.04);
+                // CommonModule.MoveTo(1636.14, -4445.57, 17.04);
                 GetUpdateInventory();
-               
-                
+
+
                 //Jump();
                 while (!cancelRequested)
                 {
@@ -980,15 +980,15 @@ namespace WowAI
                         AutoQuests.IsNeedWaitAfterLoading = true;
 
 
-                  /*  if (Me.Target != null)
-                    {
-                        log(Me.Target.GetAuras().Count + "");
-                        foreach (var aura in Me.Target.GetAuras())
-                        {
-                            log(aura.SpellId + "  " );
-                        }
-                    }*/
-                      
+                    /*  if (Me.Target != null)
+                      {
+                          log(Me.Target.GetAuras().Count + "");
+                          foreach (var aura in Me.Target.GetAuras())
+                          {
+                              log(aura.SpellId + "  " );
+                          }
+                      }*/
+
 
                     timer++;
                     timer2++;
@@ -1052,10 +1052,10 @@ namespace WowAI
                             {
                                 CheckCount = 0;
                                 break;
-                            }                               
+                            }
                         }
                     }
-                       
+
 
                     if (AutoQuests.WaitTeleport)
                         CheckCount = 0;
@@ -1252,7 +1252,7 @@ public void PluginRun()
             }
         }
 
-        private void StopPluginNow()
+        public void StopPluginNow()
         {
             try
             {
@@ -1281,7 +1281,7 @@ public void PluginRun()
                         ComboRoute = new DefaultComboRoute(this);
                         break;
 
-                  
+
 
                     default:
                         ComboRoute = new DefaultComboRoute(this);

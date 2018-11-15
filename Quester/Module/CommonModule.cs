@@ -232,6 +232,8 @@ namespace WowAI.Modules
                         }
                     }
 
+                if(Host.MapID == 1643 && Host.AutoQuests.BestQuestId == 47098)
+                    return;
                 if (Host.MapID == 1904 || Host.MapID == 1929)
                 {
                     return;
@@ -388,10 +390,7 @@ namespace WowAI.Modules
                     Host.CanselForm();
                 }
                 Host.CancelMoveTo();
-                while (Host.Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                }
+                Host.MyCheckIsMovingIsCasting();
                 Thread.Sleep(500);
                 var result = Host.SpellManager.CastSpell(mountSpell.Id);
 
@@ -1777,10 +1776,7 @@ namespace WowAI.Modules
                 {
                     Host.CanselForm();
                     Host.CancelMoveTo();
-                    while (Host.Me.IsMoving)
-                    {
-                        Thread.Sleep(100);
-                    }
+                   Host.MyCheckIsMovingIsCasting();
                     Thread.Sleep(2000);
                     foreach (var item in Host.ItemManager.GetItems())
                     {
@@ -1800,10 +1796,7 @@ namespace WowAI.Modules
                             {
                                 Host.log("Использовал камень ", Host.LogLvl.Ok);
                             }
-                            while (Host.Me.IsMoving)
-                                Thread.Sleep(50);
-                            while (Host.SpellManager.IsCasting)
-                                Thread.Sleep(50);
+                            Host.MyCheckIsMovingIsCasting();
                             while (Host.SpellManager.IsChanneling)
                                 Thread.Sleep(50);
                             Thread.Sleep(5000);
@@ -2279,6 +2272,10 @@ namespace WowAI.Modules
                 var path = GpsBase.GetPath(loc, Host.Me.Location);
                 foreach (var vector3F in path)
                 {
+                 /*   if(Host.FarmModule.farmState == FarmState.AttackOnlyAgro && Host.GetThreats().Count > 0)
+                        return;*/
+                    if(!Host.Me.IsAlive)
+                        return;
                     Host.log(path.Count + "  Путь " + Host.Me.Distance(vector3F));
                     ForceMoveTo2(vector3F);
                 }

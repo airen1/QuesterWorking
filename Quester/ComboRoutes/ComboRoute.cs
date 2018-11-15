@@ -455,10 +455,7 @@ namespace WowAI.ComboRoutes
                         {
                             host.CommonModule.SuspendMove();
                             // host.CommonModule.MyUnmount();
-                            while (host.Me.IsMoving)
-                            {
-                                Thread.Sleep(1000);
-                            }
+                            host.MyCheckIsMovingIsCasting();
                             var result = host.SpellManager.CastSpell(buffItem.Id);
                             if (result != ESpellCastError.SUCCESS)
                             {
@@ -505,16 +502,10 @@ namespace WowAI.ComboRoutes
                     try
                     {
 
-                        while (host.SpellManager.IsCasting)
-                            Thread.Sleep(200);
-                        while (host.Me.IsMoving)
-                            Thread.Sleep(200);
+                        host.MyCheckIsMovingIsCasting();
                         host.CanselForm();
                         host.CommonModule.MyUnmount();
-                        while (host.SpellManager.IsCasting)
-                            Thread.Sleep(200);
-                        while (host.Me.IsMoving)
-                            Thread.Sleep(200);
+                        host.MyCheckIsMovingIsCasting();
                         var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
                         if (result != ESpellCastError.SUCCESS)
                         {
@@ -542,11 +533,8 @@ namespace WowAI.ComboRoutes
                         return;
                     host.CommonModule.SuspendMove();
                     try
-                    {                    
-                        while (host.SpellManager.IsCasting)
-                            Thread.Sleep(200);
-                        while (host.Me.IsMoving)
-                            Thread.Sleep(200);
+                    {
+                        host.MyCheckIsMovingIsCasting();
                         var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
                         if (result != ESpellCastError.SUCCESS)
                         {
@@ -647,10 +635,7 @@ namespace WowAI.ComboRoutes
                             }
                             else
                             {
-                                while (host.Me.IsMoving)
-                                    Thread.Sleep(50);
-                                while (host.SpellManager.IsCasting)
-                                    Thread.Sleep(50);
+                                host.MyCheckIsMovingIsCasting();
                                 while (host.SpellManager.IsChanneling)
                                     Thread.Sleep(50);
 
@@ -687,10 +672,7 @@ namespace WowAI.ComboRoutes
                                 }
 
                                 Thread.Sleep(1000);
-                                while (host.Me.IsMoving)
-                                    Thread.Sleep(50);
-                                while (host.SpellManager.IsCasting)
-                                    Thread.Sleep(50);
+                                host.MyCheckIsMovingIsCasting();
                                 while (host.SpellManager.IsChanneling)
                                     Thread.Sleep(50);
                             }
@@ -847,8 +829,7 @@ namespace WowAI.ComboRoutes
 
                         host.CommonModule.MyUnmount();
 
-                        while (host.Me.IsMoving)
-                            Thread.Sleep(10);
+                        host.MyCheckIsMovingIsCasting();
 
                         if (!host.IsExists(m))
                             continue;
@@ -984,8 +965,7 @@ namespace WowAI.ComboRoutes
                             }
 
 
-                        while (host.Me.IsMoving)
-                            Thread.Sleep(100);
+                        host.MyCheckIsMovingIsCasting();
 
                         if (!host.IsExists(m))
                             continue;

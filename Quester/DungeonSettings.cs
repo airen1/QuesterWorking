@@ -28,6 +28,7 @@ namespace WowAI
         public int ItemId { get; set; }
         public uint SkillId { get; set; }
         public string Com { get; set; }
+        public string PluginPath { get; set; }
     }   
 }
 

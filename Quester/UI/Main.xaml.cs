@@ -1891,7 +1891,8 @@ namespace WowAI.UI
                         Com = dungeonCoordSettingse.Com,
                         AreaId = dungeonCoordSettingse.AreaId,
                         MapId = dungeonCoordSettingse.MapId,
-                        SkillId = dungeonCoordSettingse.SkillId
+                        SkillId = dungeonCoordSettingse.SkillId,
+                        PluginPath = dungeonCoordSettingse.PluginPath
                     };
                     Host.DungeonSettings.DungeonCoordSettings.Add(item);
                     i++;
@@ -1958,7 +1959,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.FreeInvCountForAukId = Convert.ToUInt32(textBoxFreeInvCountForAukId.Text);
                 Host.CharacterSettings.FormForFight = ComboBoxFormForFight.Text;
                 Host.CharacterSettings.FormForMove = ComboBoxFormForMove.Text;
-
+                Host.CharacterSettings.LaunchScript = CheckBoxLaunchSkript.IsChecked.Value;
                 Host.CharacterSettings.UseMountMyLoc = CheckBoxUseSMountMyLoc.IsChecked.Value;
                 Host.CharacterSettings.RunQuestHerbalism = CheckBoxRunQuestHerbalism.IsChecked.Value;
                 Host.CharacterSettings.QuestMode = ComboBoxSwitchQuestMode.SelectedIndex;
@@ -2936,7 +2937,8 @@ namespace WowAI.UI
                                 Com = dungeonCoordSetting.Com,
                                 AreaId = dungeonCoordSetting.AreaId,
                                 MapId = dungeonCoordSetting.MapId,
-                                SkillId = dungeonCoordSetting.SkillId
+                                SkillId = dungeonCoordSetting.SkillId,
+                                PluginPath = dungeonCoordSetting.PluginPath
 
                             });
                         }
@@ -2979,6 +2981,7 @@ namespace WowAI.UI
                         CheckBoxUnmountMoveFail.IsChecked = Host.CharacterSettings.UnmountMoveFail;
                         CheckBoxWaitSixMin.IsChecked = Host.CharacterSettings.WaitSixMin;
                         CheckBoxFightIfMobs.IsChecked = Host.CharacterSettings.FightIfMobs;
+                        CheckBoxLaunchSkript.IsChecked = Host.CharacterSettings.LaunchScript;
                         if (Host.CharacterSettings.UseMultiZone)
                         {
                             radioButtonMultiZone.IsChecked = true;
@@ -3766,6 +3769,7 @@ namespace WowAI.UI
                     ItemId = itemId,
                     SkillId = Convert.ToUInt32(skillId),
                     Pause = Convert.ToInt32(textBoxScriptPause.Text),
+                    PluginPath = comboBoxDungeonPlugin.SelectedItem.ToString()
                 });
 
                 comboBoxDungeonMob.SelectedIndex = 0;
@@ -5578,7 +5582,7 @@ namespace WowAI.UI
             {
 
 
-               // Host.log("dsf" + _collectionQuestTemplates.Count + "  " + DataGridQuestTemplate.Items.Count);
+                // Host.log("dsf" + _collectionQuestTemplates.Count + "  " + DataGridQuestTemplate.Items.Count);
                 if (_collectionQuestTemplates.Count > 0)
                     Host.log(_collectionQuestTemplates[0].LogTitle);
 
@@ -5593,7 +5597,7 @@ namespace WowAI.UI
                     _collectionCount.Add(item.Counts);
                 }
 
-               DataGridQuestTemplate.ItemsSource = _collectionQuestTemplates;
+                DataGridQuestTemplate.ItemsSource = _collectionQuestTemplates;
                 DataGridQuestCounts.ItemsSource = _collectionCount;
                 DataGridQuestTemplate.Items.Refresh();
             }
@@ -5606,6 +5610,43 @@ namespace WowAI.UI
         private void DataGridQuestTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void comboBoxDungeonPlugin_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                comboBoxDungeonPlugin.Items.Clear();
+                comboBoxDungeonPlugin.Items.Add("Не выбрано");
+                if (Host.Me == null)
+                    return;
+
+                if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\"))
+                {
+                    Host.log(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\");
+                    var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\");
+                    // папка с файлами
+                    foreach (var directoryInfo in dir.GetDirectories())
+                    {
+                        foreach (var fileInfo in directoryInfo.GetFiles())
+                        {
+                            if(!fileInfo.Name.Contains(".dll"))
+                                continue;
+                            comboBoxDungeonPlugin.Items.Add(directoryInfo.Name + "\\" + fileInfo.Name);
+                        }
+                    }
+
+                    
+                }
+            }
+            catch (ThreadAbortException)
+            {
+            }
+            catch (Exception err)
+            {
+
+                Host.log(err.ToString());
+            }
         }
     }
 

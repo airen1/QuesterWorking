@@ -276,6 +276,8 @@ namespace WowAI.Modules
             }
         }
 
+       
+
 
         public int GatherCount = 0;
         internal bool InteractWithProp(GameObject prop)
@@ -289,12 +291,9 @@ namespace WowAI.Modules
                 }
                 /*  if (host.GetAgroCreatures().Count > 0)
                       return false;*/
-                while (Host.SpellManager.IsCasting || Host.Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                    Host.log(Host.SpellManager.IsCasting + "    " + Host.Me.IsMoving);
-                }
-                    
+                Host.MyCheckIsMovingIsCasting();
+
+
 
                 if (Host.Me.Distance(prop) > 6)
                 {
@@ -338,10 +337,7 @@ namespace WowAI.Modules
                     }
 
                     Host.CanselForm();
-                    while (Host.Me.IsMoving)
-                    {
-                        Thread.Sleep(100);
-                    }
+                    Host.MyCheckIsMovingIsCasting();
                     if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                     {
                         if (!prop.Use())
@@ -489,10 +485,7 @@ namespace WowAI.Modules
                 if (isNeedChangeForm)
                     Host.CanselForm();
 
-                while (Host.Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                }
+                Host.MyCheckIsMovingIsCasting();
 
                 if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                 {
@@ -625,10 +618,7 @@ namespace WowAI.Modules
         {
             try
             {
-                while (Host.Me.IsMoving)
-                    Thread.Sleep(50);
-                while (Host.SpellManager.IsCasting)
-                    Thread.Sleep(50);
+                Host.MyCheckIsMovingIsCasting();
                 while (Host.SpellManager.IsChanneling)
                     Thread.Sleep(50);
 
@@ -643,10 +633,7 @@ namespace WowAI.Modules
                     Thread.Sleep(200);
                 }
 
-                while (Host.Me.IsMoving)
-                    Thread.Sleep(50);
-                while (Host.SpellManager.IsCasting)
-                    Thread.Sleep(50);
+                Host.MyCheckIsMovingIsCasting();
                 while (Host.SpellManager.IsChanneling)
                     Thread.Sleep(50);
 
@@ -1453,7 +1440,7 @@ namespace WowAI.Modules
 
 
                 Host.CancelMoveTo();
-
+                Host.MyCheckIsMovingIsCasting();
                 while (Host.SpellManager.IsCasting || Host.Me.IsMoving || Host.SpellManager.IsChanneling || Host.SpellManager.HasGlobalCooldown(skill.Id))
                 {
                     if (!Host.Me.IsAlive)

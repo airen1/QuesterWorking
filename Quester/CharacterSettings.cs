@@ -54,6 +54,7 @@ namespace WowAI
         public bool RunQuestHerbalism = false;
         public int InvFreeSlotCount { get; set; } = 5;
 
+        public bool LaunchScript = false;
 
         public int BattlePetNumber { get; set; } = 0;
         //Сбор

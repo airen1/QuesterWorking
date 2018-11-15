@@ -72,12 +72,48 @@ namespace WowAI
 
              return null;
          }*/
+        
+        public void MyCheckIsMovingIsCasting()
+        {
+            var fixMove = 0;
+            while (SpellManager.IsCasting || Me.IsMoving)
+            {
+                if (Me.IsMoving)
+                {
+                    fixMove++;
+                    log(SpellManager.IsCasting + "    " + Me.IsMoving);
+                }
+               
+                Thread.Sleep(100);
+                if (!Me.IsAlive)
+                    return;
+                if(!MainForm.On)
+                    return;
+              
+                if (fixMove > 50)
+                {
+                    SetMoveStateForClient(true);
+                    if (RandGenerator.Next(0, 2) == 0)
+                        StrafeLeft(true);
+                    else
+                        StrafeRight(true);
+                    Thread.Sleep(2000);
+                    StrafeRight(false);
+                    StrafeLeft(false);
+                    SetMoveStateForClient(false);
+                    CancelMoveTo();
+                    fixMove = 0;
+                }
+            }
+        }
 
         public void Wait(int time)
         {
             var waitTime = time;
             while (waitTime > 0)
             {
+                if(!MainForm.On)
+                    return;
                 Thread.Sleep(1000);
                 waitTime = waitTime - 1000;
                 log("Ожидаю " + waitTime + "/" + time);
@@ -254,10 +290,7 @@ namespace WowAI
 
                 CancelMoveTo();
                 Thread.Sleep(500);
-                while (Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                }
+                MyCheckIsMovingIsCasting();
                 var result = SpellManager.CastSpell(mountSpell.Id);
 
                 if (result != ESpellCastError.SUCCESS)
@@ -324,10 +357,7 @@ namespace WowAI
             if (mailBox != null)
             {
                 ForceComeTo(mailBox, 2);
-                while (Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                }
+                MyCheckIsMovingIsCasting();
                 Thread.Sleep(1000);
                 if (!OpenMailbox(mailBox))
                     log("Не удалось открыть ящик " + GetLastError(), LogLvl.Error);
@@ -425,10 +455,7 @@ namespace WowAI
             }
             log("Выбран " + npc.Name + " " + npc.Id);
             CommonModule.MoveTo(npc, 3);
-            while (Me.IsMoving)
-            {
-                Thread.Sleep(1000);
-            }
+           MyCheckIsMovingIsCasting();
             OpenDialog(npc);
             Thread.Sleep(3000);
             //Продажа
@@ -479,10 +506,7 @@ namespace WowAI
                         return false;
                     CommonModule.MyUnmount();
                     CanselForm();
-                    while (Me.IsMoving)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                    MyCheckIsMovingIsCasting();
 
                     var result = SpellManager.UseItem(item);
                     if (result != EInventoryResult.OK)
@@ -494,10 +518,7 @@ namespace WowAI
                     {
                         log("Использовал камень ", Host.LogLvl.Ok);
                     }
-                    while (Me.IsMoving)
-                        Thread.Sleep(50);
-                    while (SpellManager.IsCasting)
-                        Thread.Sleep(50);
+                    MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
                     Thread.Sleep(5000);
@@ -540,10 +561,7 @@ namespace WowAI
                         return false;
                     CommonModule.MyUnmount();
                     CanselForm();
-                    while (Me.IsMoving)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                    MyCheckIsMovingIsCasting();
 
                     var result = SpellManager.UseItem(item);
                     if (result != EInventoryResult.OK)
@@ -555,10 +573,7 @@ namespace WowAI
                     {
                         log("Использовал свисток ", Host.LogLvl.Ok);
                     }
-                    while (Me.IsMoving)
-                        Thread.Sleep(50);
-                    while (SpellManager.IsCasting)
-                        Thread.Sleep(50);
+                    MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
                     Thread.Sleep(5000);
@@ -787,10 +802,7 @@ namespace WowAI
 
                 CommonModule.MyUnmount();
                 CanselForm();
-                while (Me.IsMoving)
-                {
-                    Thread.Sleep(1000);
-                }
+                MyCheckIsMovingIsCasting();
                 Thread.Sleep(1000);
                 if (!OpenTaxi(taxinpc))
                 {
@@ -1178,10 +1190,7 @@ namespace WowAI
                     CanselForm();
                     CancelMoveTo();
                     Thread.Sleep(500);
-                    while (Me.IsMoving)
-                    {
-                        Thread.Sleep(100);
-                    }
+                    MyCheckIsMovingIsCasting();
                     var result = SpellManager.CastSpell(mountSell.Id);
 
                     if (result != ESpellCastError.SUCCESS)
@@ -1582,10 +1591,7 @@ namespace WowAI
                     CanselForm();
                     CancelMoveTo();
                     Thread.Sleep(500);
-                    while (Me.IsMoving)
-                    {
-                        Thread.Sleep(100);
-                    }
+                    MyCheckIsMovingIsCasting();
                     var result = SpellManager.CastSpell(mountSell.Id);
 
                     if (result != ESpellCastError.SUCCESS)
@@ -1832,10 +1838,7 @@ namespace WowAI
                 }
                 else
                 {
-                    while (Me.IsMoving)
-                        Thread.Sleep(50);
-                    while (SpellManager.IsCasting)
-                        Thread.Sleep(50);
+                    MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
 
@@ -1850,10 +1853,7 @@ namespace WowAI
                     else
                         log("Не получилось использовать " + item.Name + "[" + item.Id + "]  " + result + "  " + GetLastError(), Host.LogLvl.Error);
                     Thread.Sleep(1000);
-                    while (Me.IsMoving)
-                        Thread.Sleep(50);
-                    while (SpellManager.IsCasting)
-                        Thread.Sleep(50);
+                   MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
                     if (result == EInventoryResult.OK)
@@ -2225,10 +2225,7 @@ namespace WowAI
                 }
 
 
-                while (Me.IsMoving)
-                {
-                    Thread.Sleep(100);
-                }
+                MyCheckIsMovingIsCasting();
                 if (!(go as GameObject).Use())
                 {
                     log("Не смог использовать " + go.Name + " " + GetLastError(), Host.LogLvl.Error);

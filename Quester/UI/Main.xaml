@@ -240,6 +240,7 @@
                                                     <ComboBoxItem Content="Походный облик" Background="#FF36393E" Foreground="White"/>
                                                 </ComboBox>
                                             </StackPanel>
+                                            <CheckBox x:Name="CheckBoxLaunchSkript" Content="Запустить скрипт по завершению квестов" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
                                         </StackPanel>
                                         <StackPanel Margin="5,5,0,0" Orientation="Vertical" VerticalAlignment="Bottom">
                                             <CheckBox x:Name="CheckBoxLogScript" Content="Лог режима скрипт(Действия)" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogScriptAction}"/>
@@ -2281,6 +2282,7 @@
                                             <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemId}" />
                                             <GridViewColumn Header="SkillId" DisplayMemberBinding="{Binding SkillId}" />
                                             <GridViewColumn Header="Pause" DisplayMemberBinding="{Binding Pause}" />
+                                            <GridViewColumn Header="PluginPath" DisplayMemberBinding="{Binding PluginPath}" />
                                             <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Com}" />
                                         </GridView>
                                     </ListView.View>
@@ -2343,7 +2345,10 @@
                                                     <ComboBoxItem Content="Выбрать диалог"/>
                                                     <ComboBoxItem Content="Проверить группу"/>
                                                     <ComboBoxItem Content="Проверить инвентарь"/>
+                                                    <ComboBoxItem Content="Выключить плагин" IsEnabled="True"/>
                                                     <ComboBoxItem x:Name="Combo13" Content="Остановить скрипт" IsEnabled="True"/>
+                                                    <ComboBoxItem Content="Запустить другой плагин" IsEnabled="True"/>
+                                                    
                                                 </ComboBox>
                                                 <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
                                                 <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
@@ -2411,6 +2416,13 @@
                                             <StackPanel x:Name="StackPanelDungeonSkill" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
                                                 <Label x:Name="labelDungeonItem1" Content="Скилл" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                                 <ComboBox x:Name="comboBoxDungeonSkill" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonSkill_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                    <ComboBoxItem Content="Не выбрано"/>
+
+                                                </ComboBox>
+                                            </StackPanel>
+                                            <StackPanel x:Name="StackPanelDungeonPlugin" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                <Label x:Name="labelDungeonPlugin" Content="Плагин" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                <ComboBox x:Name="comboBoxDungeonPlugin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonPlugin_PreviewMouseLeftButtonDown" SelectedIndex="0">
                                                     <ComboBoxItem Content="Не выбрано"/>
 
                                                 </ComboBox>
