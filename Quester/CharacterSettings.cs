@@ -123,7 +123,13 @@ namespace WowAI
 
         public bool UseMultiZone = false;
 
+        public bool CheckAukInTimeRange = false;
+        public TimeSpan StartAukTime = new TimeSpan();
+        public TimeSpan EndAukTime = new TimeSpan();
+        public bool ScriptScheduleEnable = false;
+        public bool ScriptReverse = false;
 
+        public bool AlternateAuk = false;
         //  public EMode Mode2 { get; set; } = EMode.Questing;
         /// <summary>
         /// 0 - Квестинг; 1 - Фарм; 2 - Сбор;
@@ -170,6 +176,8 @@ namespace WowAI
 
         public List<AukSettings> AukSettingses = new List<AukSettings>();
 
+        public List<ScriptSchedule> ScriptSchedules = new List<ScriptSchedule>();
+
         public enum EventsAction
         {
             NotSellected = -1,
@@ -202,6 +210,14 @@ namespace WowAI
 
 
     [Serializable]
+
+    public class ScriptSchedule
+    {
+        public TimeSpan ScriptStartTime { get; set; }
+        public TimeSpan ScriptStopTime { get; set; }
+        public string ScriptName { get; set; }
+    }
+
 
     public class AukSettings
     {

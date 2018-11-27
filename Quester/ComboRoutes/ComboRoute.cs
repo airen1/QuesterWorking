@@ -423,7 +423,15 @@ namespace WowAI.ComboRoutes
                         if (buffItem != null)
                         {
                             host.CommonModule.SuspendMove();
-                            host.CommonModule.MyUnmount();
+
+                            var isNeedUnmount = true;
+
+                            if (buffItem.Id == 152813)
+                                isNeedUnmount = false;
+
+                            if (isNeedUnmount)
+                                host.CommonModule.MyUnmount();
+
                             var result = host.SpellManager.UseItem(buffItem);
                             if (result != EInventoryResult.OK)
                             {
@@ -498,7 +506,7 @@ namespace WowAI.ComboRoutes
 
                     if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
                         return;
-                   
+
                     try
                     {
 
@@ -524,8 +532,10 @@ namespace WowAI.ComboRoutes
 
             }
 
-            if (host.GetAgroCreatures().Count == 0 && host.Me.HpPercents < 80)
+            if (host.GetThreats().Count == 0 && host.Me.HpPercents < 80)
             {
+
+
                 var regenSpel = host.SpellManager.GetSpell(8936);
                 if (regenSpel != null)
                 {
@@ -534,6 +544,14 @@ namespace WowAI.ComboRoutes
                     host.CommonModule.SuspendMove();
                     try
                     {
+                        var needChangeForm = true;
+                        foreach (var i in host.Me.GetAuras())
+                        {                           
+                            if (i.SpellId == 24858)//Облик лунного совуха    
+                                needChangeForm = false;                          
+                        }
+                        if (needChangeForm)
+                            host.CanselForm();
                         host.MyCheckIsMovingIsCasting();
                         var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
                         if (result != ESpellCastError.SUCCESS)

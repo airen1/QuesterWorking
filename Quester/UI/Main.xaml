@@ -2255,190 +2255,225 @@
                 </TabItem>
                 <TabItem x:Name="TabItemDungeonP" Header="Скрипт" Height="39" VerticalAlignment="Top">
                     <Grid Margin="0">
-                        <GroupBox x:Name="groupBox4" Header="Список действий" Margin="0">
-                            <Grid Margin="0,0,0,-3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="611*"/>
-                                    <ColumnDefinition Width="466*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="407*"/>
-                                    <RowDefinition Height="270*"/>
-                                </Grid.RowDefinitions>
-                                <ListView x:Name="ListViewDangeonFunction" ItemsSource="{Binding CollectionDungeonCoord}" Grid.ColumnSpan="2" SelectionChanged="ListViewDangeonFunction_SelectionChanged" >
-                                    <ListView.View>
-                                        <GridView>
+                        <TabControl Foreground="Black">
+                            <TabItem Header="Основное" BorderBrush="{x:Null}" Background="{x:Null}">
+                                <Grid>
+                                    <GroupBox x:Name="groupBox4" Header="Список действий" Margin="0">
+                                        <Grid Margin="0,0,0,-3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="611*"/>
+                                                <ColumnDefinition Width="466*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="327*"/>
+                                                <RowDefinition Height="350*"/>
+                                            </Grid.RowDefinitions>
+                                            <ListView x:Name="ListViewDangeonFunction" ItemsSource="{Binding CollectionDungeonCoord}" Grid.ColumnSpan="2" SelectionChanged="ListViewDangeonFunction_SelectionChanged" >
+                                                <ListView.View>
+                                                    <GridView>
 
 
-                                            <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}" />
-                                            <GridViewColumn Header="Координаты" DisplayMemberBinding="{Binding Loc}" />
-                                            <GridViewColumn Header="MapId" DisplayMemberBinding="{Binding MapId}" />
-                                            <GridViewColumn Header="AreaId" DisplayMemberBinding="{Binding AreaId}" />
-                                            <GridViewColumn Header="Действие" DisplayMemberBinding="{Binding Action}" />
-                                            <GridViewColumn Header="MobId" DisplayMemberBinding="{Binding MobId}" />
-                                            <GridViewColumn Header="PropId" DisplayMemberBinding="{Binding PropId}" />
-                                            <GridViewColumn Header="Атаковать по пути" DisplayMemberBinding="{Binding Attack}" />
-                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                                            <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemId}" />
-                                            <GridViewColumn Header="SkillId" DisplayMemberBinding="{Binding SkillId}" />
-                                            <GridViewColumn Header="Pause" DisplayMemberBinding="{Binding Pause}" />
-                                            <GridViewColumn Header="PluginPath" DisplayMemberBinding="{Binding PluginPath}" />
-                                            <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Com}" />
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-                                <GroupBox x:Name="groupBox5" Header="Выбор действий" Margin="0,1,0,0" Grid.Row="1" Grid.Column="1">
-                                    <Grid Margin="0">
-                                        <StackPanel Margin="5,0,0,0" Orientation="Vertical">
-                                            <ComboBox x:Name="comboBoxDungeonScript" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0">
+                                                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}" />
+                                                        <GridViewColumn Header="Координаты" DisplayMemberBinding="{Binding Loc}" />
+                                                        <GridViewColumn Header="MapId" DisplayMemberBinding="{Binding MapId}" />
+                                                        <GridViewColumn Header="AreaId" DisplayMemberBinding="{Binding AreaId}" />
+                                                        <GridViewColumn Header="Действие" DisplayMemberBinding="{Binding Action}" />
+                                                        <GridViewColumn Header="MobId" DisplayMemberBinding="{Binding MobId}" />
+                                                        <GridViewColumn Header="PropId" DisplayMemberBinding="{Binding PropId}" />
+                                                        <GridViewColumn Header="Атаковать по пути" DisplayMemberBinding="{Binding Attack}" />
+                                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                                                        <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemId}" />
+                                                        <GridViewColumn Header="SkillId" DisplayMemberBinding="{Binding SkillId}" />
+                                                        <GridViewColumn Header="Pause" DisplayMemberBinding="{Binding Pause}" />
+                                                        <GridViewColumn Header="PluginPath" DisplayMemberBinding="{Binding PluginPath}" />
+                                                        <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Com}" />
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <GroupBox x:Name="groupBox5" Header="Выбор действий" Margin="0,1,0,0" Grid.Row="1" Grid.Column="1">
+                                                <Grid Margin="0">
+                                                    <StackPanel Margin="5,0,0,0" Orientation="Vertical">
+                                                        <ComboBox x:Name="comboBoxDungeonScript" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0">
+                                                            <ComboBoxItem Content="Не выбрано"/>
+                                                        </ComboBox>
+                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                            <CheckBox x:Name="CheckBoxGatherResourceScript" Content="Собирать ресурсы по дороге с радиусом" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding GatherResouceScript}"/>
+                                                            <TextBox x:Name="textBoxGatherRadiusScript" TextWrapping="Wrap" Text="{Binding GatherRadiusScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
+                                                            <CheckBox x:Name="CheckBoxFindBestPoint" Content="Ближайшая точка" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
+                                                        </StackPanel>
+                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                            <CheckBox x:Name="CheckBoxForceMoveScriptEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding ForceMoveScriptEnable}" Content="Использовать ForceMove на дистанцию до"/>
+                                                            <TextBox x:Name="textBoxForceMoveScriptDist" TextWrapping="Wrap" Text="{Binding ForceMoveScriptDist}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
+                                                            <Label x:Name="labelDungeonMob_Copy" Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                            <CheckBox x:Name="CheckBoxFightIfHPLess" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding FightIfHPLess}" Content="Отбиваться если HP меньше"/>
+                                                            <TextBox x:Name="textBoxFightIfHPLessCount" TextWrapping="Wrap" Text="{Binding FightIfHPLessCount}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
+                                                            <CheckBox x:Name="CheckBoxFightIfMobs" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Отбиваться если моб мешает сбору"/>
+                                                        </StackPanel>
+                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                            <CheckBox x:Name="CheckBoxAttack" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding Attack}" Content="Атаковать мобов в радиусе"/>
+                                                            <TextBox x:Name="textBoxAttackRadius" TextWrapping="Wrap" Text="{Binding AttackRadius}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
+                                                        </StackPanel>
+                                                        <CheckBox x:Name="CheckBoxWaitSixMin" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Ожидать до 6 минут" Margin="5,0,0,0" IsChecked="True"/>
+                                                        <CheckBox x:Name="CheckBoxScriptReverse" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Реверс маршрута" Margin="5,5,0,0"/>
+                                                        <StackPanel Margin="0,16,0,0" Orientation="Horizontal" VerticalAlignment="Bottom">
+                                                            <Button x:Name="buttonScriptSavePointMove" Content="Запись точек в движении(выкл)" Click="buttonScriptSavePointMove_Click" HorizontalAlignment="Left"/>
+                                                            <Label x:Name="labelDungeonCom_Copy1" Content="Дистанция между точками" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxScriptSavePointMoveDist" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" Text="5"/>
+                                                            <Label x:Name="labelDungeonCom_Copy2" Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom">
+                                                        <Button x:Name="buttonDungeonSaveScript" Content="Сохранить" Margin="5,0,0,0" Click="buttonDungeonSaveScript_Click"/>
+                                                        <Button x:Name="buttonDungeonLoadScript" Content="Загрузить" Margin="10,0,0,0" Click="buttonDungeonLoadScript_Click" IsEnabled="False"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </GroupBox>
+                                            <GroupBox x:Name="groupBox6" Header="Настройки действий" Margin="0" Grid.Row="1">
+                                                <Grid>
+                                                    <WrapPanel Orientation="Horizontal">
+                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                            <Label x:Name="labelDungeonMob1" Content="Действие: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0" SelectionChanged="ComboBoxDungeonAction_SelectionChanged">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                                <ComboBoxItem Content="Вход в данж" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Выход из данжа" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Бежать на точку"/>
+                                                                <ComboBoxItem Content="Фарм мобов" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Отбиться от мобов"/>
+                                                                <ComboBoxItem Content="Фарм пропов" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Пауза"/>
+                                                                <ComboBoxItem Content="Сбросить все данжи"/>
+                                                                <ComboBoxItem Content="Использовать скилл"/>
+                                                                <ComboBoxItem Content="Выбрать диалог"/>
+                                                                <ComboBoxItem Content="Проверить группу"/>
+                                                                <ComboBoxItem Content="Проверить инвентарь"/>
+                                                                <ComboBoxItem Content="Выключить плагин" IsEnabled="True"/>
+                                                                <ComboBoxItem x:Name="Combo13" Content="Остановить скрипт" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Запустить другой плагин" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Рыбалка" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Включить сбор" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Выключить сбор" IsEnabled="True"/>
+                                                            </ComboBox>
+                                                            <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
+                                                            <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                    Style="{DynamicResource ButtonStyle1}" Margin="80,0,0,0">
+                                                                <Button.RenderTransform>
+                                                                    <TransformGroup>
+                                                                        <ScaleTransform/>
+                                                                        <SkewTransform/>
+                                                                        <RotateTransform Angle="-90"/>
+                                                                        <TranslateTransform/>
+                                                                    </TransformGroup>
+                                                                </Button.RenderTransform>
+                                                            </Button>
+                                                            <Button x:Name="ButtonDownDungeon" Content="&lt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Click="ButtonDownDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                    Style="{DynamicResource ButtonStyle1}" Margin="20,0,0,0">
+                                                                <Button.RenderTransform>
+                                                                    <TransformGroup>
+                                                                        <ScaleTransform/>
+                                                                        <SkewTransform/>
+                                                                        <RotateTransform Angle="-90"/>
+                                                                        <TranslateTransform/>
+                                                                    </TransformGroup>
+                                                                </Button.RenderTransform>
+                                                            </Button>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="StackPanelDungeonMob" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                            <Label x:Name="labelDungeonMob" Content="Моб: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="comboBoxDungeonMob" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="StackPanelDungeonProp" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                            <Label x:Name="labelDungeonProp" Content="Проп: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="comboBoxDungeonProp" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob2_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="StackPanelDungeonItem" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                            <Label x:Name="labelDungeonItem" Content="Предмет: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="comboBoxDungeonItem" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonItem_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                                <ComboBoxItem Content="Тюрьма Бальмонта"/>
+                                                                <ComboBoxItem Content="Древний Мавзолей"/>
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                        <WrapPanel Margin="5,5,0,0" Width="573">
+                                                            <Label x:Name="labelDungeonLoc" Content="Координаты:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxDungeonLocX" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
+                                                            <TextBox x:Name="textBoxDungeonLocY" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
+                                                            <TextBox x:Name="textBoxDungeonLocZ" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
+                                                            <Label x:Name="labelDungeonMapId" Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxDungeonLocMapId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
+                                                            <Label x:Name="labelDungeonAreaId" Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxDungeonLocAreaId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
+                                                            <Button x:Name="buttonDungeonLocFill" Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonDungeonLocFill_Click" Margin="10,0,0,0"/>
+                                                        </WrapPanel>
+                                                        <WrapPanel Margin="0,10,0,0" Height="33">
+                                                            <Label x:Name="labelDungeonCom" Content="Комментарий:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxDungeonCom" TextWrapping="Wrap" Text="Комментарий" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left"/>
+                                                        </WrapPanel>
+                                                        <StackPanel x:Name="StackPanelPause" Height="26" Orientation="Horizontal">
+                                                            <Label x:Name="labelDungeonCom1_Copy2" Content="Пауза(мс)" HorizontalAlignment="Left" Background="#00000000" Foreground="White"/>
+                                                            <TextBox x:Name="textBoxScriptPause" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left"/>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="StackPanelDungeonSkill" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                            <Label x:Name="labelDungeonItem1" Content="Скилл" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="comboBoxDungeonSkill" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonSkill_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="StackPanelDungeonPlugin" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
+                                                            <Label x:Name="labelDungeonPlugin" Content="Плагин" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                            <ComboBox x:Name="comboBoxDungeonPlugin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonPlugin_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                                <ComboBoxItem Content="Не выбрано"/>
+
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                    </WrapPanel>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom">
+                                                        <Button x:Name="buttonDungeonAdd" Content="Добавить" Margin="5,0,0,0" Click="button2_Click"/>
+                                                        <Button x:Name="buttonDungeonDel" Content="Удалить" Margin="10,0,0,0" Click="buttonInvItemsDel2_Click"/>
+                                                        <Button x:Name="buttonDungeonEdit" Content="Редактировать" Margin="10,0,0,0" Click="buttonDungeonEdit_Click"/>
+                                                        <Button x:Name="buttonDungeonImport" Content="Импорт из wrobot" Margin="10,0,0,0" Click="buttonDungeonImport_Click"/>
+                                                        <Button x:Name="buttonDungeonDelAll" Content="Очистить" Margin="10,0,0,0" Click="buttonDungeonDelAll_Click"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Расписание" Background="{x:Null}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="171*"/>
+                                        <RowDefinition Height="163*"/>
+                                    </Grid.RowDefinitions>
+                                    <DataGrid x:Name="DataGridScriptSchedule" ItemsSource="{Binding CollectionScriptSchedules}" />
+                                    <StackPanel Grid.Row="1" Margin="0,15,0,0">
+                                        <CheckBox x:Name="CheckBoxScriptScheduleEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Включить запуск по расписанию" Margin="5,5,0,0"/>
+                                        <StackPanel Margin="0,10,0,0" Orientation="Horizontal" Width="1083" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                            <Label x:Name="LabelGoldInHour_Copy2" Content="С" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                            <TextBox x:Name="textBoxScriptScheduleStartTime" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                            <Label x:Name="LabelGoldInHour_Copy3" Content="до" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                            <TextBox x:Name="textBoxScriptSheduleEndTime" TextWrapping="Wrap" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                            <Label x:Name="LabelGoldInHour_Copy4" Content="выполнять скрипт" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                            <ComboBox x:Name="comboBoxDungeonScript_Copy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0">
                                                 <ComboBoxItem Content="Не выбрано"/>
                                             </ComboBox>
-                                            <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                <CheckBox x:Name="CheckBoxGatherResourceScript" Content="Собирать ресурсы по дороге с радиусом" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding GatherResouceScript}"/>
-                                                <TextBox x:Name="textBoxGatherRadiusScript" TextWrapping="Wrap" Text="{Binding GatherRadiusScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
-                                                <CheckBox x:Name="CheckBoxFindBestPoint" Content="Ближайшая точка" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                <CheckBox x:Name="CheckBoxForceMoveScriptEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding ForceMoveScriptEnable}" Content="Использовать ForceMove на дистанцию до"/>
-                                                <TextBox x:Name="textBoxForceMoveScriptDist" TextWrapping="Wrap" Text="{Binding ForceMoveScriptDist}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
-                                                <Label x:Name="labelDungeonMob_Copy" Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                <CheckBox x:Name="CheckBoxFightIfHPLess" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding FightIfHPLess}" Content="Отбиваться если HP меньше"/>
-                                                <TextBox x:Name="textBoxFightIfHPLessCount" TextWrapping="Wrap" Text="{Binding FightIfHPLessCount}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
-                                                <CheckBox x:Name="CheckBoxFightIfMobs" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Отбиваться если моб мешает сбору"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                <CheckBox x:Name="CheckBoxAttack" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding Attack}" Content="Атаковать мобов в радиусе"/>
-                                                <TextBox x:Name="textBoxAttackRadius" TextWrapping="Wrap" Text="{Binding AttackRadius}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
-                                            </StackPanel>
-                                            <CheckBox x:Name="CheckBoxWaitSixMin" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Ожидать до 6 минут" Margin="5,0,0,0" IsChecked="True"/>
-                                            <StackPanel Margin="0,16,0,0" Orientation="Horizontal" VerticalAlignment="Bottom">
-                                                <Button x:Name="buttonScriptSavePointMove" Content="Запись точек в движении(выкл)" Click="buttonScriptSavePointMove_Click" HorizontalAlignment="Left"/>
-                                                <Label x:Name="labelDungeonCom_Copy1" Content="Дистанция между точками" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxScriptSavePointMoveDist" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" Text="5"/>
-                                                <Label x:Name="labelDungeonCom_Copy2" Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                            </StackPanel>
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom">
-                                            <Button x:Name="buttonDungeonSaveScript" Content="Сохранить" Margin="5,0,0,0" Click="buttonDungeonSaveScript_Click"/>
-                                            <Button x:Name="buttonDungeonLoadScript" Content="Загрузить" Margin="10,0,0,0" Click="buttonDungeonLoadScript_Click" IsEnabled="False"/>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <Button x:Name="buttonScriptScheduleAdd" Content="Добавить" Click="buttonScriptScheduleAdd_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                            <Button x:Name="buttonDungeonSheduleDel" Content="Удалить" Click="buttonDungeonSheduleDel_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0"/>
                                         </StackPanel>
-                                    </Grid>
-                                </GroupBox>
-                                <GroupBox x:Name="groupBox6" Header="Настройки действий" Margin="0" Grid.Row="1">
-                                    <Grid>
-                                        <WrapPanel Orientation="Horizontal">
-                                            <StackPanel Margin="5,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                                <Label x:Name="labelDungeonMob1" Content="Действие: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0" SelectionChanged="ComboBoxDungeonAction_SelectionChanged">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-                                                    <ComboBoxItem Content="Вход в данж" IsEnabled="False"/>
-                                                    <ComboBoxItem Content="Выход из данжа" IsEnabled="False"/>
-                                                    <ComboBoxItem Content="Бежать на точку"/>
-                                                    <ComboBoxItem Content="Фарм мобов" IsEnabled="False"/>
-                                                    <ComboBoxItem Content="Отбиться от мобов"/>
-                                                    <ComboBoxItem Content="Фарм пропов" IsEnabled="False"/>
-                                                    <ComboBoxItem Content="Пауза"/>
-                                                    <ComboBoxItem Content="Сбросить все данжи"/>
-                                                    <ComboBoxItem Content="Использовать скилл"/>
-                                                    <ComboBoxItem Content="Выбрать диалог"/>
-                                                    <ComboBoxItem Content="Проверить группу"/>
-                                                    <ComboBoxItem Content="Проверить инвентарь"/>
-                                                    <ComboBoxItem Content="Выключить плагин" IsEnabled="True"/>
-                                                    <ComboBoxItem x:Name="Combo13" Content="Остановить скрипт" IsEnabled="True"/>
-                                                    <ComboBoxItem Content="Запустить другой плагин" IsEnabled="True"/>
-                                                    
-                                                </ComboBox>
-                                                <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
-                                                <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                    Style="{DynamicResource ButtonStyle1}" Margin="80,0,0,0">
-                                                    <Button.RenderTransform>
-                                                        <TransformGroup>
-                                                            <ScaleTransform/>
-                                                            <SkewTransform/>
-                                                            <RotateTransform Angle="-90"/>
-                                                            <TranslateTransform/>
-                                                        </TransformGroup>
-                                                    </Button.RenderTransform>
-                                                </Button>
-                                                <Button x:Name="ButtonDownDungeon" Content="&lt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Click="ButtonDownDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                    Style="{DynamicResource ButtonStyle1}" Margin="20,0,0,0">
-                                                    <Button.RenderTransform>
-                                                        <TransformGroup>
-                                                            <ScaleTransform/>
-                                                            <SkewTransform/>
-                                                            <RotateTransform Angle="-90"/>
-                                                            <TranslateTransform/>
-                                                        </TransformGroup>
-                                                    </Button.RenderTransform>
-                                                </Button>
-                                            </StackPanel>
-                                            <StackPanel x:Name="StackPanelDungeonMob" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                <Label x:Name="labelDungeonMob" Content="Моб: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="comboBoxDungeonMob" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-                                                </ComboBox>
-                                            </StackPanel>
-                                            <StackPanel x:Name="StackPanelDungeonProp" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                <Label x:Name="labelDungeonProp" Content="Проп: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="comboBoxDungeonProp" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob2_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-                                                </ComboBox>
-                                            </StackPanel>
-                                            <StackPanel x:Name="StackPanelDungeonItem" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                <Label x:Name="labelDungeonItem" Content="Предмет: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="comboBoxDungeonItem" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonItem_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-                                                    <ComboBoxItem Content="Тюрьма Бальмонта"/>
-                                                    <ComboBoxItem Content="Древний Мавзолей"/>
-                                                </ComboBox>
-                                            </StackPanel>
-                                            <WrapPanel Margin="5,5,0,0" Width="573">
-                                                <Label x:Name="labelDungeonLoc" Content="Координаты:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxDungeonLocX" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
-                                                <TextBox x:Name="textBoxDungeonLocY" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
-                                                <TextBox x:Name="textBoxDungeonLocZ" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
-                                                <Label x:Name="labelDungeonMapId" Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxDungeonLocMapId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
-                                                <Label x:Name="labelDungeonAreaId" Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxDungeonLocAreaId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0"/>
-                                                <Button x:Name="buttonDungeonLocFill" Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonDungeonLocFill_Click" Margin="10,0,0,0"/>
-                                            </WrapPanel>
-                                            <WrapPanel Margin="0,10,0,0" Height="33">
-                                                <Label x:Name="labelDungeonCom" Content="Комментарий:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxDungeonCom" TextWrapping="Wrap" Text="Комментарий" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left"/>
-                                            </WrapPanel>
-                                            <StackPanel x:Name="StackPanelPause" Height="26" Orientation="Horizontal">
-                                                <Label x:Name="labelDungeonCom1_Copy2" Content="Пауза(мс)" HorizontalAlignment="Left" Background="#00000000" Foreground="White"/>
-                                                <TextBox x:Name="textBoxScriptPause" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left"/>
-                                            </StackPanel>
-                                            <StackPanel x:Name="StackPanelDungeonSkill" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                <Label x:Name="labelDungeonItem1" Content="Скилл" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="comboBoxDungeonSkill" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonSkill_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-
-                                                </ComboBox>
-                                            </StackPanel>
-                                            <StackPanel x:Name="StackPanelDungeonPlugin" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                <Label x:Name="labelDungeonPlugin" Content="Плагин" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                <ComboBox x:Name="comboBoxDungeonPlugin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonPlugin_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                    <ComboBoxItem Content="Не выбрано"/>
-
-                                                </ComboBox>
-                                            </StackPanel>
-                                        </WrapPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom">
-                                            <Button x:Name="buttonDungeonAdd" Content="Добавить" Margin="5,0,0,0" Click="button2_Click"/>
-                                            <Button x:Name="buttonDungeonDel" Content="Удалить" Margin="10,0,0,0" Click="buttonInvItemsDel2_Click"/>
-                                            <Button x:Name="buttonDungeonEdit" Content="Редактировать" Margin="10,0,0,0" Click="buttonDungeonEdit_Click"/>
-                                            <Button x:Name="buttonDungeonImport" Content="Импорт из wrobot" Margin="10,0,0,0" Click="buttonDungeonImport_Click"/>
-                                            <Button x:Name="buttonDungeonDelAll" Content="Очистить" Margin="10,0,0,0" Click="buttonDungeonDelAll_Click"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </GroupBox>
-                            </Grid>
-                        </GroupBox>
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
                     </Grid>
                 </TabItem>
                 <TabItem x:Name="Debug" Header="Debug" >
@@ -2670,6 +2705,13 @@
                                             <Button x:Name="buttonAukLocFill" Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonAukLocFill_Click" Margin="10,0,0,0"/>
                                         </WrapPanel>
                                     </StackPanel>
+                                    <WrapPanel Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <CheckBox x:Name="CheckBoxCheckAukTime" Content="Проверять аук в указанное время. С" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
+                                        <TextBox x:Name="textBoxCheckAukStartTime" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                        <Label x:Name="LabelGoldInHour_Copy1" Content="по" Margin="0" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="textBoxCheckAukEndTime" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                    </WrapPanel>
+                                    <CheckBox x:Name="CheckBoxAlternateAuk" Content="Использовать второй аук в столице" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>

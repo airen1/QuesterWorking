@@ -1772,6 +1772,12 @@ namespace WowAI.Modules
                     Host.SetMoveStateForClient(false);
                 }
 
+                if (_moveFailCount > 10)
+                {
+                    if(Host.Me.IsDeadGhost)
+                    Host.ComboRoute.DeathTime = DateTime.Now;
+                }
+
                 if (_moveFailCount > 20 || Host.Me.Distance(1477.98, 1591.57, 39.66) < 5)
                 {
                     Host.CanselForm();

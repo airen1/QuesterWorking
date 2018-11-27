@@ -103,7 +103,7 @@ namespace WowAI
         public CharacterSettings CharacterSettings { get; set; } = new CharacterSettings();
         internal DungeonSetting DungeonSettings { get; set; }
         internal QuestSetting QuestSettings { get; set; }
-        internal QuestStates QuestStates { get; set; }
+       // internal QuestStates QuestStates { get; set; }
 
         internal DropBases DropBases { get; set; } = new DropBases();
         internal MonsterGroup2 MonsterGroup { get; set; } = new MonsterGroup2();
@@ -177,7 +177,7 @@ namespace WowAI
         public string PathNpCjson = "";
         public string PathDropjson = "";
         public string PathQuestSet = "";
-        public string PathQuestState = "";
+       // public string PathQuestState = "";
         public string PathMonsterGroup = "";
         public uint StartExp;
         public bool AdvancedLog = false;
@@ -192,7 +192,7 @@ namespace WowAI
                 {
                     AdvancedLog = true;
                 }
-
+                
                 /* foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
                  {
                      if (gameDbQuestTemplate.Value.QuestObjectives == null)
@@ -253,7 +253,7 @@ namespace WowAI
                 if (!Directory.Exists(PathQuestSet))
                     Directory.CreateDirectory(PathQuestSet);
 
-                if (isReleaseVersion)
+               /* if (isReleaseVersion)
                     PathQuestState = AssemblyDirectory + "\\QuestState\\";
                 else
                 {
@@ -261,7 +261,7 @@ namespace WowAI
                 }
 
                 if (!Directory.Exists(PathQuestState))
-                    Directory.CreateDirectory(PathQuestState);
+                    Directory.CreateDirectory(PathQuestState);*/
 
 
                 DateTime lastChanged = File.GetLastWriteTime(AssemblyDirectory + "\\WowAI.dll");
@@ -271,7 +271,7 @@ namespace WowAI
                 // CharacterSettings = new CharacterSettings();
                 DungeonSettings = new DungeonSetting();
                 QuestSettings = new QuestSetting();
-                QuestStates = new QuestStates();
+                //QuestStates = new QuestStates();
 
 
                 if (AdvancedLog)
@@ -352,7 +352,7 @@ namespace WowAI
                 }
 
 
-                if (File.Exists(PathQuestState + Me.Name + "[].json"))
+             /*   if (File.Exists(PathQuestState + Me.Name + "[].json"))
                 {
                     QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + CurrentServer.Name + "].json", typeof(QuestStates), QuestStates);
                     File.Delete(PathQuestState + Me.Name + "[].json");
@@ -361,7 +361,7 @@ namespace WowAI
                 else
                 {
                     QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", typeof(QuestStates), QuestStates);
-                }
+                }*/
 
 
 
@@ -421,7 +421,7 @@ namespace WowAI
                 MainForm.NeedApplyQuestSettings = true;
 
 
-
+               
 
                 MainForm.Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -950,7 +950,7 @@ namespace WowAI
                 }
 
 
-
+                
 
 
                 if (Me.Name == "")
@@ -1138,28 +1138,7 @@ namespace WowAI
 
 
 
-        /*
-         *Random  RandomGenerator = new Random();
-        public Vector3F GetRandomPoint()
-            {
-                double angle = 2.0 * Math.PI * RandomGenerator.NextDouble();
-                return new Vector3F(Me.Target.Location.X + RandomGenerator.Next(4,9) * Math.Cos(angle), Me.Target.Location.Y + RandomGenerator.Next(4,7) * Math.Sin(angle), Me.Location.Z);
-            }
-
-public void PluginRun()
-       {
-
-           while (true)
-           {
-               if (Me.Target != null)
-               {
-                   var f = GetRandomPoint();
-                   ForceMoveToWithLookTo(f, Me.Target.Location);
-               }
-           }
-}
-         *
-         */
+       
         public void PluginStop()
         {
             try
@@ -1370,7 +1349,6 @@ public void PluginRun()
             catch
             {
                 log("Не получилось загрузить скрипт: " + ScriptName, LogLvl.Error);
-
             }
 
             return _cfgLoaded;

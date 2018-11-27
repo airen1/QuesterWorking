@@ -13,8 +13,28 @@ using WoWBot.Database;
 
 namespace WowAI
 {
+    static class TimeSpanExtensions
+    {
+        static public bool IsBetween(this TimeSpan time,
+            TimeSpan startTime, TimeSpan endTime)
+        {
+            if (endTime == startTime)
+            {
+                return true;
+            }
+            if (endTime < startTime)
+            {
+                return time <= endTime ||
+                       time >= startTime;
+            }
+            return time >= startTime &&
+                   time <= endTime;
+        }
+    }
     internal partial class Host
     {
+
+
 
         public List<uint> NoShowSkill = new List<uint>
         {
@@ -72,9 +92,18 @@ namespace WowAI
 
              return null;
          }*/
-        
+
+
+        public static bool IsInRange(DateTime dateToCheck, DateTime startDate, DateTime endDate)
+        {
+
+            return dateToCheck >= startDate && dateToCheck <= endDate;
+        }
+
         public void MyCheckIsMovingIsCasting()
         {
+
+
             var fixMove = 0;
             while (SpellManager.IsCasting || Me.IsMoving)
             {
@@ -83,13 +112,13 @@ namespace WowAI
                     fixMove++;
                     log(SpellManager.IsCasting + "    " + Me.IsMoving);
                 }
-               
+
                 Thread.Sleep(100);
                 if (!Me.IsAlive)
                     return;
-                if(!MainForm.On)
+                if (!MainForm.On)
                     return;
-              
+
                 if (fixMove > 50)
                 {
                     SetMoveStateForClient(true);
@@ -112,7 +141,7 @@ namespace WowAI
             var waitTime = time;
             while (waitTime > 0)
             {
-                if(!MainForm.On)
+                if (!MainForm.On)
                     return;
                 Thread.Sleep(1000);
                 waitTime = waitTime - 1000;
@@ -308,9 +337,9 @@ namespace WowAI
 
             }
 
-           
 
-          
+
+
 
             Jump();
             Thread.Sleep(1000);
@@ -326,6 +355,10 @@ namespace WowAI
 
             if (Me.Team == ETeam.Horde)
             {
+                if (CharacterSettings.AlternateAuk)
+                {
+                    path = CommonModule.GpsBase.GetPath(new Vector3F(2029.39, -4683.23, 28.16), Me.Location);
+                }
                 log(path.Count + "  Путь");
                 foreach (var vector3F in path)
                 {
@@ -414,6 +447,10 @@ namespace WowAI
             if (Me.Team == ETeam.Horde)
                 if (Me.Distance(1654.84, -4350.49, 26.35) < 50 || Me.Distance(1573.36, -4437.08, 16.05) < 50)
                 {
+                    if (CharacterSettings.AlternateAuk)
+                    {
+                        path = CommonModule.GpsBase.GetPath(new Vector3F(2065.83, -4668.45, 32.52), Me.Location);
+                    }
                     foreach (var vector3F in path)
                     {
                         log(path.Count + "  Путь " + Me.Distance(vector3F));
@@ -445,6 +482,8 @@ namespace WowAI
                     npc = entity;
                 if (entity.Id == 8719)
                     npc = entity;
+                if (entity.Id == 46640)
+                    npc = entity;
             }
 
             if (npc == null)
@@ -455,7 +494,7 @@ namespace WowAI
             }
             log("Выбран " + npc.Name + " " + npc.Id);
             CommonModule.MoveTo(npc, 3);
-           MyCheckIsMovingIsCasting();
+            MyCheckIsMovingIsCasting();
             OpenDialog(npc);
             Thread.Sleep(3000);
             //Продажа
@@ -466,7 +505,7 @@ namespace WowAI
         public bool NeedAuk = false;
         public bool MyUseStone(bool auk = false)
         {
-           
+
             Thread.Sleep(2000);
             while (GetAgroCreatures().Count > 0)
             {
@@ -519,7 +558,7 @@ namespace WowAI
                         log("Использовал камень ", Host.LogLvl.Ok);
                     }
                     MyCheckIsMovingIsCasting();
-                    while (SpellManager.IsChanneling)
+                    while (SpellManager.IsCasting)
                         Thread.Sleep(50);
                     Thread.Sleep(5000);
                     while (GameState != EGameState.Ingame)
@@ -555,7 +594,7 @@ namespace WowAI
                         break;
                     }
 
-                    
+
                     FarmModule.farmState = FarmState.AttackOnlyAgro;
                     if (GetAgroCreatures().Count != 0)
                         return false;
@@ -762,11 +801,17 @@ namespace WowAI
                             continue;
                         if (i.Id == 1961 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
                             continue;
+                        if (i.Id == 2078 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
+                            continue;
 
                         if (i.Id == 2080 && CharacterSettings.Mode != EMode.Questing && Me.Team == ETeam.Horde)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
+                        if (i.Id == 2062 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2273 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
 
-                        log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id );
+                        log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
                         bestNode = i;
                         bestDist = Me.Distance(i.Location);
                     }
@@ -852,7 +897,7 @@ namespace WowAI
             }
             catch (Exception e)
             {
-               log(e + "");
+                log(e + "");
                 return false;
             }
         }
@@ -985,14 +1030,14 @@ namespace WowAI
 
             Dictionary<EItemQuality, uint> MinimumCountForProcess = new Dictionary<EItemQuality, uint>();
             MinimumCountForProcess[EItemQuality.Normal] = 200;
-            MinimumCountForProcess[EItemQuality.Uncommon] = 5;
+            MinimumCountForProcess[EItemQuality.Uncommon] = 40;
             MinimumCountForProcess[EItemQuality.Rare] = 5;
 
             Dictionary<EItemQuality, int> MinimumCheckingCount = new Dictionary<EItemQuality, int>();
             MinimumCheckingCount[EItemQuality.Normal] = 2000;
             MinimumCheckingCount[EItemQuality.Uncommon] = 200;
             MinimumCheckingCount[EItemQuality.Rare] = 200;
-            List<uint> ItemIDsForSell = new List<uint>(); /*{ 152510, 152509, 152507, 154898, 152513, 152506, 152579, 152505, 152512, 152576, 152508, 152511 };*/
+            List<uint> ItemIDsForSell = new List<uint>();
             foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
             {
                 ItemIDsForSell.Add(Convert.ToUInt32(characterSettingsAukSettingse.Id));
@@ -1077,6 +1122,8 @@ namespace WowAI
                         if (!MainForm.On)
                             return;
                         var countToSell = Math.Min(count, MinimumCountForProcess[item.ItemQuality]);
+                      /*  if(countToSell < MinimumCheckingCount[item.ItemQuality])
+                            break;*/
                         count -= countToSell;
                         ulong sellPrice = Averages[item.Id] * countToSell;
                         string name = item.Name;
@@ -1853,7 +1900,7 @@ namespace WowAI
                     else
                         log("Не получилось использовать " + item.Name + "[" + item.Id + "]  " + result + "  " + GetLastError(), Host.LogLvl.Error);
                     Thread.Sleep(1000);
-                   MyCheckIsMovingIsCasting();
+                    MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
                     if (result == EInventoryResult.OK)

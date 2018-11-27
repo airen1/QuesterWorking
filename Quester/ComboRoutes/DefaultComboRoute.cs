@@ -199,7 +199,7 @@ namespace WowAI.ComboRoutes
                 GlobalCheckBestMob();
 
                 host.FarmModule.BestMob = GetHightPrioritiMob();
-                if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script)
+                if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script && host.AutoQuests.EnableFarmProp)
                 {
                     if (!host.AutoQuests.NeedActionNpcRepair && !host.AutoQuests.NeedActionNpcSell && !host.NeedAuk)
                     {
@@ -342,7 +342,7 @@ namespace WowAI.ComboRoutes
             if (host.FarmModule.BestMob != null && host.IsExists(host.FarmModule.BestMob) && host.IsAlive(host.FarmModule.BestMob))
                 host.CommonModule.SuspendMove();
 
-            if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script)
+            if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script && host.AutoQuests.EnableFarmProp)
             {
                 host.FarmModule.BestProp = host.FarmModule.GetBestPropInZone(false);
 

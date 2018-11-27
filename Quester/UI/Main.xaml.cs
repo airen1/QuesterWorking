@@ -263,6 +263,17 @@ namespace WowAI.UI
         private ObservableCollection<MyBuff> _collectionMyBuffs;
         private ObservableCollection<ItemGlobal> _collectionItemGlobals;
         private ObservableCollection<GameObjectIgnore> _gameObjectIgnores;
+        private ObservableCollection<ScriptSchedule> _scriptSchedules;
+
+        public ObservableCollection<ScriptSchedule> CollectionScriptSchedules
+        {
+            get
+            {
+                if (_scriptSchedules == null)
+                    _scriptSchedules = new ObservableCollection<ScriptSchedule>();
+                return _scriptSchedules;
+            }
+        }
 
         public ObservableCollection<AukSettings> CollectionAukSettingses
         {
@@ -1994,10 +2005,11 @@ namespace WowAI.UI
                 Host.CharacterSettings.AukLocY = Convert.ToSingle(textBoxAukLocY.Text);
                 Host.CharacterSettings.AukLocZ = Convert.ToSingle(textBoxAukLocZ.Text);
 
+                Host.CharacterSettings.ScriptReverse = CheckBoxScriptReverse.IsChecked.Value;
 
                 Host.CharacterSettings.LogScriptAction = CheckBoxLogScript.IsChecked.Value;
                 Host.CharacterSettings.LogSkill = CheckBoxLogSkill.IsChecked.Value;
-
+                Host.CharacterSettings.ScriptScheduleEnable = CheckBoxScriptScheduleEnable.IsChecked.Value;
                 Host.CharacterSettings.ForceMoveScriptEnable = CheckBoxForceMoveScriptEnable.IsChecked.Value;
                 Host.CharacterSettings.ForceMoveScriptDist = Convert.ToInt32(textBoxForceMoveScriptDist.Text);
 
@@ -2019,6 +2031,7 @@ namespace WowAI.UI
 
                 Host.CharacterSettings.Mode = (EMode)ComboBoxSwitchMode.SelectedIndex;
 
+                Host.CharacterSettings.AlternateAuk = CheckBoxAlternateAuk.IsChecked.Value;
 
                 Host.CharacterSettings.PickUpLoot = CheckBoxPickUpLoot.IsChecked.Value;
                 Host.CharacterSettings.IgnoreMob = Convert.ToInt32(textBoxIgnoreMob.Text);
@@ -2043,7 +2056,36 @@ namespace WowAI.UI
                 Host.CharacterSettings.Script = comboBoxDungeonScript.Text;
                 Host.CharacterSettings.Quest = comboBoxQuestSet.Text;
 
+                try
+                {
+                  //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2    " + textBoxCheckAukStartTime.Text);
+                 //   Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2   " + textBoxCheckAukEndTime.Text);
 
+                    Host.CharacterSettings.CheckAukInTimeRange = CheckBoxCheckAukTime.IsChecked.Value;
+
+                    Host.CharacterSettings.StartAukTime = TimeSpan.Parse(textBoxCheckAukStartTime.Text);
+                    Host.CharacterSettings.EndAukTime = TimeSpan.Parse(textBoxCheckAukEndTime.Text);
+
+                  //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2  " + textBoxCheckAukStartTime.Text);
+                  //  Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2  " + textBoxCheckAukEndTime.Text);
+                }
+                catch (Exception e)
+                {
+                  
+                }
+
+
+                Host.CharacterSettings.ScriptSchedules.Clear();
+                foreach (var  collectionScriptSchedule in CollectionScriptSchedules) 
+                {
+                    var item = new ScriptSchedule
+                    {
+                        ScriptStopTime = collectionScriptSchedule.ScriptStopTime,
+                        ScriptName = collectionScriptSchedule.ScriptName,
+                        ScriptStartTime = collectionScriptSchedule.ScriptStartTime
+                    };
+                    Host.CharacterSettings.ScriptSchedules.Add(item);
+                }
 
                 Host.CharacterSettings.AukSettingses.Clear();
                 foreach (var collectionAukSettingse in CollectionAukSettingses)
@@ -3009,7 +3051,7 @@ namespace WowAI.UI
                         CheckBoxSummonBattlePet.IsChecked = Host.CharacterSettings.SummonBattlePet;
                         CheckBoxStopQuesting.IsChecked = Host.CharacterSettings.StopQuesting;
                         textBoxStopQuestingLevel.Text = Host.CharacterSettings.StopQuestingLevel.ToString();
-
+                        CheckBoxAlternateAuk.IsChecked = Host.CharacterSettings.AlternateAuk;
                         if (Host.CharacterSettings.FormForFight == "Не использовать")
                             ComboBoxFormForFight.SelectedIndex = 0;
                         if (Host.CharacterSettings.FormForFight == "Облик медведя")
@@ -3031,9 +3073,25 @@ namespace WowAI.UI
                         textBoxValuta.Text = Host.CharacterSettings.Valuta;
                         textBoxPrice.Text = Host.CharacterSettings.Price.ToString();
                         textBoxPriceKK.Text = Host.CharacterSettings.PriceKK.ToString();
-
+                    
                         textBoxFreeInvCount.Text = Host.CharacterSettings.InvFreeSlotCount.ToString();
 
+                        CheckBoxScriptReverse.IsChecked = Host.CharacterSettings.ScriptReverse;
+
+                        try
+                        {
+                           // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                           // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                            textBoxCheckAukStartTime.Text = Host.CharacterSettings.StartAukTime.ToString("hh':'mm");
+                            textBoxCheckAukEndTime.Text = Host.CharacterSettings.EndAukTime.ToString("hh':'mm");
+                            CheckBoxCheckAukTime.IsChecked = Host.CharacterSettings.CheckAukInTimeRange;
+                           // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                           // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                        }
+                        catch (Exception e)
+                        {
+                          Host.log(e + " ");
+                        }
 
                         CheckBoxAukRun.IsChecked = Host.CharacterSettings.AukRun;
                         textBoxAukLocX.Text = Host.CharacterSettings.AukLocX.ToString();
@@ -3073,7 +3131,7 @@ namespace WowAI.UI
 
                         CheckBoxSkining.IsChecked = Host.CharacterSettings.Skinning;
                         CheckBoxNoAttackOnMount.IsChecked = Host.CharacterSettings.NoAttackOnMount;
-
+                        CheckBoxScriptScheduleEnable.IsChecked = Host.CharacterSettings.ScriptScheduleEnable;
                         CheckBoxGatherResourceScript.IsChecked = Host.CharacterSettings.GatherResouceScript;
                         textBoxGatherRadiusScript.Text = Host.CharacterSettings.GatherRadiusScript.ToString();
 
@@ -3178,6 +3236,18 @@ namespace WowAI.UI
                         CollectionGameObjectIgnores.RemoveAll();
 
                         CollectionAukSettingses.RemoveAll();
+                        CollectionScriptSchedules.RemoveAll();
+
+                        foreach (var characterSettingsScriptSchedule in Host.CharacterSettings.ScriptSchedules)
+                        {
+                            CollectionScriptSchedules.Add(new ScriptSchedule
+                            {
+                                ScriptName = characterSettingsScriptSchedule.ScriptName,
+                                ScriptStopTime = characterSettingsScriptSchedule.ScriptStopTime,
+                                ScriptStartTime = characterSettingsScriptSchedule.ScriptStartTime
+                            });
+                        }
+
                         foreach (var characterSettingsAukSettingse in Host.CharacterSettings.AukSettingses)
                         {
                             CollectionAukSettingses.Add(new AukSettings
@@ -4814,6 +4884,9 @@ namespace WowAI.UI
                 {
                     if (comboBoxDungeonScript.Items.Count > 0)
                         comboBoxDungeonScript?.Items?.Clear();
+                    if (comboBoxDungeonScript_Copy.Items.Count > 0)
+                        comboBoxDungeonScript_Copy?.Items?.Clear();
+                    
                 }
 
                 if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
@@ -4823,6 +4896,7 @@ namespace WowAI.UI
                     foreach (FileInfo file in dir.GetFiles())
                     {
                         comboBoxDungeonScript.Items.Add(file.Name);
+                        comboBoxDungeonScript_Copy.Items.Add(file.Name);
                     }
                 }
             }
@@ -5646,6 +5720,37 @@ namespace WowAI.UI
             {
 
                 Host.log(err.ToString());
+            }
+        }
+
+        private void buttonDungeonSheduleDel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (DataGridScriptSchedule.SelectedIndex != -1)
+                    CollectionScriptSchedules.RemoveAt(DataGridScriptSchedule.SelectedIndex);
+            }
+            catch (Exception exception)
+            {
+                Host.log(exception.ToString());
+            }
+        }
+
+        private void buttonScriptScheduleAdd_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CollectionScriptSchedules.Add(new ScriptSchedule
+                {
+                    ScriptStartTime = TimeSpan.Parse(textBoxScriptScheduleStartTime.Text),
+                    ScriptStopTime = TimeSpan.Parse(textBoxScriptSheduleEndTime.Text),
+                    ScriptName = comboBoxDungeonScript_Copy.Text,
+                });
+                
+            }
+            catch (Exception exception)
+            {
+                Host.log(exception + " ");
             }
         }
     }
