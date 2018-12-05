@@ -25,6 +25,7 @@ namespace WowAI.Modules
                 Host.onUserNavMeshPreMoveFull -= NavMeshPreMoveFull;
                 Host.onUserNavMeshPreMove -= NavMeshPreMove;
                 Host.onMoveTick -= MyonMoveTick;
+                Host.onCastFailedMessage -= MyonCastFailedMessage;
                 // host.onCreatureAttacked -= MyCreatureAttacked;
                 // host.onSkillLaunched -= MeSkillLaunched;
                 // host.onChatNotify -= OnChatNotify;
@@ -71,6 +72,7 @@ namespace WowAI.Modules
                 host.onUserNavMeshPreMoveFull += NavMeshPreMoveFull;
                 Host.onUserNavMeshPreMove += NavMeshPreMove;
                 Host.onMoveTick += MyonMoveTick;
+                Host.onCastFailedMessage += MyonCastFailedMessage;
                 //  host.onChatNotify += OnChatNotify;
                 //  host.onPartyInvite += MyonPartyInvite;
                 // host.onGuildInvite += MyonGuildInvite;
@@ -82,7 +84,35 @@ namespace WowAI.Modules
             }
         }
 
-
+        public void MyonCastFailedMessage(uint SpellID, ESpellCastError Reason, int FailedArg1, int FailedArg2)
+        {
+            try
+            {
+                Host.log(SpellID + " " + Reason + " " + FailedArg1 + " " + FailedArg2);
+                if (SpellID == 131476 && Reason == ESpellCastError.NOT_FISHABLE)
+                {
+                    Host.SetMoveStateForClient(true);
+                    Host.TurnLeft(true);
+                    Thread.Sleep(500);
+                    Host.TurnLeft(false);
+                    Host.SetMoveStateForClient(false);
+                    Host.AutoQuests.StartWait = false;
+                }
+                if (SpellID == 131476 && Reason == ESpellCastError.TOO_SHALLOW)
+                {
+                    Host.SetMoveStateForClient(true);
+                    Host.TurnLeft(true);
+                    Thread.Sleep(500);
+                    Host.TurnLeft(false);
+                    Host.SetMoveStateForClient(false);
+                    Host.AutoQuests.StartWait = false;
+                }
+            }
+            catch (Exception e)
+            {
+                Host.log(e + "");
+            }
+        }
 
 
         public void MyonFoundGameMaster(string name, Vector3F pos)
@@ -328,7 +358,7 @@ namespace WowAI.Modules
                             if (spell.Id == formId)
                             {
                                 var i = 0;
-                                while (Host.SpellManager.IsSpellReady(spell.Id))
+                                while (Host.SpellManager.CheckCanCast(spell.Id, Host.Me) != ESpellCastError.SUCCESS)
                                 {
                                     if (!Host.MainForm.On)
                                         return;
@@ -673,6 +703,8 @@ namespace WowAI.Modules
             {
                 foreach (var entity in Host.GetEntities<Unit>())
                 {
+                    if (Host.CharacterSettings.Mode == EMode.Questing)
+                        break;
                     /*if (Host.Me.Target != null && Host.Me.Target.HpPercents < 100)
                         break;*/
                     if (Host.GetAgroCreatures().Count > 0)
@@ -775,6 +807,7 @@ namespace WowAI.Modules
 
                 if (Host.FarmModule.farmState == FarmState.Disabled)
                     return;
+              
                 if (Host.MapID == 1904)
                     return;
                 //  Host.log("Тест");
@@ -823,6 +856,8 @@ namespace WowAI.Modules
                 {
                     foreach (var entity in Host.GetEntities<Unit>())
                     {
+                        if (Host.CharacterSettings.Mode == EMode.Questing)
+                            break;
                         /*  if (Host.Me.Target != null && Host.Me.Target.HpPercents < 100)
                               break;*/
                         if (Host.GetAgroCreatures().Count > 0)
@@ -1351,6 +1386,15 @@ namespace WowAI.Modules
 
                     foreach (var gameObject in Host.GetEntities<GameObject>())
                     {
+                        if (gameObject.Id == 303217)//Почтовый ящик
+                        {
+                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
+                            {
+                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
+                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 3, 3);
+                            }
+                        }
+
                         if (gameObject.Id == 202589)//Почтовый ящик
                         {
                             if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
@@ -2281,6 +2325,8 @@ namespace WowAI.Modules
                  /*   if(Host.FarmModule.farmState == FarmState.AttackOnlyAgro && Host.GetThreats().Count > 0)
                         return;*/
                     if(!Host.Me.IsAlive)
+                        return;
+                    if (!Host.MainForm.On)
                         return;
                     Host.log(path.Count + "  Путь " + Host.Me.Distance(vector3F));
                     ForceMoveTo2(vector3F);

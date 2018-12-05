@@ -784,7 +784,8 @@ namespace WowAI.ComboRoutes
             {
                 if (!host.CharacterSettings.Skinning)
                     return;
-
+                if(!host.AutoQuests.EnableSkinning)
+                    return;
                 /*   uint skillSkinning = 0;
                    if (host.SpellManager.GetSpell(8613) != null)
                    {
@@ -861,7 +862,7 @@ namespace WowAI.ComboRoutes
                         }
                         if (host.GetAgroCreatures().Count != 0)
                             return;
-                        var result = host.SpellManager.CastSpell(skillSkinning.Id);
+                        var result = host.SpellManager.CastSpell(skillSkinning.Id, m);
                         Thread.Sleep(500);
 
                         if (result != ESpellCastError.SUCCESS)//8613 Skinning

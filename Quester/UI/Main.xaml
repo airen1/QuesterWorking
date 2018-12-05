@@ -245,6 +245,7 @@
                                         <StackPanel Margin="5,5,0,0" Orientation="Vertical" VerticalAlignment="Bottom">
                                             <CheckBox x:Name="CheckBoxLogScript" Content="Лог режима скрипт(Действия)" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogScriptAction}"/>
                                             <CheckBox x:Name="CheckBoxLogSkill" Content="Лог использования скилов" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogSkill}"/>
+                                            <CheckBox x:Name="CheckBoxAllLog" Content="Все логи" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogSkill}"/>
                                         </StackPanel>
                                     </Grid>
                                 </GroupBox>
@@ -2355,6 +2356,11 @@
                                                                 <ComboBoxItem Content="Рыбалка" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Включить сбор" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Выключить сбор" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Включить сбор шкуры" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Выключить сбор шкуры" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Аукцион" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Почта" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Ремонт" IsEnabled="True"/>
                                                             </ComboBox>
                                                             <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
                                                             <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
@@ -2466,6 +2472,7 @@
                                                 <ComboBoxItem Content="Не выбрано"/>
                                             </ComboBox>
                                         </StackPanel>
+                                        <CheckBox x:Name="CheckBoxScriptReverseShedule" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Content="Реверс" Margin="0,5,0,0"/>
                                         <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                             <Button x:Name="buttonScriptScheduleAdd" Content="Добавить" Click="buttonScriptScheduleAdd_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                             <Button x:Name="buttonDungeonSheduleDel" Content="Удалить" Click="buttonDungeonSheduleDel_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0"/>

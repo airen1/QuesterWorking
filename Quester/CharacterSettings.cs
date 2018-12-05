@@ -110,7 +110,7 @@ namespace WowAI
         public bool Skinning { get; set; } = true;
         public bool NoAttackOnMount { get; set; } = true;
 
-
+        public bool LogAll { get; set; } = true;
         public bool GatherResouceScript { get; set; } = true;
         public int GatherRadiusScript { get; set; } = 30;
 
@@ -216,6 +216,7 @@ namespace WowAI
         public TimeSpan ScriptStartTime { get; set; }
         public TimeSpan ScriptStopTime { get; set; }
         public string ScriptName { get; set; }
+        public bool Reverse { get; set; }
     }
 
 

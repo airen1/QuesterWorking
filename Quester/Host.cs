@@ -62,6 +62,10 @@ namespace WowAI
         // ReSharper disable once InconsistentNaming
         public void log(string text, LogLvl type = LogLvl.Info)
         {
+            if (CharacterSettings != null)
+                if (!CharacterSettings.LogAll)
+                    return;
+
             var color = new Color();
             switch (type)
             {
@@ -689,7 +693,7 @@ namespace WowAI
 
 
                     log(CurrentInteractionGuid + " CurrentInteractionGuid");
-
+                   
                     //CreateNewEditorGpsPoint(Me.Location);
                     //  log(QuestManager.FindQuestSlot(29078) + "  " + QuestManager.GetQuestSlotQuestId(0) + "  " + QuestManager.(29078));
 
@@ -793,6 +797,11 @@ namespace WowAI
 
                 }
 
+
+                /*foreach (var dungeonSettingsDungeonCoordSetting in DungeonSettings.DungeonCoordSettings)
+                {
+                    CreateNewEditorGpsPoint(dungeonSettingsDungeonCoordSetting.Loc);
+                }*/
 
                 // log(LFGStatus.Joined + "" + Scenario.GetCriterias().Count);
 

@@ -394,16 +394,26 @@ namespace WowAI
                 Thread.Sleep(1000);
                 if (!OpenMailbox(mailBox))
                     log("Не удалось открыть ящик " + GetLastError(), LogLvl.Error);
-                Thread.Sleep(1000);
+                else
+                {
+                    log("Открыл ящик", LogLvl.Ok);
+                }
+                Thread.Sleep(2000);
 
                 foreach (var mail in GetMails())
                 {
                     log(mail.SenderType + " " + mail.GetAttachedItems().Count);
                     mail.MarkAsRead();
                     Thread.Sleep(500);
+                    if (GetBotLogin() == "deathstar")
+                        Thread.Sleep(500);
                     if (!mail.TakeAllAttachmentsAndGold())
                     {
                         log("Не удалось получить письмо " + GetLastError(), LogLvl.Error);
+                    }
+                    else
+                    {
+                        log("Получил письмо", LogLvl.Ok);
                     }
                 }
             }
@@ -772,6 +782,12 @@ namespace WowAI
         {
             try
             {
+                if (GetThreats().Count > 0)
+                {
+                    FarmModule.farmState = FarmState.AttackOnlyAgro;
+                    return false;
+                }
+
                 var needArea = GetAreaById(areaId);
 
                 if (needArea == null)
@@ -780,7 +796,7 @@ namespace WowAI
                     Thread.Sleep(10000);
                     return false;
                 }
-                log("Нужно в зону " + areaId + "    " + needArea.AreaName, LogLvl.Important);
+                log("Нужно в зону " + areaId + "    " + needArea.AreaName + "  " +  Me.Distance(loc), LogLvl.Important);
 
                 double bestDist = 9999999;
                 TaxiNode bestNode = null;
@@ -810,6 +826,61 @@ namespace WowAI
                             continue;
                         if (i.Id == 2273 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
+                        if (i.Id == 2114 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2144 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2112 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 1642 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2153 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2147 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2145 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2157 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2148 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2129 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2012 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 1962 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2110 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+                        if (i.Id == 2112 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                            continue;
+
+                        if (i.Id == 2274 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+
+                        if (i.Id == 2275 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2091 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2107 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2135 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2127 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2108 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2057 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2056 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2033 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2093 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2090 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+
 
                         log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
                         bestNode = i;
@@ -877,7 +948,33 @@ namespace WowAI
                     var result = UseTaxi(node.Id);
                     Thread.Sleep(1000);
                     if (result != ETaxiError.Ok)
+                    {
                         log("Ошибка перелета " + result, LogLvl.Error);
+                        if (result == ETaxiError.SameNode)
+                        {
+                            var path = GetServerPath(Me.Location, loc);
+                            log("Маршрут " + path.Path.Count);
+                            AutoQuests.EnableFarmProp = false;
+                            foreach (var vector3F in path.Path)
+                            {
+                                if (!MainForm.On)
+                                {
+                                    AutoQuests.EnableFarmProp = true;
+                                    return false;
+                                }
+                                   
+                                if (!Me.IsAlive)
+                                {
+                                    AutoQuests.EnableFarmProp = true;
+                                    return false;
+                                }
+                                    
+                               CommonModule.ForceMoveTo2(vector3F);
+                            }
+                            AutoQuests.EnableFarmProp = true;
+                        }
+                    }
+                       
                     Thread.Sleep(2000);
                 }
                 else
@@ -892,7 +989,7 @@ namespace WowAI
                     Thread.Sleep(1000);
                 }
 
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
                 return false;
             }
             catch (Exception e)
@@ -1621,7 +1718,6 @@ namespace WowAI
                 if (mountSell != null)
                 {
 
-
                     if (CharacterSettings.UseMountMyLoc)
                     {
 
@@ -2303,6 +2399,10 @@ namespace WowAI
                     }
                 }
 
+            }
+            else
+            {
+                log("Не нашел геймобжект " + id);
             }
         }
 

@@ -1961,6 +1961,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.PriceKK = Convert.ToInt32(textBoxPriceKK.Text);
                 Host.CharacterSettings.FindBestPoint = CheckBoxFindBestPoint.IsChecked.Value;
                 Host.CharacterSettings.CheckAuk = CheckBoxCheckAuk.IsChecked.Value;
+                Host.CharacterSettings.LogAll = CheckBoxAllLog.IsChecked.Value;
                 Host.CharacterSettings.FreeInvCountForAuk = Convert.ToInt32(textBoxFreeInvCountForAuk.Text);
                 Host.CharacterSettings.SummonBattlePet = CheckBoxSummonBattlePet.IsChecked.Value;
                 Host.CharacterSettings.BattlePetNumber = ComboBoxSummonBattlePetNumber.SelectedIndex;
@@ -2082,7 +2083,8 @@ namespace WowAI.UI
                     {
                         ScriptStopTime = collectionScriptSchedule.ScriptStopTime,
                         ScriptName = collectionScriptSchedule.ScriptName,
-                        ScriptStartTime = collectionScriptSchedule.ScriptStartTime
+                        ScriptStartTime = collectionScriptSchedule.ScriptStartTime,
+                        Reverse = collectionScriptSchedule.Reverse
                     };
                     Host.CharacterSettings.ScriptSchedules.Add(item);
                 }
@@ -3034,7 +3036,7 @@ namespace WowAI.UI
                             radioButtonMultiZone.IsChecked = false;
                             radioButtonOneZone.IsChecked = true;
                         }
-
+                        CheckBoxAllLog.IsChecked = Host.CharacterSettings.LogAll;
                         CheckBoxUseSMountMyLoc.IsChecked = Host.CharacterSettings.UseMountMyLoc;
                         CheckBoxCheckRepair.IsChecked = Host.CharacterSettings.CheckRepair;
                         textBoxRepairCount.Text = Host.CharacterSettings.RepairCount.ToString();
@@ -3244,7 +3246,8 @@ namespace WowAI.UI
                             {
                                 ScriptName = characterSettingsScriptSchedule.ScriptName,
                                 ScriptStopTime = characterSettingsScriptSchedule.ScriptStopTime,
-                                ScriptStartTime = characterSettingsScriptSchedule.ScriptStartTime
+                                ScriptStartTime = characterSettingsScriptSchedule.ScriptStartTime,
+                                Reverse = characterSettingsScriptSchedule.Reverse
                             });
                         }
 
@@ -3820,8 +3823,8 @@ namespace WowAI.UI
                     skillId = GetSkillIdFromCombobox(comboBoxDungeonSkill.Text);
 
                 var tempLoc = new Vector3F();
-                if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
-                    ComboBoxDungeonAction.SelectedIndex == 6)
+             /*   if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
+                    ComboBoxDungeonAction.SelectedIndex == 6)*/
                     tempLoc = Host.Me.Location;
 
 
@@ -5745,6 +5748,7 @@ namespace WowAI.UI
                     ScriptStartTime = TimeSpan.Parse(textBoxScriptScheduleStartTime.Text),
                     ScriptStopTime = TimeSpan.Parse(textBoxScriptSheduleEndTime.Text),
                     ScriptName = comboBoxDungeonScript_Copy.Text,
+                    Reverse = CheckBoxScriptReverseShedule.IsChecked.Value
                 });
                 
             }

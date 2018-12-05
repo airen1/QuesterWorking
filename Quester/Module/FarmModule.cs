@@ -672,7 +672,7 @@ namespace WowAI.Modules
 
                 //17130 ураган
                 //18313 меч
-                List<uint> listArea = new List<uint>{17130, 18313};
+                List<uint> listArea = new List<uint>{17130, 18313, 17129};
                 foreach (var areaTrigger in Host.GetEntities<AreaTrigger>())
                 {
                     if (listArea.Contains(areaTrigger.Id) && Host.Me.Distance(areaTrigger) < 4)
@@ -716,7 +716,7 @@ namespace WowAI.Modules
                     }
                 }
 
-                if (BestMob.Id == 122666)
+                if (BestMob?.Id == 122666)
                 {
                     foreach (var entity in Host.GetEntities<Unit>())
                     {
@@ -729,7 +729,7 @@ namespace WowAI.Modules
                     }
                 }
 
-                if (BestMob.Id == 131522 && Host.GetThreats().Count == 0)
+                if (BestMob?.Id == 131522 && Host.GetThreats().Count == 0)
                 {
                     if (Host.SpellManager.GetSpell(8921) != null && Host.Me.Distance(BestMob) < 40)
                         Host.SpellManager.CastSpell(8921);
@@ -2122,6 +2122,8 @@ namespace WowAI.Modules
                         if (obj.Distance(9860.81, 1504.84, 1270.48) < 20)
                             continue;
                         if (obj.Distance(9776.68, 1560.15, 1266.34) < 20)
+                            continue;
+                        if (obj.Distance(776.45, 1654.16, 1.57) < 20)
                             continue;
 
                         if ((!farmZone.ObjInZone(obj) || !farmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
