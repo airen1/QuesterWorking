@@ -276,7 +276,7 @@ namespace WowAI.Modules
             }
         }
 
-       
+
 
 
         public int GatherCount = 0;
@@ -451,8 +451,10 @@ namespace WowAI.Modules
                         isNeedUnmount = false;
                     if (aura.SpellId == 267560)
                         isNeedUnmount = false;
-                    /*    if (aura.SpellId == 134359 && prop.RequiredGatheringSkill.Contains(182))
-                            isNeedUnmount = false;*/
+                    if (aura.SpellId == 134359 && skillGather.Id == 265835)
+                        isNeedUnmount = false;
+                    if (aura.SpellId == 134359 && skillGather.Id == 265831)
+                        isNeedUnmount = false;
                 }
 
 
@@ -668,11 +670,11 @@ namespace WowAI.Modules
                     return false;
                 }
 
-       
+
 
                 //17130 ураган
                 //18313 меч
-                List<uint> listArea = new List<uint>{17130, 18313, 17129};
+                List<uint> listArea = new List<uint> { 17130, 18313, 17129 };
                 foreach (var areaTrigger in Host.GetEntities<AreaTrigger>())
                 {
                     if (listArea.Contains(areaTrigger.Id) && Host.Me.Distance(areaTrigger) < 4)
@@ -690,17 +692,17 @@ namespace WowAI.Modules
                             var y1 = yc + radius * Math.Sin(u);
                             // log(" " + i + " x:" + x + " y:" + y);
                             u = u + a;
-                           
+
                             var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1, 0));
                             var nextpoint = false;
                             foreach (var trigger in Host.GetEntities<AreaTrigger>())
                             {
-                                if(!listArea.Contains(trigger.Id))
+                                if (!listArea.Contains(trigger.Id))
                                     continue;
                                 if (trigger.Distance(x1, y1, z1) < 4)
                                     nextpoint = true;
                             }
-                            if(nextpoint)
+                            if (nextpoint)
                                 continue;
 
                             if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
@@ -710,7 +712,7 @@ namespace WowAI.Modules
                         if (safePoint.Count > 0)
                         {
                             var bestPoint = safePoint[Host.RandGenerator.Next(safePoint.Count)];
-                            Host.ForceMoveToWithLookTo(bestPoint, Host.Me.Target.Location); 
+                            Host.ForceMoveToWithLookTo(bestPoint, Host.Me.Target.Location);
                         }
 
                     }
@@ -720,12 +722,12 @@ namespace WowAI.Modules
                 {
                     foreach (var entity in Host.GetEntities<Unit>())
                     {
-                        if(!entity.IsAlive)
+                        if (!entity.IsAlive)
                             continue;
-                        if(entity.Id != 126654)
+                        if (entity.Id != 126654)
                             continue;
                         BestMob = entity;
-                        
+
                     }
                 }
 
@@ -735,6 +737,13 @@ namespace WowAI.Modules
                         Host.SpellManager.CastSpell(8921);
                 }
 
+                if (BestMob?.Id == 126502)
+                {
+                    var item = Host.ItemManager.GetItemById(152572);
+                    if (item != null && BestMob.HpPercents == 100)
+                        if (Host.Me.Distance(BestMob) < 15 && !Host.SpellManager.IsCasting)
+                            Host.MyUseItemAndWait(item, BestMob);
+                }
 
                 if (Host.GetAgroCreatures().Count > 0 && !Host.GetAgroCreatures().Contains(BestMob) || (Host.GetAgroCreatures().Count > 1))
                     BestMob = GetBestAgroMob();
@@ -754,26 +763,28 @@ namespace WowAI.Modules
                         if (entity.Owner != Host.Me)
                             continue;
                         needsummon = false;
-                        if (!entity.IsAlive)
-                            needrevive = true;
+                        /* if (!entity.IsAlive)
+                             needrevive = true;*/
                     }
-
+                    if (Host.Me.GetPet() != null)
+                        if (!Host.Me.GetPet().IsAlive)
+                            needrevive = true;
                     if (needrevive)
                     {
-                        /*  var pet = Host.SpellManager.CastSpell(982);
-                          if (pet == ESpellCastError.SUCCESS)
-                          {
-                              Host.log("Воскрешаю питомца", Host.LogLvl.Ok);
-                          }
-                          else
-                          {
-                              Host.log("Не удалось воскресить питомца " + pet, Host.LogLvl.Error);
-                          }
-                          Thread.Sleep(2000);
-                          while (Host.SpellManager.IsCasting)
-                          {
-                              Thread.Sleep(100);
-                          }*/
+                        var pet = Host.SpellManager.CastSpell(982);
+                        if (pet == ESpellCastError.SUCCESS)
+                        {
+                            Host.log("Воскрешаю питомца", Host.LogLvl.Ok);
+                        }
+                        else
+                        {
+                            Host.log("Не удалось воскресить питомца " + pet, Host.LogLvl.Error);
+                        }
+                        Thread.Sleep(2000);
+                        while (Host.SpellManager.IsCasting)
+                        {
+                            Thread.Sleep(100);
+                        }
 
                     }
                     if (needsummon && Host.CharacterSettings.SummonBattlePet)
@@ -1158,7 +1169,7 @@ namespace WowAI.Modules
 
 
                 var alternatePower = EPowerType.AlternatePower;
-                if (Host.Me.Class == EClass.Druid)
+                if (Host.Me.Class == EClass.Druid || Host.Me.Class == EClass.Rogue)
                     alternatePower = EPowerType.ComboPoints;
                 if (Host.Me.Class == EClass.Monk)
                     alternatePower = EPowerType.Chi;
@@ -1642,9 +1653,9 @@ namespace WowAI.Modules
                 GameObject bestProp = null;
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
-                  /*  if (Host.CharacterSettings.Mode != EMode.Questing)
-                        if (prop.GameObjectType != EGameObjectType.GatheringNode)
-                            continue;*/
+                    /*  if (Host.CharacterSettings.Mode != EMode.Questing)
+                          if (prop.GameObjectType != EGameObjectType.GatheringNode)
+                              continue;*/
                     if (!Host.IsExists(prop))
                         continue;
                     if (IsBadProp(prop, Host.ComboRoute.TickTime))

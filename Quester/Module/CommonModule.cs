@@ -246,6 +246,13 @@ namespace WowAI.Modules
                 }
 
                 if (Host.CharacterSettings.Mode == EMode.Script)
+                {
+                    if (Host.CharacterSettings.CheckBoxAttackForSitMount && Host.GetThreats(Host.Me).Count > 0 && Host.Me.MountId == 0 )
+                    {
+                        
+                        Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
+                        return;
+                    }
                     if (Host.FarmModule.farmState == FarmState.AttackOnlyAgro)
                     {
                         foreach (var entity in Host.GetEntities<Unit>())
@@ -261,6 +268,8 @@ namespace WowAI.Modules
                             return;
                         }
                     }
+                }
+                   
 
                 if(Host.MapID == 1643 && Host.AutoQuests.BestQuestId == 47098)
                     return;
@@ -1181,6 +1190,7 @@ namespace WowAI.Modules
         {
             try
             {
+               
                 var equipCells = new Dictionary<EEquipmentSlot, Item>();
                 // host.log("Тест  EquipBestArmorAndWeapon");
 
@@ -1484,7 +1494,58 @@ namespace WowAI.Modules
                             }
                         }
                     }
+                    if (Host.Me.Distance(1770.84, -4512.96, 27.43) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(1770.84, -4512.96, 27.43)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(1770.84, -4512.96, 27.43), 4, 4);
+                        }
+                    }
 
+                    if (Host.Me.Distance(-213.00, 396.73, 201.68) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(-213.00, 396.73, 201.68)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(-213.00, 396.73, 201.68), 4, 4);
+                        }
+                    }
+
+                    if (Host.Me.Distance(2452.94, 827.52, 10.89) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(2452.94, 827.52, 10.89)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(2452.94, 827.52, 10.89), 1, 1);
+                        }
+                    }
+
+                    if (Host.Me.Distance(2240.47, 4345.53, 37.74) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(2240.47, 4345.53, 37.74)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(2240.47, 4345.53, 37.74), 8, 8);
+                        }
+                    }
+
+                    if (Host.Me.Distance(2220.45, 4345.64, 38.29) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(2220.45, 4345.64, 38.29)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(2220.45, 4345.64, 38.29), 8, 8);
+                        }
+                    }
+                    if (Host.Me.Distance(2896.73, 2534.25, 61.64) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(2896.73, 2534.25, 61.64)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(2896.73, 2534.25, 61.64), 8, 8);
+                        }
+                    }
                     if (Host.Me.Distance(1475.53, 1596.20, 45.40) < 100)
                     {
                         if (Host.IsInsideNavMesh(new Vector3F(1475.53, 1596.20, 45.40)))
@@ -1950,9 +2011,9 @@ namespace WowAI.Modules
 
                 IsMoveToNow = true;
                 doneDist = Host.Me.RunSpeed / 5.0;
-                //  Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
+                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
                 var result = Host.ForceComeTo(loc, dist, doneDist);
-                //  Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
+                Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
 
                 //  
@@ -2024,7 +2085,42 @@ namespace WowAI.Modules
                 IsMoveToNow = true;
                 doneDist = Host.Me.RunSpeed / 5.0;
 
+                if (Host.GetNavMeshHeight(new Vector3F(x, y, 0)) == 0 && Host.Me.Distance(x,y,z) > 300)
+                {
+                    var x0 = Host.Me.Location.X;
+                    var y0 = Host.Me.Location.Y;
+                    var x1 = x;
+                    var y1 = y;
+                    var distance = Host.Me.Distance(x, y, z) - 400;
+                    var expectedDistance = Host.Me.Distance(x, y, z) - distance;
 
+                    //находим длину исходного отрезка
+                    var dx = x1 - x0;
+                    var dy = y1 - y0;
+                    var l = Math.Sqrt(dx * dx + dy * dy);
+                    //находим направляющий вектор
+                    var dirX = dx / l;
+                    var dirY = dy / l;
+                    //умножаем направляющий вектор на необх длину
+                    dirX *= expectedDistance;
+                    dirY *= expectedDistance;
+                    //находим точку
+                    var resX = dirX + x0;
+                    var resY = dirY + y0;
+                    var z1 = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
+                    if (z1 > 0)
+                    {
+                        Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z1));
+                        CheckMoveFailed(Host.ComeTo(resX, resY, z1, 50, 50));
+                        return false;
+                    }
+                    else
+                    {
+                        Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z1) + " " + expectedDistance);
+                        CheckMoveFailed(Host.ComeTo(resX, resY, z1, 250, 250));
+                        return false;
+                    }
+                }
 
                 var result = Host.ComeTo(x, y, z, dist, doneDist);
 
@@ -2237,7 +2333,7 @@ namespace WowAI.Modules
                     return false;
                 }
 
-                if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
+               // if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
                     if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
                     {
                         var x0 = Host.Me.Location.X;
@@ -2283,9 +2379,9 @@ namespace WowAI.Modules
                 if (Host.Me.Distance(713.81, 3128.34, 133.02) < 30 && Host.Me.Distance(loc) > 300)
                     Host.MoveTo(749.13, 3099.93, 133.11);
 
-                // Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
+                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
                 var result = Host.ComeTo(loc, dist, doneDist);
-                //   Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
+                 Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
 
                 //  

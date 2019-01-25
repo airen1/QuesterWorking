@@ -114,14 +114,7 @@ namespace WowAI.ComboRoutes
             {
                 if (!host.IsAlive() || host.Me.IsDeadGhost)
                 {
-                    if (host.CommonModule.AttackPlayer)
-                    {
-                        DeadCountInPVP++;
-                    }
-                    else
-                    {
-                        DeadCount++;
-                    }
+                    
 
                     host.log("Умер " + host.IsAlive() + " " + host.Me.IsDeadGhost);
                     EventDeath = true;
@@ -145,6 +138,14 @@ namespace WowAI.ComboRoutes
                         }
                         else
                         {
+                            if (host.CommonModule.AttackPlayer)
+                            {
+                                DeadCountInPVP++;
+                            }
+                            else
+                            {
+                                DeadCount++;
+                            }
                             Thread.Sleep(2000);
                             while (host.GameState != EGameState.Ingame)
                                 Thread.Sleep(1000);
@@ -224,7 +225,7 @@ namespace WowAI.ComboRoutes
                     }
                     else
                     {
-                        if (!host.CommonModule.MoveTo(host.ReviveCorpseInfo.Location, 10, 10))
+                        if (!host.CommonModule.MoveTo(host.ReviveCorpseInfo.Location, 20, 20))
                             return;
                         Thread.Sleep(3000);
                         if (!host.ReviveWithCorpse())
@@ -291,6 +292,30 @@ namespace WowAI.ComboRoutes
 
 
                     Thread.Sleep(2000);
+                    if (host.Me.Class == EClass.Hunter)
+                    {
+                        var needrevive = false;
+                        if (host.Me.GetPet() != null)
+                            if (!host.Me.GetPet().IsAlive)
+                            needrevive = true;
+                        if (needrevive)
+                        {
+                            var pet = host.SpellManager.CastSpell(982);
+                            if (pet == ESpellCastError.SUCCESS)
+                            {
+                                host.log("Воскрешаю питомца", Host.LogLvl.Ok);
+                            }
+                            else
+                            {
+                                host.log("Не удалось воскресить питомца " + pet, Host.LogLvl.Error);
+                            }
+                            Thread.Sleep(2000);
+                            while (host.SpellManager.IsCasting)
+                            {
+                                Thread.Sleep(100);
+                            }
+                        }
+                    }
 
 
                     FarmState = FarmState.Disabled;
@@ -431,7 +456,7 @@ namespace WowAI.ComboRoutes
 
                             if (isNeedUnmount)
                                 host.CommonModule.MyUnmount();
-
+                           
                             var result = host.SpellManager.UseItem(buffItem);
                             if (result != EInventoryResult.OK)
                             {
@@ -476,10 +501,6 @@ namespace WowAI.ComboRoutes
                     }
                 }
 
-
-
-
-
             }
             catch (ThreadAbortException)
             {
@@ -490,12 +511,55 @@ namespace WowAI.ComboRoutes
                 host.log(e.ToString());
             }
         }
-
+        DateTime NextUsePottion = DateTime.MinValue;
         public virtual void UseRegenItems()
         {
             if (host.MyGetAura(269824) != null)//стан
                 return;
 
+            if (host.CommonModule.InFight() && host.Me.HpPercents < 50 && !host.Me.IsMounted)
+            {
+
+                if (NextUsePottion > DateTime.UtcNow)
+                {
+
+                }
+                else
+                {
+                    NextUsePottion = DateTime.UtcNow.AddSeconds(host.RandGenerator.Next(5, 15));
+                    Item buffItem = null;
+                    foreach (var item in host.ItemManager.GetItems())
+                    {
+                        if (item.Id == 152494)
+                        {
+                            buffItem = item;
+                            break;
+                        }
+                    }
+                    if (buffItem != null && host.SpellManager.GetItemCooldown(buffItem) == 0)
+                    {
+                        host.CommonModule.SuspendMove();
+
+                        var isNeedUnmount = true;
+
+                        if (buffItem.Id == 152813)
+                            isNeedUnmount = false;
+
+                        if (isNeedUnmount)
+                            host.CommonModule.MyUnmount();
+
+                        var result = host.SpellManager.UseItem(buffItem);
+                        if (result != EInventoryResult.OK)
+                        {
+                            host.log("Не смог использовать итем для регена " + buffItem.Name + "  " + result, Host.LogLvl.Error);
+                        }
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(100);
+                        host.CommonModule.ResumeMove();
+                    }
+                }
+
+            }
 
             if (host.GetThreats().Count == 0 && host.Me.HpPercents < 50)
             {
@@ -529,13 +593,10 @@ namespace WowAI.ComboRoutes
                         host.CommonModule.ResumeMove();
                     }
                 }
-
             }
 
             if (host.GetThreats().Count == 0 && host.Me.HpPercents < 80)
             {
-
-
                 var regenSpel = host.SpellManager.GetSpell(8936);
                 if (regenSpel != null)
                 {
@@ -546,9 +607,9 @@ namespace WowAI.ComboRoutes
                     {
                         var needChangeForm = true;
                         foreach (var i in host.Me.GetAuras())
-                        {                           
+                        {
                             if (i.SpellId == 24858)//Облик лунного совуха    
-                                needChangeForm = false;                          
+                                needChangeForm = false;
                         }
                         if (needChangeForm)
                             host.CanselForm();
@@ -590,6 +651,14 @@ namespace WowAI.ComboRoutes
                 if (host.AutoQuests.BestQuestId == 49078 && host.Me.Target?.Id != 128071)
                     return;
 
+                if (host.AutoQuests.BestQuestId == 50771 && host.FarmModule.BestMob?.Id != 135080)
+                    return;
+                if (host.AutoQuests.BestQuestId == 47924 && host.FarmModule.BestMob?.Id != 124949)
+                    return;
+
+                if (host.AutoQuests.BestQuestId == 49125 && host.FarmModule.BestMob?.Id != 138536)
+                    return;
+
                 if (SpecialItems != null)
                 {
                     for (var i = 0; i < SpecialItems?.Length; i++)
@@ -625,7 +694,7 @@ namespace WowAI.ComboRoutes
                                 {
                                     //Плохая цель
                                     host.log("Плохая цель 4 :" + host.FarmModule.BestMob.Name, Host.LogLvl.Error);
-                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 30000);
                                     host.FarmModule.BestMob = null;
                                     _failMoveUseSpecialSkill = 0;
                                     // host.SetTarget(null);
@@ -666,6 +735,11 @@ namespace WowAI.ComboRoutes
                                             result = host.SpellManager.UseItem(spItem, host.Me.Target);
                                         }
                                         break;
+                                    case 160559:
+                                    {
+                                        result = host.SpellManager.UseItem(spItem, host.Me.Target);
+                                    }
+                                        break;
                                     default:
                                         {
                                             result = host.SpellManager.UseItem(spItem);
@@ -676,16 +750,14 @@ namespace WowAI.ComboRoutes
 
                                 if (result == EInventoryResult.OK)
                                 {
-                                    host.log("Использую " + spItem.Name + "[" + spItem.Id + "] " + spItem.Place,
-                                        Host.LogLvl.Ok);
-                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
+                                    host.log("Использую " + spItem.Name + "[" + spItem.Id + "] " + spItem.Place, Host.LogLvl.Ok);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
                                     host.FarmModule.BestMob = null;
                                 }
-
                                 else
                                 {
                                     host.log("Не получилось использовать " + spItem.Name + "[" + SpecialItems[i] + "]  " + result + "  " + host.GetLastError() + "  " + host.FarmModule.BestMob.Guid, Host.LogLvl.Error);
-                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 120000);
+                                    host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
                                     host.FarmModule.BestMob = null;
                                 }
 
@@ -754,9 +826,7 @@ namespace WowAI.ComboRoutes
                 if (!host.CharacterSettings.Skinning)
                     return 0;
 
-                if (host.SpellManager.GetSpell(8613) == null &&
-                    host.SpellManager.GetSpell(8617) == null
-                    )
+                if (host.SpellManager.GetSpell(8613) == null && host.SpellManager.GetSpell(8617) == null)
                     return 0;
 
                 foreach (var m in host.GetEntities<Unit>())
@@ -784,7 +854,7 @@ namespace WowAI.ComboRoutes
             {
                 if (!host.CharacterSettings.Skinning)
                     return;
-                if(!host.AutoQuests.EnableSkinning)
+                if (!host.AutoQuests.EnableSkinning)
                     return;
                 /*   uint skillSkinning = 0;
                    if (host.SpellManager.GetSpell(8613) != null)

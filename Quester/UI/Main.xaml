@@ -281,6 +281,7 @@
                                                 <ComboBoxItem Content="Пет 5" Background="#FF36393E" Foreground="White"/>
                                             </ComboBox>
                                         </StackPanel>
+                                        <CheckBox x:Name="CheckBoxAttackForSitMount" Content="Отбиваться если нужно сесть на маунта" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding NoAttackOnMount}"/>
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox x:Name="groupBox_Pets" Header="Настройки питомцев" Margin="0" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1">
@@ -2345,6 +2346,7 @@
                                                                 <ComboBoxItem Content="Отбиться от мобов"/>
                                                                 <ComboBoxItem Content="Фарм пропов" IsEnabled="False"/>
                                                                 <ComboBoxItem Content="Пауза"/>
+                                                                <ComboBoxItem Content="Пауза 2"/>
                                                                 <ComboBoxItem Content="Сбросить все данжи"/>
                                                                 <ComboBoxItem Content="Использовать скилл"/>
                                                                 <ComboBoxItem Content="Выбрать диалог"/>
@@ -2692,6 +2694,12 @@
                                         <Button x:Name="ButtonAukDel" Content="Удалить" Margin="10,0,0,0" Click="ButtonAukDel_Click"/>
                                         <Button x:Name="ButtonAddAllProps1" Content="Редактировать" Margin="5,0,0,0" IsEnabled="False"/>
                                         <Button x:Name="ButtonClearAllProps1" Content="Очистить" Margin="20,0,0,0" IsEnabled="False"/>
+                                        <Label x:Name="LabelDiscount_Copy" Content="Уровень вещи" Margin="0" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="textBoxLevel" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
+                                        <Label x:Name="LabelMaxPrice" Content="Макс. цена" Margin="0" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="textBoxMaxPrice" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
+                                        <Label x:Name="LabelDiscount" Content="Скидка от конкурента" Margin="0" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="textBoxDiscount" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
                                     </StackPanel>
                                     <WrapPanel Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top">
                                         <CheckBox x:Name="CheckBoxCheckAuk" Content="Бежать на аук если предметов с Id" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
@@ -2775,6 +2783,7 @@
 
             </StackPanel>
             <Grid x:Name="myGrid" Margin="0,361,0,50" Opacity="0.5" Background="Black" PreviewMouseWheel="myGrid_PreviewMouseWheel"/>
+            <Button x:Name="ButtonContinue" Content="Продолжить" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Click="ButtonContinue_Click" RenderTransformOrigin="-2.107,2.12" Foreground="White" Background="#FF36393E" BorderBrush="#FF4A4F55" Style="{DynamicResource ButtonStyle1}" Panel.ZIndex="1" IsEnabled="False"/>
         </Grid>
         <ComboBox x:Name="ComboBoxSwitchMode"  HorizontalAlignment="Right" Margin="138,0,0,0" VerticalAlignment="Top" Width="154" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged"  
                 >

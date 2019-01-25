@@ -232,7 +232,7 @@ namespace WowAI.UI
         private List<Quest> _collectionQuest;
         private List<LFGStatus> _collectionLfg = new List<LFGStatus>();
         private List<LFGProposal> _collectionLfgProposals = new List<LFGProposal>();
-        private IList<Transport> _collectionEntities = new List<Transport>();
+        private IList<Unit> _collectionEntities = new List<Unit>();
         private List<Scenario> _collectionScenarios = new List<Scenario>();
         private List<ScenarioCriteria> _collectionCriterias = new List<ScenarioCriteria>();
         private List<Item> _collectionItems = new List<Item>();
@@ -1049,7 +1049,7 @@ namespace WowAI.UI
                         TextBlockMp.Text = Host.Me.PowerType + ": " + formattedString;
 
                         var alternatePoint = EPowerType.AlternatePower;
-                        if (Host.Me.Class == EClass.Druid)
+                        if (Host.Me.Class == EClass.Druid || Host.Me.Class == EClass.Rogue)
                             alternatePoint = EPowerType.ComboPoints;
                         if (Host.Me.Class == EClass.Monk)
                             alternatePoint = EPowerType.Chi;
@@ -1073,7 +1073,7 @@ namespace WowAI.UI
 
                         var formattedTimeSpan =
                     $"{allTime.Hours:D2} hr, {allTime.Minutes:D2} min, {allTime.Seconds:D2} sec";
-                        LabelTimeWork.Content = "Время работы: " + formattedTimeSpan + " (" + Host.CheckCount + ")";
+                        LabelTimeWork.Content = "Время работы: " + formattedTimeSpan + " (" + Host.CheckCount + ") " + "Умер: " + Host.ComboRoute.DeadCount + "/" + Host.ComboRoute.DeadCountInPVP;
 
                         //   LabelAllDamage.Content = "Всего урона: " + Host.AllDamage;
 
@@ -1985,7 +1985,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.GatherLocMapId = Convert.ToInt32(textBoxGatherLocMapId.Text);
                 Host.CharacterSettings.GatherLocAreaId = Convert.ToInt32(textBoxGatherLocAreaId.Text);
                 Host.CharacterSettings.GatherRadius = Convert.ToInt32(textBoxGatherLocRadius.Text);
-
+                Host.CharacterSettings.CheckBoxAttackForSitMount = CheckBoxAttackForSitMount.IsChecked.Value;
                 Host.CharacterSettings.FarmLocX = Convert.ToSingle(textBoxFarmLocX.Text);
                 Host.CharacterSettings.FarmLocY = Convert.ToSingle(textBoxFarmLocY.Text);
                 Host.CharacterSettings.FarmLocZ = Convert.ToSingle(textBoxFarmLocZ.Text);
@@ -2095,7 +2095,10 @@ namespace WowAI.UI
                     var item = new AukSettings
                     {
                         Id = collectionAukSettingse.Id,
-                        Name = collectionAukSettingse.Name
+                        Name = collectionAukSettingse.Name,
+                        Disscount = collectionAukSettingse.Disscount,
+                        Level = collectionAukSettingse.Level,
+                        MaxPrice = collectionAukSettingse.MaxPrice
                     };
                     Host.CharacterSettings.AukSettingses.Add(item);
                 }
@@ -2581,7 +2584,8 @@ namespace WowAI.UI
 
                     _collectionLfgProposals.Add(Host.LFGStatus.Proposal);
                     DataGridLfg_Copy.ItemsSource = _collectionLfgProposals;
-                    _collectionEntities = Host.GetEntities<Transport>();
+
+                    _collectionEntities = Host.GetEntities<Unit>();
                     DataGridEntity.ItemsSource = _collectionEntities;
 
                     _collectionScenarios.Add(Host.Scenario);
@@ -3049,7 +3053,7 @@ namespace WowAI.UI
                         CheckBoxDebuffDeath.IsChecked = Host.CharacterSettings.DebuffDeath;
                         CheckBoxAOEFarm.IsChecked = Host.CharacterSettings.AoeFarm;
                         textBoxAOEMobsCount.Text = Host.CharacterSettings.AoeMobsCount.ToString();
-
+                        CheckBoxAttackForSitMount.IsChecked = Host.CharacterSettings.CheckBoxAttackForSitMount;
                         CheckBoxSummonBattlePet.IsChecked = Host.CharacterSettings.SummonBattlePet;
                         CheckBoxStopQuesting.IsChecked = Host.CharacterSettings.StopQuesting;
                         textBoxStopQuestingLevel.Text = Host.CharacterSettings.StopQuestingLevel.ToString();
@@ -3256,7 +3260,10 @@ namespace WowAI.UI
                             CollectionAukSettingses.Add(new AukSettings
                             {
                                 Id = characterSettingsAukSettingse.Id,
-                                Name = characterSettingsAukSettingse.Name
+                                Name = characterSettingsAukSettingse.Name,
+                                Level = characterSettingsAukSettingse.Level,
+                                Disscount = characterSettingsAukSettingse.Disscount,
+                                MaxPrice = characterSettingsAukSettingse.MaxPrice
                             });
                         }
 
@@ -3827,6 +3834,9 @@ namespace WowAI.UI
                     ComboBoxDungeonAction.SelectedIndex == 6)*/
                     tempLoc = Host.Me.Location;
 
+
+
+              
 
 
                 CollectionDungeonCoord.Add(new DungeonCoordSettings
@@ -4411,14 +4421,37 @@ namespace WowAI.UI
                         continue;
 
                     Host.log(gossipOptionsData.QuestID + " " + gossipOptionsData.QuestTitle + " ");
-                    CollectionQuestSettings.Add(new QuestCoordSettings
+
+                    var item = new QuestCoordSettings
                     {
                         Run = true,
                         QuestId = gossipOptionsData.QuestID,
                         QuestName = gossipOptionsData.QuestTitle,
                         NpcId = Host.Me.Target.Id,
                         Loc = Host.Me.Target.Location
-                    });
+                    };
+
+
+                    if (listViewQuest.SelectedIndex != -1)
+                    {
+                        if (listViewQuest.SelectedIndex + 1 > listViewQuest.Items.Count - 1)
+                        {
+                            CollectionQuestSettings.Add(item);
+                        }
+                        else
+                        {
+                            CollectionQuestSettings.Insert(listViewQuest.SelectedIndex + 1, item);
+                        }
+
+                    }
+                    else
+                    {
+                        CollectionQuestSettings.Add(item);
+                    }
+
+                    listViewQuest.ScrollIntoView(item);
+
+                   
                 }
 
 
@@ -5598,13 +5631,19 @@ namespace WowAI.UI
                 var tempname = GetSkillIdFromComboboxName(ComboBoxAuk.Text);
 
 
-                if (CollectionAukSettingses.Any(collectionprop => tempId == collectionprop.Id))
-                    return;
+               /* if (CollectionAukSettingses.Any(collectionprop => tempId == collectionprop.Id))
+                    return;*/
+
+                var level = 0;
+               
 
                 CollectionAukSettingses.Add(new AukSettings
                 {
                     Id = Convert.ToInt32(tempId),
                     Name = tempname,
+                    MaxPrice = Convert.ToUInt64(textBoxMaxPrice.Text),
+                    Disscount = Convert.ToUInt64(textBoxDiscount.Text),
+                    Level = Convert.ToInt32(textBoxLevel.Text)
                     /*  Count = Convert.ToInt32(TextBoxAucCount.Text),
                       MaxPrixe = Convert.ToInt32(TextBoxAucMaxPrice.Text),
                       MinPrice = Convert.ToInt32(TextBoxAucMinPrice.Text),
@@ -5756,6 +5795,15 @@ namespace WowAI.UI
             {
                 Host.log(exception + " ");
             }
+        }
+
+        private void ButtonContinue_Click(object sender, RoutedEventArgs e)
+        {
+            Host.AutoQuests.Continue = true;
+            Dispatcher.Invoke(() =>
+            {
+                ButtonContinue.IsEnabled = false;
+            });
         }
     }
 

@@ -30,10 +30,10 @@ namespace WowAI
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once InconsistentNaming
-        public static bool isReleaseVersion = true;
+        public static bool isReleaseVersion = false;
 
         public Random RandGenerator { get; private set; }
-        private const string Version = "v0.14";
+        private const string Version = "v0.15";
         private bool _cfgLoaded;
         public string CfgName = "";
         public string ScriptName = "";
@@ -938,7 +938,6 @@ namespace WowAI
                 {
                     StartGold = Me.Money;
                     StartExp = Me.Exp;
-
                 }
 
 
@@ -1139,6 +1138,11 @@ namespace WowAI
 
                 log("Ошибка запуска " + err);
             }
+            finally
+            {
+                log("Main Stop");
+            }
+           
         }
 
         public bool NeedRestart = false;
@@ -1247,7 +1251,7 @@ namespace WowAI
                 var indexOfChar = _path.IndexOf(Ch, StringComparison.Ordinal);
                 _path = indexOfChar > 0 ? _path.Substring(indexOfChar) : "Quester";
                 log(_path + "\\WowAI.dll");
-                StopPlugin(_path + "\\WowAI.dll");
+              //  StopPlugin(_path + "\\WowAI.dll");
                 cancelRequested = true;
             }
             catch (ThreadAbortException) { }

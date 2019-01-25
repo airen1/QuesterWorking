@@ -218,7 +218,7 @@ namespace WowAI
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
             }
 
-            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929)
+            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929 || npc.Id == 131135)
             {
                 Thread.Sleep(1000);
                 foreach (var gossipOptionsData in GetNpcDialogs())
@@ -505,10 +505,17 @@ namespace WowAI
             log("Выбран " + npc.Name + " " + npc.Id);
             CommonModule.MoveTo(npc, 3);
             MyCheckIsMovingIsCasting();
-            OpenDialog(npc);
+            if (!OpenAuction(npc))
+                log("Не смог открыть диалог для аука " + GetLastError(), LogLvl.Error);
+            else
+            {
+                log("Открыл диалог для аука", LogLvl.Ok);
+            }
             Thread.Sleep(3000);
             //Продажа
+            AutoQuests.WaitTeleport = true;
             SellAll();
+            AutoQuests.WaitTeleport = false;
             Thread.Sleep(2000);
         }
 
@@ -524,6 +531,11 @@ namespace WowAI
                 Thread.Sleep(1000);
             }
 
+            if (auk)
+            {
+                if (MapID == 0 || MapID == 1)
+                    return true;
+            }
             foreach (var item in ItemManager.GetItems())
             {
                 if (item.Id == 6948 || item.Id == 8690)
@@ -598,10 +610,14 @@ namespace WowAI
             {
                 if (item.Id == 141605)
                 {
-                    if (SpellManager.GetItemCooldown(item) != 0)
+                    FarmModule.farmState = FarmState.AttackOnlyAgro;
+                    while (SpellManager.GetItemCooldown(item) != 0)
                     {
+                        if (!MainForm.On)
+                            return false;
+                        Thread.Sleep(5000);
                         log("Свисток в КД " + SpellManager.GetItemCooldown(item));
-                        break;
+                        //  break;
                     }
 
 
@@ -796,7 +812,7 @@ namespace WowAI
                     Thread.Sleep(10000);
                     return false;
                 }
-                log("Нужно в зону " + areaId + "    " + needArea.AreaName + "  " +  Me.Distance(loc), LogLvl.Important);
+                log("Нужно в зону " + areaId + "    " + needArea.AreaName + "  " + Me.Distance(loc), LogLvl.Important);
 
                 double bestDist = 9999999;
                 TaxiNode bestNode = null;
@@ -826,7 +842,7 @@ namespace WowAI
                             continue;
                         if (i.Id == 2273 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
-                        if (i.Id == 2114 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
+                        if (i.Id == 2114)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
                         if (i.Id == 2144 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
@@ -880,6 +896,14 @@ namespace WowAI
                             continue;
                         if (i.Id == 2090 && CharacterSettings.Mode != EMode.Questing)
                             continue;
+                        if (i.Id == 2156 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2105 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2054 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
+                        if (i.Id == 2282 && CharacterSettings.Mode != EMode.Questing)
+                            continue;
 
 
                         log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
@@ -912,7 +936,7 @@ namespace WowAI
                     Thread.Sleep(10000);
                     return false;
                 }
-                if (!ComeTo(taxinpc, 2))
+                if (!ComeTo(taxinpc, 1))
                     return false;
 
 
@@ -962,19 +986,19 @@ namespace WowAI
                                     AutoQuests.EnableFarmProp = true;
                                     return false;
                                 }
-                                   
+
                                 if (!Me.IsAlive)
                                 {
                                     AutoQuests.EnableFarmProp = true;
                                     return false;
                                 }
-                                    
-                               CommonModule.ForceMoveTo2(vector3F);
+
+                                CommonModule.ForceMoveTo2(vector3F);
                             }
                             AutoQuests.EnableFarmProp = true;
                         }
                     }
-                       
+
                     Thread.Sleep(2000);
                 }
                 else
@@ -1119,7 +1143,14 @@ namespace WowAI
         }
 
 
-
+        ulong RoundDown(ulong toRound)
+        {
+            return toRound - toRound % 1000000;
+        }
+        ulong RoundDown2(ulong toRound)
+        {
+            return toRound - toRound % 100;
+        }
 
         bool isRuLang = false;
         public void SellAll()
@@ -1127,16 +1158,20 @@ namespace WowAI
 
             Dictionary<EItemQuality, uint> MinimumCountForProcess = new Dictionary<EItemQuality, uint>();
             MinimumCountForProcess[EItemQuality.Normal] = 200;
-            MinimumCountForProcess[EItemQuality.Uncommon] = 40;
+            MinimumCountForProcess[EItemQuality.Uncommon] = 200;
             MinimumCountForProcess[EItemQuality.Rare] = 5;
+            MinimumCountForProcess[EItemQuality.Epic] = 5;
 
             Dictionary<EItemQuality, int> MinimumCheckingCount = new Dictionary<EItemQuality, int>();
             MinimumCheckingCount[EItemQuality.Normal] = 2000;
-            MinimumCheckingCount[EItemQuality.Uncommon] = 200;
+            MinimumCheckingCount[EItemQuality.Uncommon] = 2000;
             MinimumCheckingCount[EItemQuality.Rare] = 200;
+            MinimumCheckingCount[EItemQuality.Epic] = 1;
             List<uint> ItemIDsForSell = new List<uint>();
             foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
             {
+                if (ItemIDsForSell.Contains(Convert.ToUInt32(characterSettingsAukSettingse.Id)))
+                    continue;
                 ItemIDsForSell.Add(Convert.ToUInt32(characterSettingsAukSettingse.Id));
             }
 
@@ -1146,15 +1181,57 @@ namespace WowAI
             Dictionary<uint, ulong> Averages = new Dictionary<uint, ulong>();
             foreach (var item in ItemManager.GetItems())
             {
-                if (ItemIDsForSell.Contains(item.Id))
+                if (item.ItemQuality == EItemQuality.Epic)
                 {
-                    if (!Items.ContainsKey(item.Id))
-                        Items[item.Id] = new List<Item>();
-                    Items[item.Id].Add(item);
+                    var needItem = false;
+                    foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
+                    {
+                        if (item.Id == characterSettingsAukSettingse.Id)
+                        {
+                            if (item.Level == characterSettingsAukSettingse.Level)
+                                needItem = true;
+                        }
+                    }
+                    if (!needItem)
+                        continue;
                 }
+                if (item.Place >= EItemPlace.InventoryBag && item.Place <= EItemPlace.Bag4)
+                {
+                    if (ItemIDsForSell.Contains(item.Id))
+                    {
+                        if (!Items.ContainsKey(item.Id))
+                            Items[item.Id] = new List<Item>();
+                        Items[item.Id].Add(item);
+                    }
+                }
+
 
             }
 
+            /*  Dictionary<uint, ulong> epicPrices = new Dictionary<uint, ulong>
+              {
+                  {350, 0 },
+                  {355, 0 },
+                  {360, 0 }
+              };*/
+
+            Dictionary<KeyValuePair<uint, uint>, ulong> epicPrices = new Dictionary<KeyValuePair<uint, uint>, ulong>();
+            foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
+            {
+                if (characterSettingsAukSettingse.Level != 0)
+                {
+                    if (epicPrices.ContainsKey(new KeyValuePair<uint, uint>(Convert.ToUInt32(characterSettingsAukSettingse.Id), Convert.ToUInt32(characterSettingsAukSettingse.Level))))
+                    {
+                        // epicPrices[Convert.ToUInt32(characterSettingsAukSettingse.Id)].Add(Convert.ToUInt32(characterSettingsAukSettingse.Level), characterSettingsAukSettingse.MaxPrice);
+                    }
+                    else
+                    {
+                        epicPrices.Add(new KeyValuePair<uint, uint>(Convert.ToUInt32(characterSettingsAukSettingse.Id), Convert.ToUInt32(characterSettingsAukSettingse.Level)),
+                            characterSettingsAukSettingse.MaxPrice * 10000);
+                    }
+                }
+
+            }
 
             foreach (var id in ItemIDsForSell)
             {
@@ -1177,6 +1254,9 @@ namespace WowAI
 
                 ulong priceSumm = 0;
                 int itemsCount = 0;
+
+                Dictionary<ulong, int> normalPrices = new Dictionary<ulong, int>();
+                ulong mylotPrice = 0;
                 while (itemsCount < MinimumCheckingCount[firstItem.ItemQuality])
                 {
                     if (!MainForm.On)
@@ -1188,6 +1268,43 @@ namespace WowAI
                     {
                         if (aucItem.BuyoutPrice == 0)
                             continue;
+                        log(aucItem.Count + "  " + aucItem.BuyoutPrice + " " + aucItem.ItemLevel);
+                        if (quality == EItemQuality.Epic && epicPrices.ContainsKey(new KeyValuePair<uint, uint>(aucItem.ItemId, aucItem.ItemLevel)))
+                        {
+                            if (epicPrices[new KeyValuePair<uint, uint>(aucItem.ItemId, aucItem.ItemLevel)] == 0 ||
+                                aucItem.BuyoutPrice < epicPrices[new KeyValuePair<uint, uint>(aucItem.ItemId, aucItem.ItemLevel)])
+                            {
+                                foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
+                                {
+                                    if (characterSettingsAukSettingse.Id == aucItem.ItemId &&
+                                        characterSettingsAukSettingse.Level == aucItem.ItemLevel)
+                                    {
+                                        epicPrices[new KeyValuePair<uint, uint>(aucItem.ItemId, aucItem.ItemLevel)] = aucItem.BuyoutPrice - (characterSettingsAukSettingse.Disscount * 10000);
+                                    }
+                                }
+
+
+                            }
+                        }
+
+                        if (quality < EItemQuality.Epic)
+                        {
+                            if (aucItem.Count < 50)
+                                continue;
+
+                            var priceforone = aucItem.BuyoutPrice / (uint)aucItem.Count;
+                            if (aucItem.Owner == Me.Guid)
+                                mylotPrice = priceforone;
+
+                            if (normalPrices.ContainsKey(priceforone))
+                            {
+                                normalPrices[priceforone] = normalPrices[priceforone] + aucItem.Count;
+                            }
+                            else
+                            {
+                                normalPrices.Add(priceforone, aucItem.Count);
+                            }
+                        }
                         itemsCount += aucItem.Count;
                         priceSumm += aucItem.BuyoutPrice;
                     }
@@ -1195,12 +1312,90 @@ namespace WowAI
                 }
 
 
+
+
                 if (itemsCount >= MinimumCheckingCount[quality])
                 {
-                    ulong averagePrice = priceSumm / (uint)itemsCount;
-                    log("Средняя цена для " + itemsCount + " " + name + "[" + firstItem.Id + "] = " + (averagePrice / 10000f).ToString("F2"));
-                    Averages[firstItem.Id] = averagePrice;
 
+                    ulong averagePrice = priceSumm / (uint)itemsCount;
+                    if (quality == EItemQuality.Epic)
+                    {
+                        if (epicPrices.ContainsKey(new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)))
+                        {
+                            foreach (var @ulong in epicPrices)
+                            {
+                                if (@ulong.Key.Key == firstItem.Id)
+                                    log("Средняя цена для " + itemsCount + " " + name + "{" + @ulong.Key + "}[" + firstItem.Id + "] = " + (@ulong.Value / 10000f).ToString("F2"), LogLvl.Important);
+
+                            }
+
+                            /* foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
+                             {
+                                 if (characterSettingsAukSettingse.Id != firstItem.Id || characterSettingsAukSettingse.Level != firstItem.Level)
+                                     continue;
+                                 if (characterSettingsAukSettingse.MaxPrice * 10000 < epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] || epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] == 0)
+                                 {
+                                     Averages[firstItem.Id] = RoundDown(characterSettingsAukSettingse.MaxPrice * 10000);
+                                     log(firstItem.Level + "  цена 1 : " + (Averages[firstItem.Id] / 10000f).ToString("F2") + " " + Averages[firstItem.Id]);
+                                     epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] = RoundDown(characterSettingsAukSettingse.MaxPrice * 10000);
+                                     //break;
+                                 }
+                                 if (characterSettingsAukSettingse.MaxPrice * 10000 >= epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)])
+                                 {
+                                     Averages[firstItem.Id] = RoundDown(epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] - (characterSettingsAukSettingse.Disscount * 10000));
+                                     log(firstItem.Level + "  цена 2: " + (Averages[firstItem.Id] / 10000f).ToString("F2") + " " + Averages[firstItem.Id]);
+                                     epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] = RoundDown(epicPrices[new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)] - (characterSettingsAukSettingse.Disscount * 10000));
+                                 }
+                             }*/
+
+
+                        }
+
+
+                        /* foreach (var epicPrice in epicPrices)
+                         {
+                             //  log(epicPrice.Key + "  цена: " + (epicPrice.Value / 10000f).ToString("F2"));
+                             if (firstItem.Level != epicPrice.Key)
+                                 continue;
+                             foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
+                             {
+                                 if (characterSettingsAukSettingse.Id != firstItem.Id || characterSettingsAukSettingse.Level != firstItem.Level)
+                                     continue;
+                                 if (characterSettingsAukSettingse.MaxPrice * 10000 < epicPrice.Value || epicPrice.Value == 0)
+                                 {
+                                     Averages[firstItem.Id] = RoundDown(characterSettingsAukSettingse.MaxPrice * 10000);
+                                     log(epicPrice.Key + "  цена 1 : " + (Averages[firstItem.Id] / 10000f).ToString("F2") + " " + Averages[firstItem.Id]);
+                                     epicPrice.Value = RoundDown(characterSettingsAukSettingse.MaxPrice * 10000);
+                                     break;
+                                 }
+                                 if (characterSettingsAukSettingse.MaxPrice * 10000 >= epicPrice.Value)
+                                 {
+                                     Averages[firstItem.Id] = RoundDown(epicPrice.Value - (characterSettingsAukSettingse.Disscount * 10000));
+                                     log(epicPrice.Key + "  цена 2: " + (Averages[firstItem.Id] / 10000f).ToString("F2") + " " + Averages[firstItem.Id]);
+                                 }
+                             }
+
+                             log("Средняя цена для " + itemsCount + " " + name + "[" + firstItem.Id + "] = " + (Averages[firstItem.Id] / 10000f).ToString("F2"));
+                             //  Averages[firstItem.Id] = epicPrice.Value;
+                         }*/
+                    }
+                    else
+                    {
+                        foreach (var normalPrice in normalPrices.OrderBy(i => i.Key))
+                        {
+                            if (normalPrice.Value < 399)
+                                continue;
+                            Averages[firstItem.Id] = normalPrice.Key - 1;
+                            if (mylotPrice == normalPrice.Key)
+                                Averages[firstItem.Id] = normalPrice.Key;
+                            log("Цена " + normalPrice.Key + "  Кол-во " + normalPrice.Value + "  " + Averages[firstItem.Id]);
+
+                            break;
+                        }
+
+                        log("Средняя цена для " + itemsCount + " " + name + "{" + firstItem.Level + "}[" + firstItem.Id + "] = " + (Averages[firstItem.Id] / 10000f).ToString("F2"));
+
+                    }
                 }
             }
 
@@ -1210,8 +1405,9 @@ namespace WowAI
                 foreach (var item in k.Value)
                 {
                     log("Проверяем итем [" + item.Id + "] в количестве " + item.Count);
-                    if (!Averages.ContainsKey(item.Id))
-                        continue;
+                    if (item.ItemQuality < EItemQuality.Epic)
+                        if (!Averages.ContainsKey(item.Id))
+                            continue;
                     var count = (uint)item.Count;
                     log("можем продать " + count);
                     while (count > 0)
@@ -1219,24 +1415,35 @@ namespace WowAI
                         if (!MainForm.On)
                             return;
                         var countToSell = Math.Min(count, MinimumCountForProcess[item.ItemQuality]);
-                      /*  if(countToSell < MinimumCheckingCount[item.ItemQuality])
-                            break;*/
+                        /*  if(countToSell < MinimumCheckingCount[item.ItemQuality])
+                              break;*/
                         count -= countToSell;
-                        ulong sellPrice = Averages[item.Id] * countToSell;
+                        ulong sellPrice = 0;
+                        if (item.ItemQuality < EItemQuality.Epic)
+                            sellPrice = Averages[item.Id] * countToSell;
                         string name = item.Name;
                         if (isRuLang)
                             name = item.NameRu;
-                        log("Выставляем на продажу " + name + "[" + item.Id + "] в количестве " + countToSell + " штук за " + (sellPrice / 10000f).ToString("F2"));
-                        var result = item.AuctionSell(sellPrice, sellPrice, EAuctionSellTime.TwelveHours, countToSell);
-                        if (result == EAuctionHouseError.Ok)
+                        var minbid = sellPrice;
+                        if (item.ItemQuality == EItemQuality.Epic)
                         {
-                            log("Успешно", LogLvl.Ok);
+
+                            sellPrice = epicPrices[new KeyValuePair<uint, uint>(item.Id, item.Level)];
+
+                            minbid = sellPrice - (sellPrice / 100 * 20);
                         }
-                        else
-                        {
-                            log("Ошибка выставления на аукцион " + result + " " + GetLastError(), LogLvl.Error);
-                            Thread.Sleep(5000);
-                        }
+
+                        log("Выставляем на продажу " + name + "{" + item.Level + "}[" + item.Id + "] в количестве " + countToSell + " штук за " + (sellPrice / 10000f).ToString("F2") + "   " + (minbid / 10000f).ToString("F2"), LogLvl.Important);
+                         var result = item.AuctionSell(minbid, sellPrice, EAuctionSellTime.TwelveHours, countToSell);
+                         if (result == EAuctionHouseError.Ok)
+                         {
+                             log("Успешно", LogLvl.Ok);
+                         }
+                         else
+                         {
+                             log("Ошибка выставления на аукцион " + result + " " + GetLastError(), LogLvl.Error);
+                             Thread.Sleep(5000);
+                         }
                     }
                 }
             }
@@ -1971,7 +2178,22 @@ namespace WowAI
                     log("Нет предмета");
                     return false;
                 }
-                CanselForm();
+
+                switch (item.Id)
+                {
+                    case 152572:
+                        {
+
+                        }
+                        break;
+                    default:
+                        {
+                            CanselForm();
+                        }
+                        break;
+                }
+
+
                 Thread.Sleep(1000);
                 if (SpellManager.GetItemCooldown(item.Id) > 0)
                 {

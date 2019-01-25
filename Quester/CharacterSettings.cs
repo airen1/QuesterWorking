@@ -113,7 +113,7 @@ namespace WowAI
         public bool LogAll { get; set; } = true;
         public bool GatherResouceScript { get; set; } = true;
         public int GatherRadiusScript { get; set; } = 30;
-
+        public bool CheckBoxAttackForSitMount { get; set; }
         public bool Attack { get; set; } = false;
         public int AttackRadius { get; set; } = 20;
 
@@ -224,6 +224,9 @@ namespace WowAI
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int Level { get; set; }
+        public ulong MaxPrice { get; set; }
+        public ulong Disscount { get; set; }
       /*  public int Count { get; set; }
         public int MinPrice { get; set; }
         public int MaxPrixe { get; set; } = 9999999;
