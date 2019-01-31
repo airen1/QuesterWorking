@@ -2363,6 +2363,7 @@
                                                                 <ComboBoxItem Content="Аукцион" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Почта" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Ремонт" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Крафт" IsEnabled="True"/>
                                                             </ComboBox>
                                                             <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
                                                             <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"

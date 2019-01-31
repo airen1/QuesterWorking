@@ -650,7 +650,7 @@ namespace WowAI.Modules
             }
         }
 
-
+        DateTime UseQuestSpell = DateTime.MinValue;
         //Использование скилов
         internal bool UseSkillAndWait(SkillSettings skill, bool selfTarget = false, bool suspendMovements = false)
         {
@@ -670,7 +670,24 @@ namespace WowAI.Modules
                     return false;
                 }
 
-
+                if (Host.AutoQuests.BestQuestId == 47311)
+                {
+                    if(UseQuestSpell  < DateTime.UtcNow)
+                    {
+                        UseQuestSpell = DateTime.UtcNow.AddSeconds(5);
+                        var questSpell = Host.SpellManager.GetSpell(245398);
+                        if (questSpell != null)
+                        {
+                            if (Host.SpellManager.GetSpellCooldown(questSpell) == 0 && Host.SpellManager.CheckCanCast(questSpell.Id, Host.Me.Target) == ESpellCastError.SUCCESS)
+                            {
+                                var res = Host.SpellManager.CastSpell(questSpell.Id);
+                                if (res != ESpellCastError.SUCCESS)
+                                    Host.log("Не смог использовать скилл для квеста " + questSpell.Name + "[" + questSpell.Id + "] " + res + " " + Host.GetLastError(), Host.LogLvl.Error);
+                            }
+                        }
+                    }
+                   
+                }
 
                 //17130 ураган
                 //18313 меч

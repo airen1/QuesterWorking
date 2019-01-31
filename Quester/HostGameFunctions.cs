@@ -967,7 +967,7 @@ namespace WowAI
 
                 if (node != null)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                     log(node.Id + "  " + node.Name + " " + node.MapId + "  " + node.Cost + "   " + node.Location);
                     var result = UseTaxi(node.Id);
                     Thread.Sleep(1000);
@@ -1434,16 +1434,16 @@ namespace WowAI
                         }
 
                         log("Выставляем на продажу " + name + "{" + item.Level + "}[" + item.Id + "] в количестве " + countToSell + " штук за " + (sellPrice / 10000f).ToString("F2") + "   " + (minbid / 10000f).ToString("F2"), LogLvl.Important);
-                         var result = item.AuctionSell(minbid, sellPrice, EAuctionSellTime.TwelveHours, countToSell);
-                         if (result == EAuctionHouseError.Ok)
-                         {
-                             log("Успешно", LogLvl.Ok);
-                         }
-                         else
-                         {
-                             log("Ошибка выставления на аукцион " + result + " " + GetLastError(), LogLvl.Error);
-                             Thread.Sleep(5000);
-                         }
+                        var result = item.AuctionSell(minbid, sellPrice, EAuctionSellTime.TwelveHours, countToSell);
+                        if (result == EAuctionHouseError.Ok)
+                        {
+                            log("Успешно", LogLvl.Ok);
+                        }
+                        else
+                        {
+                            log("Ошибка выставления на аукцион " + result + " " + GetLastError(), LogLvl.Error);
+                            Thread.Sleep(5000);
+                        }
                     }
                 }
             }
@@ -2527,11 +2527,11 @@ namespace WowAI
                                 }
                                 if (!isNosell)
                                 {
-                                    log("Продаю " + item.Name + "  " + item.Id + "  Цена:" + item.GetSellPrice(), LogLvl.Ok);
+                                    log("Продаю " + item.Name + "  [" + item.Id + "]  Цена:" + (item.GetSellPrice() / 10000f).ToString("F2"), LogLvl.Ok);
                                     var result = item.Sell();
                                     if (result != ESellResult.Success)
                                     {
-                                        log("Не смог продать  " + item.Name + "[" + item.Id + "] Цена:" + item.GetSellPrice() + "  " + result + " " + " " + GetLastError(), LogLvl.Error);
+                                        log("Не смог продать  " + item.Name + "[" + item.Id + "] Цена:" + (item.GetSellPrice() / 10000f).ToString("F2") + "  " + result + " " + " " + GetLastError(), LogLvl.Error);
                                         Thread.Sleep(5000);
                                     }
                                 }
@@ -2576,6 +2576,7 @@ namespace WowAI
             var go = GetNpcById(id);
             if (go != null)
             {
+                CommonModule.MyUnmount();
                 switch (id)
                 {
 

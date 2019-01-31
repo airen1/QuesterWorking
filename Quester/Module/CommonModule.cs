@@ -1494,6 +1494,16 @@ namespace WowAI.Modules
                             }
                         }
                     }
+
+                    if (Host.Me.Distance(-896.24, -193.22, 222.11) < 100)
+                    {
+                        if (Host.IsInsideNavMesh(new Vector3F(-896.24, -193.22, 222.11)))
+                        {
+                            Host.log("Ставлю обстакл ");
+                            Host.AddObstacle(new Vector3F(-896.24, -193.22, 222.11), 4, 4);
+                        }
+                    }
+
                     if (Host.Me.Distance(1770.84, -4512.96, 27.43) < 100)
                     {
                         if (Host.IsInsideNavMesh(new Vector3F(1770.84, -4512.96, 27.43)))
