@@ -53,7 +53,10 @@ namespace WowAI.UI
         [Description("Скрипт")]
         Script,
         [Description("Отбивание")]
-        OnlyAttack
+        OnlyAttack,
+       
+        /*  [Description("Пати фарм")]
+          PartyFarm*/
 
     }
 
@@ -124,14 +127,8 @@ namespace WowAI.UI
                 On = true;
                 NeedApplySettings = false;
                 SettingsNeedSave = false;
-                InitializeComponent();
-
-
-                // ListViewAllSkill.DataContext = this;
-                // ListViewDebugEntity.DataContext = this;
+                InitializeComponent();           
                 DataContext = this;
-
-
                 CollectionActiveSkill.RemoveAll();
                 CollectionInvItems.RemoveAll();
                 CollectionAllSkill.RemoveAll();
@@ -144,18 +141,14 @@ namespace WowAI.UI
                 CollectionMultiZone.RemoveAll();
                 CollectionQuestSettings.RemoveAll();
                 CollectionMyQuests.RemoveAll();
-                CollectionNpcForActions.Clear();
-                CollectionMyBuffs.Clear();
-                CollectionItemGlobals.Clear();
-
+                CollectionNpcForActions.RemoveAll();
+                CollectionMyBuffs.RemoveAll();
+                CollectionItemGlobals.RemoveAll();
                 comboBoxDungeonScript.SelectionChanged += ComboBoxDungeonScript_SelectionChanged;
             }
             catch (Exception e)
             {
-
-
                 Host.log(e.ToString());
-
             }
         }
 
@@ -229,7 +222,10 @@ namespace WowAI.UI
         public bool NeedUpdate = true;
         internal Host Host;
 
-        private List<Quest> _collectionQuest;
+        private List<Quest> _collectionQuests = new List<Quest>();
+        public ObservableCollection<MyQuestTemplate1> collectionQuestTemplate = new ObservableCollection<MyQuestTemplate1>();
+
+
         private List<LFGStatus> _collectionLfg = new List<LFGStatus>();
         private List<LFGProposal> _collectionLfgProposals = new List<LFGProposal>();
         private IList<Unit> _collectionEntities = new List<Unit>();
@@ -240,7 +236,7 @@ namespace WowAI.UI
         private List<Aura> _collectionAurasTarget = new List<Aura>();
         private List<Spell> _collectionSpell = new List<Spell>();
 
-        private ObservableCollection<ushort[]> _collectionCount = new ObservableCollection<ushort[]>();
+
 
 
         private ObservableCollection<QuestCoordSettings> _collectionQuestSettings;
@@ -264,6 +260,17 @@ namespace WowAI.UI
         private ObservableCollection<ItemGlobal> _collectionItemGlobals;
         private ObservableCollection<GameObjectIgnore> _gameObjectIgnores;
         private ObservableCollection<ScriptSchedule> _scriptSchedules;
+
+        private ObservableCollection<EquipAuc> _EquipAucs;
+        public ObservableCollection<EquipAuc> CollectionEquipAuc
+        {
+            get
+            {
+                if (_EquipAucs == null)
+                    _EquipAucs = new ObservableCollection<EquipAuc>();
+                return _EquipAucs;
+            }
+        }
 
         public ObservableCollection<ScriptSchedule> CollectionScriptSchedules
         {
@@ -845,8 +852,8 @@ namespace WowAI.UI
             });
         }
 
-        private float offsetX = 0;
-        private float offsetY = 0;
+        private float offsetX;
+        private float offsetY;
         private int Masshtab = 1;
 
         public void Point(Vector3F entity)
@@ -986,7 +993,7 @@ namespace WowAI.UI
 
 
 
-                        IsMoveToNow.Content = "IsMoveToNow: " + Host.CommonModule.IsMoveToNow + " Moving: " + Host.Me.IsMoving + " Susp: " + Host.CommonModule.IsMoveSuspended();
+                        IsMoveToNow.Content = "IsMoveToNow: " + Host.CommonModule.IsMoveToNow + " Moving: " + Host.Me.IsMoving + " Susp: " + Host.CommonModule.IsMoveSuspended() + Host.Me.RunSpeed;
                         //FarmState.Content = "FarmState: " + Host.FarmModule.farmState + "  " + Host.FarmModule.readyToActions;
 
                         if (Host.FarmModule.BestMob != null)
@@ -1992,7 +1999,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.FarmLocMapId = Convert.ToInt32(textBoxFarmLocMapId.Text);
                 Host.CharacterSettings.FarmLocAreaId = Convert.ToUInt32(textBoxFarmLocAreaId.Text);
                 Host.CharacterSettings.FarmRadius = Convert.ToInt32(textBoxFarmLocRadius.Text);
-
+                Host.CharacterSettings.WorldQuest = CheckBoxWorldQuest.IsChecked.Value;
                 Host.CharacterSettings.MountLocX = Convert.ToSingle(textBoxMountLocX.Text);
                 Host.CharacterSettings.MountLocY = Convert.ToSingle(textBoxMountLocY.Text);
                 Host.CharacterSettings.MountLocZ = Convert.ToSingle(textBoxMountLocZ.Text);
@@ -2005,9 +2012,9 @@ namespace WowAI.UI
                 Host.CharacterSettings.AukLocX = Convert.ToSingle(textBoxAukLocX.Text);
                 Host.CharacterSettings.AukLocY = Convert.ToSingle(textBoxAukLocY.Text);
                 Host.CharacterSettings.AukLocZ = Convert.ToSingle(textBoxAukLocZ.Text);
-
+                Host.CharacterSettings.SummonMount = CheckBoxSummonMount.IsChecked.Value;
                 Host.CharacterSettings.ScriptReverse = CheckBoxScriptReverse.IsChecked.Value;
-
+                Host.CharacterSettings.UseWhistleForSellAndRepair = CheckBoxUseWhistleForSellAndRepair.IsChecked.Value;
                 Host.CharacterSettings.LogScriptAction = CheckBoxLogScript.IsChecked.Value;
                 Host.CharacterSettings.LogSkill = CheckBoxLogSkill.IsChecked.Value;
                 Host.CharacterSettings.ScriptScheduleEnable = CheckBoxScriptScheduleEnable.IsChecked.Value;
@@ -2022,7 +2029,7 @@ namespace WowAI.UI
 
                 Host.CharacterSettings.GatherResouceScript = CheckBoxGatherResourceScript.IsChecked.Value;
                 Host.CharacterSettings.GatherRadiusScript = Convert.ToInt32(textBoxGatherRadiusScript.Text);
-
+                Host.CharacterSettings.EquipItemStat = Convert.ToInt32(textBoxEquipStateWeapon.Text);
                 Host.CharacterSettings.Attack = CheckBoxAttack.IsChecked.Value;
                 Host.CharacterSettings.AttackRadius = Convert.ToInt32(textBoxAttackRadius.Text);
 
@@ -2052,32 +2059,75 @@ namespace WowAI.UI
 
 
 
-                //  
+                Host.CharacterSettings.SendMail = CheckBoxSendMail.IsChecked.Value;
+                Host.CharacterSettings.SendMailName = textBoxSendMailName.Text;
 
+
+                Host.CharacterSettings.SendMailLocAreaId = Convert.ToInt32(textBoxSendMailLocAreaId.Text);
+                Host.CharacterSettings.SendMailLocMapId = Convert.ToInt32(textBoxSendMailLocMapId.Text);
+                Host.CharacterSettings.SendMailLocX = Convert.ToSingle(textBoxSendMailLocX.Text);
+                Host.CharacterSettings.SendMailLocY = Convert.ToSingle(textBoxSendMailLocY.Text);
+                Host.CharacterSettings.SendMailLocZ = Convert.ToSingle(textBoxSendMailLocZ.Text);
+
+                try
+                {
+                    //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2    " + textBoxCheckAukStartTime.Text);
+                    //   Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2   " + textBoxCheckAukEndTime.Text);
+
+                    
+
+                    Host.CharacterSettings.SendMailStartTime = TimeSpan.Parse(textBoxSendMailStartTime.Text);
+                    Host.CharacterSettings.SendMailStopTime = TimeSpan.Parse(textBoxSendMailEndTime.Text);
+
+                    //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2  " + textBoxCheckAukStartTime.Text);
+                    //  Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2  " + textBoxCheckAukEndTime.Text);
+                }
+                catch (Exception e)
+                {
+                    Host.log(e + "");
+                }
+
+                //  
+                Host.CharacterSettings.AukTime = ComboBoxAukTime.SelectedIndex;
                 Host.CharacterSettings.Script = comboBoxDungeonScript.Text;
                 Host.CharacterSettings.Quest = comboBoxQuestSet.Text;
 
                 try
                 {
-                  //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2    " + textBoxCheckAukStartTime.Text);
-                 //   Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2   " + textBoxCheckAukEndTime.Text);
+                    //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2    " + textBoxCheckAukStartTime.Text);
+                    //   Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2   " + textBoxCheckAukEndTime.Text);
 
                     Host.CharacterSettings.CheckAukInTimeRange = CheckBoxCheckAukTime.IsChecked.Value;
 
                     Host.CharacterSettings.StartAukTime = TimeSpan.Parse(textBoxCheckAukStartTime.Text);
                     Host.CharacterSettings.EndAukTime = TimeSpan.Parse(textBoxCheckAukEndTime.Text);
 
-                  //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2  " + textBoxCheckAukStartTime.Text);
-                  //  Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2  " + textBoxCheckAukEndTime.Text);
+                    //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2  " + textBoxCheckAukStartTime.Text);
+                    //  Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2  " + textBoxCheckAukEndTime.Text);
                 }
                 catch (Exception e)
                 {
-                  
+                    Host.log(e + "");
                 }
 
 
+                Host.CharacterSettings.EquipAucs.Clear();
+                foreach (var collectionScriptSchedule in CollectionEquipAuc)
+                {
+                    var item = new EquipAuc
+                    {
+                        Slot = collectionScriptSchedule.Slot,
+                        Level = collectionScriptSchedule.Level,
+                        MaxPrice = collectionScriptSchedule.MaxPrice,
+                        Name= collectionScriptSchedule.Name,
+                        Stat1 = collectionScriptSchedule.Stat1,
+                        Stat2 = collectionScriptSchedule.Stat2
+                    };
+                    Host.CharacterSettings.EquipAucs.Add(item);
+                }
+
                 Host.CharacterSettings.ScriptSchedules.Clear();
-                foreach (var  collectionScriptSchedule in CollectionScriptSchedules) 
+                foreach (var collectionScriptSchedule in CollectionScriptSchedules)
                 {
                     var item = new ScriptSchedule
                     {
@@ -2098,7 +2148,8 @@ namespace WowAI.UI
                         Name = collectionAukSettingse.Name,
                         Disscount = collectionAukSettingse.Disscount,
                         Level = collectionAukSettingse.Level,
-                        MaxPrice = collectionAukSettingse.MaxPrice
+                        MaxPrice = collectionAukSettingse.MaxPrice,
+                        MaxCount = collectionAukSettingse.MaxCount
                     };
                     Host.CharacterSettings.AukSettingses.Add(item);
                 }
@@ -2125,7 +2176,8 @@ namespace WowAI.UI
                     var item = new ItemGlobal
                     {
                         Quality = collectionItemGlobal.Quality,
-                        Class = collectionItemGlobal.Class
+                        Class = collectionItemGlobal.Class,
+                        ItemLevel = collectionItemGlobal.ItemLevel
                     };
                     Host.CharacterSettings.MyItemGlobals.Add(item);
                 }
@@ -2558,6 +2610,82 @@ namespace WowAI.UI
             }
         }
 
+
+
+        public class MyQuestTemplate1
+        {
+            public uint Id { get; set; }
+            public uint RewardFactionFlags { get; set; }
+            public int[] RewardFactionCapIns { get; set; }
+            public int[] RewardFactionValues { get; set; }
+            public int[] RewardFactionOverrides { get; set; }
+            public uint[] RewardFactionIDs { get; set; }
+            public uint QuestTurnInPortrait { get; set; }
+            public uint[] RewardCurrencyIDs { get; set; }
+            public uint PortraitGiverMount { get; set; }
+            public uint RewardNumSkillUps { get; set; }
+            public uint RewardSkillLineID { get; set; }
+            public uint RewardArenaPoints { get; set; }
+            public uint RewardTitle { get; set; }
+            public int POIPriorityWod { get; set; }
+            public float POIy { get; set; }
+            public uint QuestGiverPortrait { get; set; }
+            public float POIx { get; set; }
+            public uint[] RewardCurrencyCounts { get; set; }
+            public uint SoundTurnIn { get; set; }
+            public string QuestTurnTargetName { get; set; }
+            public string QuestTurnTextWindow { get; set; }
+            public string QuestGiverTargetName { get; set; }
+            public string QuestGiverTextWindow { get; set; }
+            public string AreaDescription { get; set; }
+            public string QuestDescription { get; set; }
+            public uint SoundAccept { get; set; }
+            public string LogDescription { get; set; }
+            public QuestObjective[] QuestObjectives { get; set; }
+            public int Expansion { get; set; }
+            public int QuestRewardID { get; set; }
+            public long AllowableRaces { get; set; }
+            public uint AreaGroupID { get; set; }
+            public uint TimeAllowed { get; set; }
+            public string LogTitle { get; set; }
+            public string QuestCompletionLog { get; set; }
+            public uint POIContinent { get; set; }
+            public uint[] RewardChoiceItemQuantits { get; set; }
+            public int RewardMoney { get; set; }
+            public float RewardXPMultiplier { get; set; }
+            public uint RewardXPDifficulty { get; set; }
+            public uint RewardNextQuest { get; set; }
+            public uint SuggestedGroupNum { get; set; }
+            public EQuestInfo QuestInfoID { get; set; }
+            public uint RewardMoneyDifficulty { get; set; }
+            public EQuestSort QuestSortID { get; set; }
+            public int QuestMaxScalingLevel { get; set; }
+            public uint QuestPackageID { get; set; }
+            public int QuestLevel { get; set; }
+            public EQuestType QuestType { get; set; }
+            public KeyValuePair<int, bool> QuestID { get; set; }
+            public bool HasData { get; set; }
+            public int MinLevel { get; set; }
+            public uint[] RewardChoiceItemDiplayIDs { get; set; }
+            public float RewardMoneyMultiplier { get; set; }
+            public uint[] RewardDisplaySpell { get; set; }
+            public uint[] RewardChoiceItemIDs { get; set; }
+            public uint[] ItemDropQuantitys { get; set; }
+            public uint[] ItemDrops { get; set; }
+            public uint[] RewardAmounts { get; set; }
+            public uint[] RewardItems { get; set; }
+            public EQuestFlags2 FlagsEx { get; set; }
+            public uint RewardBonusMoney { get; set; }
+            public EQuestFlags Flags { get; set; }
+            public uint RewardArtifactCategoryID { get; set; }
+            public float RewardArtifactXPMultiplier { get; set; }
+            public uint RewardArtifactXPDifficulty { get; set; }
+            public float RewardKillHonor { get; set; }
+            public uint RewardHonor { get; set; }
+            public uint RewardSpell { get; set; }
+            public uint StartItem { get; set; }
+        }
+
         /// <summary>
         /// Открывает настройки
         /// </summary>
@@ -2575,9 +2703,15 @@ namespace WowAI.UI
 
                 if (!IsToggle)
                 {
-                    _collectionQuest = Host.GetQuests();
-                    DataGridQuest.ItemsSource = _collectionQuest;
 
+                    _collectionQuests = Host.GetQuests();
+
+                  
+
+                    DataGridQuest.ItemsSource = _collectionQuests;
+
+
+                    DataGridQuestTemplate.ItemsSource = collectionQuestTemplate;
 
                     _collectionLfg.Add(Host.LFGStatus);
                     DataGridLfg.ItemsSource = _collectionLfg;
@@ -2628,21 +2762,22 @@ namespace WowAI.UI
                     CollectionAllBuff.RemoveAll();
                     foreach (var buff in Host.ItemManager.GetItems())
                     {
-                        if (buff.Place == EItemPlace.Equipment)
-                            continue;
+                      /*  if (buff.Place == EItemPlace.Equipment)
+                            continue;*/
 
                         if (buff.SpellId == 0)
                             continue;
-                        var isbuff = false;
-
+                      /*  var isbuff = false;
+                        Host.log(buff.NameRu);
                         foreach (var effect in buff.GetEffectsData())
                         {
+                            Host.log(effect.Effect + " " + effect.ApplyAuraName);
                             if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
                                 isbuff = true;
-                        }
+                        }*/
 
-                        if (!isbuff)
-                            continue;
+                       /* if (!isbuff)
+                            continue;*/
                         var item = new BuffTable(buff.Name, buff.Id, buff.SpellId);
                         if (CollectionAllBuff.Any(collectionInvItem => buff.Id == collectionInvItem.ItemId))
                             continue;
@@ -3049,7 +3184,7 @@ namespace WowAI.UI
                         CheckBoxUseStoneForSellAndRepair.IsChecked = Host.CharacterSettings.UseStoneForSellAndRepair;
                         ComboBoxSummonBattlePetNumber.SelectedIndex = Host.CharacterSettings.BattlePetNumber;
                         textBoxFreeInvCountForAukId.Text = Host.CharacterSettings.FreeInvCountForAukId.ToString();
-
+                        CheckBoxWorldQuest.IsChecked = Host.CharacterSettings.WorldQuest;
                         CheckBoxDebuffDeath.IsChecked = Host.CharacterSettings.DebuffDeath;
                         CheckBoxAOEFarm.IsChecked = Host.CharacterSettings.AoeFarm;
                         textBoxAOEMobsCount.Text = Host.CharacterSettings.AoeMobsCount.ToString();
@@ -3076,27 +3211,55 @@ namespace WowAI.UI
                         if (Host.CharacterSettings.FormForMove == "Походный облик")
                             ComboBoxFormForMove.SelectedIndex = 3;
 
-                        textBoxValuta.Text = Host.CharacterSettings.Valuta;
-                        textBoxPrice.Text = Host.CharacterSettings.Price.ToString();
-                        textBoxPriceKK.Text = Host.CharacterSettings.PriceKK.ToString();
-                    
-                        textBoxFreeInvCount.Text = Host.CharacterSettings.InvFreeSlotCount.ToString();
+                        ComboBoxAukTime.SelectedIndex = Host.CharacterSettings.AukTime;
 
-                        CheckBoxScriptReverse.IsChecked = Host.CharacterSettings.ScriptReverse;
 
+                        CheckBoxSendMail.IsChecked = Host.CharacterSettings.SendMail;
+                        textBoxSendMailName.Text = Host.CharacterSettings.SendMailName;
+
+                        textBoxSendMailLocX.Text = Host.CharacterSettings.SendMailLocX.ToString();
+                        textBoxSendMailLocY.Text = Host.CharacterSettings.SendMailLocY.ToString();
+                        textBoxSendMailLocZ.Text = Host.CharacterSettings.SendMailLocZ.ToString();
+                        textBoxSendMailLocMapId.Text = Host.CharacterSettings.SendMailLocMapId.ToString();
+                        textBoxSendMailLocAreaId.Text = Host.CharacterSettings.SendMailLocAreaId.ToString();
                         try
                         {
-                           // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
-                           // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
-                            textBoxCheckAukStartTime.Text = Host.CharacterSettings.StartAukTime.ToString("hh':'mm");
-                            textBoxCheckAukEndTime.Text = Host.CharacterSettings.EndAukTime.ToString("hh':'mm");
-                            CheckBoxCheckAukTime.IsChecked = Host.CharacterSettings.CheckAukInTimeRange;
-                           // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
-                           // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                            // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                            // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                            textBoxSendMailStartTime.Text = Host.CharacterSettings.SendMailStartTime.ToString("hh':'mm");
+                            textBoxSendMailEndTime.Text = Host.CharacterSettings.SendMailStopTime.ToString("hh':'mm");
+                           
+                            // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                            // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
                         }
                         catch (Exception e)
                         {
-                          Host.log(e + " ");
+                            Host.log(e + " ");
+                        }
+
+
+
+                        textBoxValuta.Text = Host.CharacterSettings.Valuta;
+                        textBoxPrice.Text = Host.CharacterSettings.Price.ToString();
+                        textBoxPriceKK.Text = Host.CharacterSettings.PriceKK.ToString();
+
+                        textBoxFreeInvCount.Text = Host.CharacterSettings.InvFreeSlotCount.ToString();
+
+                        CheckBoxScriptReverse.IsChecked = Host.CharacterSettings.ScriptReverse;
+                        CheckBoxUseWhistleForSellAndRepair.IsChecked = Host.CharacterSettings.UseWhistleForSellAndRepair;
+                        try
+                        {
+                            // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                            // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                            textBoxCheckAukStartTime.Text = Host.CharacterSettings.StartAukTime.ToString("hh':'mm");
+                            textBoxCheckAukEndTime.Text = Host.CharacterSettings.EndAukTime.ToString("hh':'mm");
+                            CheckBoxCheckAukTime.IsChecked = Host.CharacterSettings.CheckAukInTimeRange;
+                            // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
+                            // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
+                        }
+                        catch (Exception e)
+                        {
+                            Host.log(e + " ");
                         }
 
                         CheckBoxAukRun.IsChecked = Host.CharacterSettings.AukRun;
@@ -3131,7 +3294,7 @@ namespace WowAI.UI
 
                         CheckBoxForceMoveScriptEnable.IsChecked = Host.CharacterSettings.ForceMoveScriptEnable;
                         textBoxForceMoveScriptDist.Text = Host.CharacterSettings.ForceMoveScriptDist.ToString();
-
+                        CheckBoxSummonMount.IsChecked = Host.CharacterSettings.SummonMount;
                         CheckBoxFightIfHPLess.IsChecked = Host.CharacterSettings.FightIfHPLess;
                         textBoxFightIfHPLessCount.Text = Host.CharacterSettings.FightIfHPLessCount.ToString();
 
@@ -3160,6 +3323,7 @@ namespace WowAI.UI
                             ComboBoxSwitchMode.SelectedIndex = 3;
                         if (Host.CharacterSettings.Mode == EMode.OnlyAttack)
                             ComboBoxSwitchMode.SelectedIndex = 4;
+                       
 
 
 
@@ -3223,7 +3387,7 @@ namespace WowAI.UI
                         textBoxIgnoreMob.Text = Host.CharacterSettings.IgnoreMob.ToString();
 
 
-
+                        textBoxEquipStateWeapon.Text = Host.CharacterSettings.EquipItemStat.ToString();
                         //Умения
                         CollectionActiveSkill.RemoveAll();
                         CollectionInvItems.RemoveAll();
@@ -3243,6 +3407,20 @@ namespace WowAI.UI
 
                         CollectionAukSettingses.RemoveAll();
                         CollectionScriptSchedules.RemoveAll();
+                        CollectionEquipAuc.RemoveAll();
+
+                        foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
+                        {
+                            CollectionEquipAuc.Add(new EquipAuc
+                            {
+                                Slot = characterSettingsEquipAuc.Slot,
+                                Name = characterSettingsEquipAuc.Name,
+                                MaxPrice = characterSettingsEquipAuc.MaxPrice,
+                                Level = characterSettingsEquipAuc.Level,
+                                Stat1 = characterSettingsEquipAuc.Stat1,
+                                Stat2 = characterSettingsEquipAuc.Stat2
+                            });
+                        }
 
                         foreach (var characterSettingsScriptSchedule in Host.CharacterSettings.ScriptSchedules)
                         {
@@ -3263,7 +3441,8 @@ namespace WowAI.UI
                                 Name = characterSettingsAukSettingse.Name,
                                 Level = characterSettingsAukSettingse.Level,
                                 Disscount = characterSettingsAukSettingse.Disscount,
-                                MaxPrice = characterSettingsAukSettingse.MaxPrice
+                                MaxPrice = characterSettingsAukSettingse.MaxPrice,
+                                MaxCount = characterSettingsAukSettingse.MaxCount
                             });
                         }
 
@@ -3283,7 +3462,8 @@ namespace WowAI.UI
                             CollectionItemGlobals.Add(new ItemGlobal
                             {
                                 Quality = characterSettingsMyItemGlobal.Quality,
-                                Class = characterSettingsMyItemGlobal.Class
+                                Class = characterSettingsMyItemGlobal.Class,
+                                ItemLevel = characterSettingsMyItemGlobal.ItemLevel
                             });
                         }
 
@@ -3830,13 +4010,13 @@ namespace WowAI.UI
                     skillId = GetSkillIdFromCombobox(comboBoxDungeonSkill.Text);
 
                 var tempLoc = new Vector3F();
-             /*   if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
-                    ComboBoxDungeonAction.SelectedIndex == 6)*/
-                    tempLoc = Host.Me.Location;
+                /*   if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
+                       ComboBoxDungeonAction.SelectedIndex == 6)*/
+                tempLoc = Host.Me.Location;
 
 
 
-              
+
 
 
                 CollectionDungeonCoord.Add(new DungeonCoordSettings
@@ -4184,6 +4364,8 @@ namespace WowAI.UI
                     textBoxDungeonLocY.Text = df.Loc.Y.ToString();
                     textBoxDungeonLocZ.Text = df.Loc.Z.ToString();
                     textBoxScriptPause.Text = df.Pause.ToString();
+                    textBoxDungeonLocAreaId.Text = df.AreaId.ToString();
+                    textBoxDungeonLocMapId.Text = df.MapId.ToString();
                     textBoxDungeonCom.Text = df.Com;
                 }
             }
@@ -4413,7 +4595,10 @@ namespace WowAI.UI
                     return;
                 }
 
-
+                if (Host.GetNpcQuestDialogs().Count == 0)
+                {
+                    Host.log("Нет квестов в диалоге");
+                }
 
                 foreach (var gossipOptionsData in Host.GetNpcQuestDialogs())
                 {
@@ -4451,7 +4636,7 @@ namespace WowAI.UI
 
                     listViewQuest.ScrollIntoView(item);
 
-                   
+
                 }
 
 
@@ -4922,7 +5107,7 @@ namespace WowAI.UI
                         comboBoxDungeonScript?.Items?.Clear();
                     if (comboBoxDungeonScript_Copy.Items.Count > 0)
                         comboBoxDungeonScript_Copy?.Items?.Clear();
-                    
+
                 }
 
                 if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
@@ -5191,6 +5376,7 @@ namespace WowAI.UI
                     }
 
                     );
+
                 //сброс настроек по умолчанию
                 // ResetSettingSkillDefault();
                 GroupBoxSettingsSkill1.Header = "Настройки";
@@ -5387,7 +5573,8 @@ namespace WowAI.UI
                 CollectionItemGlobals.Add(new ItemGlobal
                 {
                     Class = (EItemClass)Enum.Parse(typeof(EItemClass), comboBoxInvItemsGlobalClass.Text),
-                    Quality = (EItemQuality)Enum.Parse(typeof(EItemQuality), comboBoxInvItemsGlobalQuality.Text)
+                    Quality = (EItemQuality)Enum.Parse(typeof(EItemQuality), comboBoxInvItemsGlobalQuality.Text),
+                    ItemLevel = Convert.ToUInt32(textBoxItemLevel.Text)
                 });
             }
             catch (Exception exception)
@@ -5631,11 +5818,11 @@ namespace WowAI.UI
                 var tempname = GetSkillIdFromComboboxName(ComboBoxAuk.Text);
 
 
-               /* if (CollectionAukSettingses.Any(collectionprop => tempId == collectionprop.Id))
-                    return;*/
+                /* if (CollectionAukSettingses.Any(collectionprop => tempId == collectionprop.Id))
+                     return;*/
 
-                var level = 0;
-               
+
+
 
                 CollectionAukSettingses.Add(new AukSettings
                 {
@@ -5643,7 +5830,8 @@ namespace WowAI.UI
                     Name = tempname,
                     MaxPrice = Convert.ToUInt64(textBoxMaxPrice.Text),
                     Disscount = Convert.ToUInt64(textBoxDiscount.Text),
-                    Level = Convert.ToInt32(textBoxLevel.Text)
+                    Level = Convert.ToInt32(textBoxLevel.Text),
+                    MaxCount = Convert.ToUInt32(textBoxMaxCount.Text)
                     /*  Count = Convert.ToInt32(TextBoxAucCount.Text),
                       MaxPrixe = Convert.ToInt32(TextBoxAucMaxPrice.Text),
                       MinPrice = Convert.ToInt32(TextBoxAucMinPrice.Text),
@@ -5698,24 +5886,108 @@ namespace WowAI.UI
             {
 
 
-                // Host.log("dsf" + _collectionQuestTemplates.Count + "  " + DataGridQuestTemplate.Items.Count);
-                if (_collectionQuestTemplates.Count > 0)
-                    Host.log(_collectionQuestTemplates[0].LogTitle);
 
-                if (DataGridQuestTemplate.Items.Count > 1)
-                    Host.log((DataGridQuestTemplate.Items[0] as QuestTemplate).LogTitle);
+                 if (_collectionQuestTemplates.Count > 0)
+                      Host.log(_collectionQuestTemplates[0].LogTitle);
+
+                   if (DataGridQuest.Items.Count > 1)
+                       Host.log((DataGridQuest.Items[0] as QuestTemplate).LogTitle);
 
                 //_collectionQuestTemplates.Clear();
-                _collectionCount.Clear();
+
                 if (DataGridQuest.SelectedItem is Quest item)
                 {
-                    _collectionQuestTemplates.Add(item.Template);
-                    _collectionCount.Add(item.Counts);
+                    var t = item.Template;
+                    collectionQuestTemplate.Add(
+                        new MyQuestTemplate1
+                        {
+                            Id = t.Id,
+                            AllowableRaces = t.AllowableRaces,
+                            AreaDescription = t.AreaDescription,
+                            QuestID = t.QuestID,
+                            LogTitle = t.LogTitle,
+                            AreaGroupID = t.AreaGroupID,
+                            Expansion = t.Expansion,
+                            Flags = t.Flags,
+                            FlagsEx = t.FlagsEx,
+                            HasData = t.HasData,
+                            ItemDropQuantitys = t.ItemDropQuantitys,
+                            ItemDrops = t.ItemDrops,
+                            LogDescription = t.LogDescription,
+                            MinLevel = t.MinLevel,
+                            POIContinent = t.POIContinent,
+                            POIPriorityWod = t.POIPriorityWod,
+                            POIx = t.POIx,
+                            POIy = t.POIy,
+                            PortraitGiverMount = t.PortraitGiverMount,
+                            QuestCompletionLog = t.QuestCompletionLog,
+                            QuestDescription = t.QuestDescription,
+                            QuestGiverPortrait = t.QuestGiverPortrait,
+                            QuestGiverTargetName = t.QuestGiverTargetName,
+                            QuestGiverTextWindow = t.QuestGiverTextWindow,
+                            QuestInfoID = t.QuestInfoID,
+                            QuestLevel = t.QuestLevel,
+                            QuestMaxScalingLevel = t.QuestMaxScalingLevel,
+                            QuestObjectives = t.QuestObjectives,
+                            QuestPackageID = t.QuestPackageID,
+                            QuestRewardID = t.QuestRewardID,
+                            QuestSortID = t.QuestSortID,
+                            QuestTurnInPortrait = t.QuestTurnInPortrait,
+                            QuestTurnTargetName = t.QuestTurnTargetName,
+                            QuestTurnTextWindow = t.QuestTurnTextWindow,
+                            QuestType = t.QuestType,
+                            RewardAmounts = t.RewardAmounts,
+                            RewardArenaPoints = t.RewardArenaPoints,
+                            RewardArtifactCategoryID = t.RewardArtifactCategoryID,
+                            RewardArtifactXPDifficulty = t.RewardArtifactXPDifficulty,
+                            RewardArtifactXPMultiplier = t.RewardArtifactXPMultiplier,
+                            RewardBonusMoney = t.RewardBonusMoney,
+                            RewardChoiceItemDiplayIDs = t.RewardChoiceItemDisplayIDs,
+                            RewardChoiceItemIDs = t.RewardChoiceItemIDs,
+                            RewardChoiceItemQuantits = t.RewardChoiceItemQuantitys,
+                            RewardCurrencyCounts = t.RewardCurrencyCounts,
+                            RewardCurrencyIDs = t.RewardCurrencyIDs,
+                            RewardDisplaySpell = t.RewardDisplaySpell,
+                            RewardFactionCapIns = t.RewardFactionCapIns,
+                            RewardFactionFlags = t.RewardFactionFlags,
+                            RewardFactionIDs = t.RewardFactionIDs,
+                            RewardFactionOverrides = t.RewardFactionOverrides,
+                            RewardFactionValues = t.RewardFactionValues,
+                            RewardHonor = t.RewardHonor,
+                            RewardItems = t.RewardItems,
+                            RewardKillHonor = t.RewardKillHonor,
+                            RewardMoney = t.RewardMoney,
+                            RewardMoneyDifficulty = t.RewardMoneyDifficulty,
+                            RewardMoneyMultiplier = t.RewardMoneyMultiplier,
+                            RewardNextQuest = t.RewardNextQuest,
+                            RewardNumSkillUps = t.RewardNumSkillUps,
+                            RewardSkillLineID = t.RewardSkillLineID,
+                            RewardSpell = t.RewardSpell,
+                            RewardTitle = t.RewardTitle,
+                            RewardXPDifficulty = t.RewardXPDifficulty,
+                            RewardXPMultiplier = t.RewardXPMultiplier,
+                            SoundAccept = t.SoundAccept,
+                            SoundTurnIn = t.SoundTurnIn,
+                            StartItem = t.StartItem,
+                            SuggestedGroupNum = t.SuggestedGroupNum,
+                            TimeAllowed = t.TimeAllowed
+
+                        });
+
+
+
+                    DataGridQuestTemplate.ItemsSource = collectionQuestTemplate;
+
+                    /*  foreach(var i in _collectionCount)
+                          Host.log(i.Id + " " + i.LogTitle);*/
+
                 }
 
-                DataGridQuestTemplate.ItemsSource = _collectionQuestTemplates;
-                DataGridQuestCounts.ItemsSource = _collectionCount;
-                DataGridQuestTemplate.Items.Refresh();
+                //  DataGridQuestTemplate.ItemsSource = _collectionQuestTemplates;
+
+
+                Host.log(collectionQuestTemplate.Count() + "  " + DataGridQuestTemplate.ItemsSource + "  " + DataGridQuestTemplate.Items.Count);
+                Host.log(collectionQuestTemplate.Count() + "  " + DataGridQuest.ItemsSource + "  " + DataGridQuest.Items.Count);
             }
             catch (Exception exception)
             {
@@ -5746,13 +6018,13 @@ namespace WowAI.UI
                     {
                         foreach (var fileInfo in directoryInfo.GetFiles())
                         {
-                            if(!fileInfo.Name.Contains(".dll"))
+                            if (!fileInfo.Name.Contains(".dll"))
                                 continue;
                             comboBoxDungeonPlugin.Items.Add(directoryInfo.Name + "\\" + fileInfo.Name);
                         }
                     }
 
-                    
+
                 }
             }
             catch (ThreadAbortException)
@@ -5789,7 +6061,7 @@ namespace WowAI.UI
                     ScriptName = comboBoxDungeonScript_Copy.Text,
                     Reverse = CheckBoxScriptReverseShedule.IsChecked.Value
                 });
-                
+
             }
             catch (Exception exception)
             {
@@ -5804,6 +6076,127 @@ namespace WowAI.UI
             {
                 ButtonContinue.IsEnabled = false;
             });
+        }
+
+        private void DataGridQuest_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            try
+            {
+                /*Type myType = e.AddedCells[0].Item.GetType();
+
+                foreach (MemberInfo mi in myType.GetMembers())
+                {
+                     Host.log(mi.DeclaringType + " " + mi.MemberType + " " + mi.Name);
+                }
+
+                var property = myType.GetProperty(e.AddedCells[0].Column.Header.ToString());
+                if (property == null)
+                    Host.log("nulll");
+                else
+                {
+                    var obj = property.GetValue(e.AddedCells[0].Item);
+                    if (obj == null)
+                        Host.log("nulll 2");
+                    else
+                    {
+                        Host.log("Тест " + obj.ToString());
+                        DataGrid1QuestLocation.ItemsSource = obj as IEnumerable;
+                        Host.log("Тест2 " + DataGrid1QuestLocation.ItemsSource);
+
+                        if(obj is QuestTemplate)
+                        {
+                            Host.log("Тет 33 ");
+                            var col = new ObservableCollection<QuestTemplate>();
+                            col.Add(obj as QuestTemplate);
+                            DataGrid1QuestLocation.ItemsSource = col;
+                        }
+                    }
+                }*/
+
+
+            }
+            catch (Exception err)
+            {
+                Host.log(err + "");
+            }
+        }
+
+        private void DataGrid1QuestLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void DataGridQuestCounts_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+
+        }
+
+        private void DataGridQuestCounts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void comboBoxBuyAuc_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            foreach (EEquipmentSlot value in Enum.GetValues(typeof(EEquipmentSlot)))
+            {
+                if (value == EEquipmentSlot.Ranged)
+                    continue;
+                //  Host.log(value.ToString());
+                if (!comboBoxBuyAuc.Items.Contains(value.ToString()))
+                    comboBoxBuyAuc.Items.Add(value.ToString());
+            }
+        }
+
+        private void buttonEquipAucDel_Click(object sender, RoutedEventArgs e)
+        {
+            
+                try
+                {
+                    if (DataGridEquipAuction.SelectedIndex != -1)
+                        CollectionEquipAuc.RemoveAt(DataGridEquipAuction.SelectedIndex);
+                }
+                catch (Exception exception)
+                {
+                    Host.log(exception.ToString());
+                }
+            
+        }
+
+        private void buttonAddEquipAuc_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (comboBoxBuyAuc.SelectedIndex == -1)
+                    return;
+
+
+                CollectionEquipAuc.Add(new EquipAuc()
+                {
+                    Slot = (EEquipmentSlot)Enum.Parse(typeof(EEquipmentSlot), comboBoxBuyAuc.Text),
+                   
+                });
+            }
+            catch (Exception exception)
+            {
+                Host.log(exception.ToString());
+            }
+        }
+
+        private void buttonSendMailLocFill_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                textBoxSendMailLocX.Text = Convert.ToInt32(Host.Me.Location.X).ToString();
+                textBoxSendMailLocY.Text = Convert.ToInt32(Host.Me.Location.Y).ToString();
+                textBoxSendMailLocZ.Text = Convert.ToInt32(Host.Me.Location.Z).ToString();
+                textBoxSendMailLocMapId.Text = Convert.ToInt32(Host.MapID).ToString();
+                textBoxSendMailLocAreaId.Text = Convert.ToInt32(Host.Area.Id).ToString();
+            }
+            catch (Exception err)
+            {
+                Host.log(err.ToString());
+            }
         }
     }
 

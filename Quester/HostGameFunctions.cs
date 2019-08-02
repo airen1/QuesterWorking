@@ -6,17 +6,14 @@ using WowAI.Modules;
 using Out.Internal.Core;
 using WoWBot.Core;
 using System.Linq;
-using System.Windows.Documents;
 using Out.Utility;
 using WowAI.UI;
-using WoWBot.Database;
 
 namespace WowAI
 {
     static class TimeSpanExtensions
     {
-        static public bool IsBetween(this TimeSpan time,
-            TimeSpan startTime, TimeSpan endTime)
+        static public bool IsBetween(this TimeSpan time, TimeSpan startTime, TimeSpan endTime)
         {
             if (endTime == startTime)
             {
@@ -24,89 +21,26 @@ namespace WowAI
             }
             if (endTime < startTime)
             {
-                return time <= endTime ||
-                       time >= startTime;
+                return time <= endTime || time >= startTime;
             }
-            return time >= startTime &&
-                   time <= endTime;
+            return time >= startTime && time <= endTime;
         }
     }
+
     internal partial class Host
     {
-
-
-
-        public List<uint> NoShowSkill = new List<uint>
-        {
-            3365,   //Opening IsPassive =  False
-            6233,   //Closing IsPassive =  False
-            6246,   //Closing IsPassive =  False
-            6247,   //Opening IsPassive =  False
-            6477,  // Opening IsPassive =  False
-            6478,   //Opening IsPassive =  False
-            7266,   //Duel IsPassive =  False
-            7267,   //Grovel IsPassive =  False
-            21651,   //Opening IsPassive =  False
-            21652,   //Closing IsPassive =  False
-            61437,   //Opening IsPassive =  False
-            96220,   //Opening IsPassive =  False
-            68398,   //Opening IsPassive =  False
-            7355,   //Stuck IsPassive =  
-            22027,   //Remove Insignia IsPassive =  False
-            22810,   //Opening - No Text IsPassive =  False
-            161691,   //Garrison Ability IsPassive =  False
-            45927,   //Summon Friend IsPassive =  False
-            211390,   //Combat Ally IsPassive =  False
-            59752,    //Every Man for Himself IsPassive =  False
-            //Охотник
-            1494,   //Track Beasts IsPassive =  False
-            19878,   //Track Demons IsPassive =  False
-            19879,   //Track Dragonkin IsPassive =  False
-            19880,   //Track Elementals IsPassive =  False
-            19882,   //Track Giants IsPassive =  False
-            19885,   //Track Hidden IsPassive =  False
-            19883,   //Track Humanoids IsPassive =  False
-            19884,   //Track Undead IsPassive =  False
-            200749,   //Activating Specialization IsPassive =  False
-            883,   //Call Pet 1 IsPassive =  False
-            982,   //Revive Pet IsPassive =  False
-            175686,   //Stopping Power IsPassive =  False
-
-          //  6603,   //Auto Attack IsPassive =  False
-            8386,  // Attacking IsPassive =  False
-          //  5019,  // Shoot IsPassive =  False
-            205243,   //Снятие шкур IsPassive =  False
-            194174,   //Навыки снятия шкур IsPassive =  False
-          //  8613,   //Снятие шкур IsPassive =  False
-            212801,   //Смещение IsPassive =  False
-        };
-
-
-        /* public Aura MyGetAura(uint id)
-         {
-             foreach (var aura in Me.GetAuras())
-             {
-                 if (aura.SpellId == id)
-                     return aura;
-             }
-
-             return null;
-         }*/
-
-
         public static bool IsInRange(DateTime dateToCheck, DateTime startDate, DateTime endDate)
         {
-
             return dateToCheck >= startDate && dateToCheck <= endDate;
         }
 
-        public void MyCheckIsMovingIsCasting()
+        public void MyCheckIsMovingIsCasting(bool waitMove = true)
         {
-
-
             var fixMove = 0;
             while (SpellManager.IsCasting || Me.IsMoving)
             {
+                if (!waitMove)
+                    return;
                 if (Me.IsMoving)
                 {
                     fixMove++;
@@ -147,7 +81,6 @@ namespace WowAI
                 waitTime = waitTime - 1000;
                 log("Ожидаю " + waitTime + "/" + time);
             }
-
         }
 
 
@@ -203,7 +136,7 @@ namespace WowAI
                     log("Не смог открыть диалог 2 " + GetLastError(), Host.LogLvl.Error);
             }
 
-
+          
 
             foreach (var gossipOptionsData in GetNpcDialogs())
             {
@@ -218,7 +151,7 @@ namespace WowAI
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
             }
 
-            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929 || npc.Id == 131135)
+            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929 || npc.Id == 131135 || npc.Id == 137613)
             {
                 Thread.Sleep(1000);
                 foreach (var gossipOptionsData in GetNpcDialogs())
@@ -258,10 +191,10 @@ namespace WowAI
         }
 
 
-
         public void FlyForm()
         {
-
+            CancelMoveTo();
+            Thread.Sleep(1000);
             if (Me.Class == EClass.Druid)
             {
                 if (MyGetAura(783) == null)
@@ -334,7 +267,6 @@ namespace WowAI
                     return;
 
                 }
-
             }
 
 
@@ -350,7 +282,6 @@ namespace WowAI
 
         public void Mail()
         {
-
             var path = CommonModule.GpsBase.GetPath(new Vector3F(1610.48, -4419.00, 14.14), Me.Location);
 
             if (Me.Team == ETeam.Horde)
@@ -363,7 +294,7 @@ namespace WowAI
                 foreach (var vector3F in path)
                 {
                     log(path.Count + "  Путь " + Me.Distance(vector3F));
-                    CommonModule.ForceMoveTo2(vector3F);
+                    CommonModule.ForceMoveTo2(vector3F, 1,  false);
                 }
             }
             if (Me.Team == ETeam.Alliance)
@@ -372,7 +303,7 @@ namespace WowAI
                 foreach (var vector3F in path)
                 {
                     log(path.Count + "  Путь " + Me.Distance(vector3F));
-                    CommonModule.ForceMoveTo2(vector3F);
+                    CommonModule.ForceMoveTo2(vector3F, 1,  false);
                 }
             }
 
@@ -395,61 +326,33 @@ namespace WowAI
                 if (!OpenMailbox(mailBox))
                     log("Не удалось открыть ящик " + GetLastError(), LogLvl.Error);
                 else
-                {
                     log("Открыл ящик", LogLvl.Ok);
-                }
                 Thread.Sleep(2000);
 
                 foreach (var mail in GetMails())
                 {
-                    log(mail.SenderType + " " + mail.GetAttachedItems().Count);
+                    if (mail.Cod != 0)
+                        continue;
+                    log(mail.SenderType + " " + mail.GetAttachedItems().Count + " " + mail.Subject + " ");
                     mail.MarkAsRead();
                     Thread.Sleep(500);
                     if (GetBotLogin() == "deathstar")
                         Thread.Sleep(500);
                     if (!mail.TakeAllAttachmentsAndGold())
-                    {
                         log("Не удалось получить письмо " + GetLastError(), LogLvl.Error);
-                    }
                     else
-                    {
                         log("Получил письмо", LogLvl.Ok);
-                    }
+
+                    if (mail.Subject == "Auction won: WoW Token")
+                        if (!mail.Delete())
+                            log("Не удалось удалить письмо " + GetLastError(), LogLvl.Error);
+
                 }
             }
+            //   SendKeyPress(0x1b);
         }
 
 
-        /*  public GameObject GetNearestMailBox()
-          {
-              double bestDist = double.MaxValue;
-              GameObject result = null;
-              foreach (var e in GetEntities<GameObject>())
-              {
-                  if (e.GameObjectType != EGameObjectType.Mailbox)
-                      continue;
-                  if (Me.Distance(e) < bestDist)
-                  {
-                      bestDist = Me.Distance(e);
-                      result = e;
-                  }
-              }
-              return result;
-          }
-          public void HandleMails()
-          {
-              var mb = GetNearestMailBox();
-              if (mb == null)
-                  return;
-              OpenMailbox(mb);
-              Console.WriteLine(GetMails().Count);
-              foreach (var mail in GetMails())
-              {
-                  mail.MarkAsRead();
-                  mail.TakeAllAttachmentsAndGold();
-                  //пустые письма клиент удаляет сам, хз
-              }
-          }*/
 
         public void Auk()
         {
@@ -464,7 +367,7 @@ namespace WowAI
                     foreach (var vector3F in path)
                     {
                         log(path.Count + "  Путь " + Me.Distance(vector3F));
-                        CommonModule.ForceMoveTo2(vector3F);
+                        CommonModule.ForceMoveTo2(vector3F, 1,  false);
                     }
                 }
 
@@ -474,7 +377,7 @@ namespace WowAI
                 foreach (var vector3F in path)
                 {
                     log(path.Count + "  Путь " + Me.Distance(vector3F));
-                    CommonModule.ForceMoveTo2(vector3F);
+                    CommonModule.ForceMoveTo2(vector3F, 1,  false);
                 }
             }
 
@@ -519,7 +422,7 @@ namespace WowAI
             Thread.Sleep(2000);
         }
 
-        public bool NeedAuk = false;
+        public bool NeedAuk;
         public bool MyUseStone(bool auk = false)
         {
 
@@ -689,6 +592,11 @@ namespace WowAI
             return Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2));
         }
 
+        public double MyDistance(Vector3F loc1, Vector3F loc2)
+        {
+            return Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) + Math.Pow((loc1.Z - loc2.Z), 2));
+        }
+
         public double DistanceGpcPoint(GpsPoint loc1, GpsPoint loc2)
         {
             return
@@ -744,6 +652,7 @@ namespace WowAI
             if (needEntity != null)
             {
 
+
                 AutoQuests.MyUseSpellClick(needEntity);
             }
 
@@ -762,6 +671,9 @@ namespace WowAI
                 foreach (var npc in listEntity.OrderBy((i => Me.Distance(i))))
                 {
                     if (npc.Distance(2475.74, 1130.51, 5.97) < 10)
+                        continue;
+                    
+                    if(npc.Id == 138449 && npc.Distance(3899.11, 405.34, 148.84) < 5)
                         continue;
                     /*if (!npc.IsVisible)
                         continue;*/
@@ -798,7 +710,7 @@ namespace WowAI
         {
             try
             {
-                if (GetThreats().Count > 0)
+                if (Me.GetThreats().Count > 0)
                 {
                     FarmModule.farmState = FarmState.AttackOnlyAgro;
                     return false;
@@ -822,6 +734,10 @@ namespace WowAI
                     if (Me.Distance(i.Location) < bestDist)
                     {
                         if (i.Id == 1839)//Настрондир  1220  0  81.2824630737305  1839
+                            continue;
+                        if (i.Id == 2161)//Настрондир  1220  0  81.2824630737305  1839
+                            continue;
+                        if (i.Id == 2078)//Настрондир  1220  0  81.2824630737305  1839
                             continue;
 
                         if (i.Id == 2073 && CharacterSettings.Mode != EMode.Questing)//Throne Room, Zuldazar  1642  0  37.4401321411133  2073
@@ -904,6 +820,8 @@ namespace WowAI
                             continue;
                         if (i.Id == 2282 && CharacterSettings.Mode != EMode.Questing)
                             continue;
+                        /* if (i.Id == 1642 && CharacterSettings.Mode != EMode.Questing)
+                             continue;*/
 
 
                         log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
@@ -956,6 +874,8 @@ namespace WowAI
                 double bestDistnode = 99999999;
                 foreach (var canLandNode in TaxiNodesData.CanLandNodes)
                 {
+                    if (canLandNode.Id == 1965 && CharacterSettings.Mode != EMode.Questing)
+                        continue;
                     if (Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z) < bestDistnode)
                     {
                         bestDistnode = Distance(loc.X, loc.Y, loc.Z, canLandNode.Location.X, canLandNode.Location.Y, canLandNode.Location.Z);
@@ -1164,7 +1084,7 @@ namespace WowAI
 
             Dictionary<EItemQuality, int> MinimumCheckingCount = new Dictionary<EItemQuality, int>();
             MinimumCheckingCount[EItemQuality.Normal] = 2000;
-            MinimumCheckingCount[EItemQuality.Uncommon] = 2000;
+            MinimumCheckingCount[EItemQuality.Uncommon] = 500;
             MinimumCheckingCount[EItemQuality.Rare] = 200;
             MinimumCheckingCount[EItemQuality.Epic] = 1;
             List<uint> ItemIDsForSell = new List<uint>();
@@ -1172,6 +1092,19 @@ namespace WowAI
             {
                 if (ItemIDsForSell.Contains(Convert.ToUInt32(characterSettingsAukSettingse.Id)))
                     continue;
+                if (characterSettingsAukSettingse.MaxCount != 0)
+                {
+                    var i = 0;
+                    foreach (var myAuctionItem in GetMyAuctionItems())
+                    {
+                        if (myAuctionItem.ItemId == characterSettingsAukSettingse.Id)
+                            i = i + myAuctionItem.Count;
+                    }
+
+                    if (i > characterSettingsAukSettingse.MaxCount)
+                        continue;
+                }
+
                 ItemIDsForSell.Add(Convert.ToUInt32(characterSettingsAukSettingse.Id));
             }
 
@@ -1255,6 +1188,8 @@ namespace WowAI
                 ulong priceSumm = 0;
                 int itemsCount = 0;
 
+
+
                 Dictionary<ulong, int> normalPrices = new Dictionary<ulong, int>();
                 ulong mylotPrice = 0;
                 while (itemsCount < MinimumCheckingCount[firstItem.ItemQuality])
@@ -1276,14 +1211,11 @@ namespace WowAI
                             {
                                 foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
                                 {
-                                    if (characterSettingsAukSettingse.Id == aucItem.ItemId &&
-                                        characterSettingsAukSettingse.Level == aucItem.ItemLevel)
+                                    if (characterSettingsAukSettingse.Id == aucItem.ItemId && characterSettingsAukSettingse.Level == aucItem.ItemLevel)
                                     {
                                         epicPrices[new KeyValuePair<uint, uint>(aucItem.ItemId, aucItem.ItemLevel)] = aucItem.BuyoutPrice - (characterSettingsAukSettingse.Disscount * 10000);
                                     }
                                 }
-
-
                             }
                         }
 
@@ -1389,10 +1321,8 @@ namespace WowAI
                             if (mylotPrice == normalPrice.Key)
                                 Averages[firstItem.Id] = normalPrice.Key;
                             log("Цена " + normalPrice.Key + "  Кол-во " + normalPrice.Value + "  " + Averages[firstItem.Id]);
-
                             break;
                         }
-
                         log("Средняя цена для " + itemsCount + " " + name + "{" + firstItem.Level + "}[" + firstItem.Id + "] = " + (Averages[firstItem.Id] / 10000f).ToString("F2"));
 
                     }
@@ -1427,14 +1357,18 @@ namespace WowAI
                         var minbid = sellPrice;
                         if (item.ItemQuality == EItemQuality.Epic)
                         {
-
                             sellPrice = epicPrices[new KeyValuePair<uint, uint>(item.Id, item.Level)];
-
                             minbid = sellPrice - (sellPrice / 100 * 20);
                         }
 
+                        EAuctionSellTime time = EAuctionSellTime.TwelveHours;
+                        if (CharacterSettings.AukTime == 1)
+                            time = EAuctionSellTime.TwentyFourHours;
+                        if (CharacterSettings.AukTime == 2)
+                            time = EAuctionSellTime.FortyEightHours;
+
                         log("Выставляем на продажу " + name + "{" + item.Level + "}[" + item.Id + "] в количестве " + countToSell + " штук за " + (sellPrice / 10000f).ToString("F2") + "   " + (minbid / 10000f).ToString("F2"), LogLvl.Important);
-                        var result = item.AuctionSell(minbid, sellPrice, EAuctionSellTime.TwelveHours, countToSell);
+                        var result = item.AuctionSell(minbid, sellPrice, time, countToSell);
                         if (result == EAuctionHouseError.Ok)
                         {
                             log("Успешно", LogLvl.Ok);
@@ -1511,100 +1445,109 @@ namespace WowAI
         {
             try
             {
+                if (GetBotLogin() == "wowklausvovot")
+                {
+
+                }
+                else
                 if (!MyAllItemsRepair())
                     return true;
 
-
-                var mountSell = SpellManager.GetSpell(61447);//Тундровый мамонт путешественника
-                if (mountSell == null)
-                    mountSell = SpellManager.GetSpell(61425);//Тундровый мамонт путешественника
-
-                if (mountSell != null)
+                if (CharacterSettings.SummonMount)
                 {
-                    if (CharacterSettings.UseMountMyLoc)
-                    {
+                    var mountSell = SpellManager.GetSpell(61447);//Тундровый мамонт путешественника
+                    if (mountSell == null)
+                        mountSell = SpellManager.GetSpell(61425);//Тундровый мамонт путешественника
 
-                    }
-                    else
+                    if (mountSell != null)
                     {
-                        if (CharacterSettings.MountLocX != 0)
-                            if (!MoveTo(CharacterSettings.MountLocX, CharacterSettings.MountLocY, CharacterSettings.MountLocZ))
-                                return false;
-                    }
-                    /*  var mount = CommonModule.MyGetAura(61447);
-                      if(mount == null)
-                      {
-                         
-                      }
-                     */
-                    CommonModule.MyUnmount();
-                    CanselForm();
-                    CancelMoveTo();
-                    Thread.Sleep(500);
-                    MyCheckIsMovingIsCasting();
-                    var result = SpellManager.CastSpell(mountSell.Id);
-
-                    if (result != ESpellCastError.SUCCESS)
-                    {
-                        log("Не удалось призвать маунта " + mountSell.Name + "  " + result, Host.LogLvl.Error);
-                        return false;
-                    }
-                    else
-                        log("Призвал маунта", Host.LogLvl.Ok);
-                    Thread.Sleep(2000);
-                    while (SpellManager.IsCasting)
-                        Thread.Sleep(100);
-                    Thread.Sleep(2000);
-                    foreach (var npc in GetEntities<Unit>())
-                    {
-                        if (npc.Id == 32641 || npc.Id == 32639)
+                        if (CharacterSettings.UseMountMyLoc)
                         {
-                            Thread.Sleep(1000);
-                            if (!OpenShop(npc))
+
+                        }
+                        else
+                        {
+                            if (CharacterSettings.MountLocX != 0)
+                                if (!MoveTo(CharacterSettings.MountLocX, CharacterSettings.MountLocY, CharacterSettings.MountLocZ))
+                                    return false;
+                        }
+                        /*  var mount = CommonModule.MyGetAura(61447);
+                          if(mount == null)
+                          {
+
+                          }
+                         */
+                        CommonModule.MyUnmount();
+                        CanselForm();
+                        CancelMoveTo();
+                        Thread.Sleep(500);
+                        MyCheckIsMovingIsCasting();
+                        var result = SpellManager.CastSpell(mountSell.Id);
+
+                        if (result != ESpellCastError.SUCCESS)
+                        {
+                            log("Не удалось призвать маунта " + mountSell.Name + "  " + result, Host.LogLvl.Error);
+                            return false;
+                        }
+                        else
+                            log("Призвал маунта", Host.LogLvl.Ok);
+                        Thread.Sleep(2000);
+                        while (SpellManager.IsCasting)
+                            Thread.Sleep(100);
+                        Thread.Sleep(2000);
+                        foreach (var npc in GetEntities<Unit>())
+                        {
+                            if (npc.Id == 32641 || npc.Id == 32639)
                             {
-                                log("Не смог открыть шоп 5 " + npc.Name + "[" + npc.Id + "]  " + GetLastError(), LogLvl.Error);
-                                if (InteractionObject != null)
-                                    log("Открыт диалог с " + InteractionObject.Name + "  " + InteractionObject.Id + "  " + Me.Distance(InteractionObject.Location) + " " + CurrentInteractionGuid);
+                                Thread.Sleep(1000);
+                                if (!OpenShop(npc))
+                                {
+                                    log("Не смог открыть шоп 5 " + npc.Name + "[" + npc.Id + "]  " + GetLastError(), LogLvl.Error);
+                                    if (InteractionObject != null)
+                                        log("Открыт диалог с " + InteractionObject.Name + "  " + InteractionObject.Id + "  " + Me.Distance(InteractionObject.Location) + " " + CurrentInteractionGuid);
+                                    else
+                                    {
+                                        log("InteractionNpc = null " + CurrentInteractionGuid);
+                                    }
+                                    Thread.Sleep(5000);
+                                    /* if (GetLastError() != ELastError.ActionNotAllowed)
+                                     {
+                                         return false;
+                                     }*/
+
+
+                                }
                                 else
                                 {
-                                    log("InteractionNpc = null " + CurrentInteractionGuid);
+                                    log("Открыл шоп");
                                 }
-                                Thread.Sleep(5000);
-                                /* if (GetLastError() != ELastError.ActionNotAllowed)
-                                 {
-                                     return false;
-                                 }*/
 
+                                Thread.Sleep(1000);
+                                if (!ItemManager.RepairAllItems())
+                                {
+                                    log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
+                                    /* if (GetLastError() == ELastError.NoItemForRepair)
+                                         return true;*/
+                                    Thread.Sleep(10000);
+                                    //  return false;
+                                }
+                                else
+                                {
+                                    log("Отремонтировал ", LogLvl.Ok);
+                                }
+                                Thread.Sleep(1000);
 
+                                SellItems();
+                                CommonModule.MyUnmount();
+                                AutoQuests.NeedActionNpcSell = false;
+                                AutoQuests.NeedActionNpcRepair = false;
+                                return true;
                             }
-                            else
-                            {
-                                log("Открыл шоп");
-                            }
-
-                            Thread.Sleep(1000);
-                            if (!ItemManager.RepairAllItems())
-                            {
-                                log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
-                                if (GetLastError() == ELastError.NoItemForRepair)
-                                    return true;
-                                Thread.Sleep(10000);
-                                return false;
-                            }
-                            else
-                            {
-                                log("Отремонтировал ", LogLvl.Ok);
-                            }
-                            Thread.Sleep(1000);
-
-                            SellItems();
-                            CommonModule.MyUnmount();
-                            AutoQuests.NeedActionNpcSell = false;
-                            AutoQuests.NeedActionNpcRepair = false;
-                            return true;
                         }
                     }
+
                 }
+
 
 
                 var Vendor = FindNpcForActionArmored();
@@ -1645,6 +1588,8 @@ namespace WowAI
                         if (myNpcLoc.Id == 3316)
                             continue;
                         if (myNpcLoc.Id == 3493)
+                            continue;
+                        if (myNpcLoc.Id == 135072)
                             continue;
 
 
@@ -1694,19 +1639,27 @@ namespace WowAI
                             {
                                 log("Открыл шоп");
                             }
+
+                            foreach (var gossipOptionsData in GetNpcDialogs())
+                            {
+                                if (gossipOptionsData.Text.Contains("buy from you"))
+                                    SelectNpcDialog(gossipOptionsData);
+                                log(gossipOptionsData.Text);
+                            }
                             Thread.Sleep(1000);
                             if (!ItemManager.RepairAllItems())
                             {
                                 log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
-                                if (GetLastError() == ELastError.NoItemForRepair)
-                                    return true;
+                                /* if (GetLastError() == ELastError.NoItemForRepair)
+                                     return true;*/
                                 Thread.Sleep(10000);
-                                return false;
+                                //  return false;
                             }
                             else
                             {
                                 log("Отремонтировал ", LogLvl.Ok);
                             }
+                            SellItems();
                             return true;
 
                         }
@@ -1785,16 +1738,17 @@ namespace WowAI
                     if (!ItemManager.RepairAllItems())
                     {
                         log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
-                        if (GetLastError() == ELastError.NoItemForRepair)
-                            return true;
+                        /* if (GetLastError() == ELastError.NoItemForRepair)
+                             return true;*/
                         Thread.Sleep(10000);
-                        return false;
+                        //   return false;
                     }
                     else
                     {
                         log("Отремонтировал ", LogLvl.Ok);
                         Thread.Sleep(2000);
                     }
+                    SellItems();
                     return true;
                 }
 
@@ -1819,6 +1773,7 @@ namespace WowAI
             public Vector3F Loc;
             public bool IsArmorer;
             public bool IsQuestGiver;
+            public List<Vector3F> ListLoc = new List<Vector3F>();
         }
 
         public List<MyPlayer> MyPlayers = new List<MyPlayer>();
@@ -1875,53 +1830,114 @@ namespace WowAI
                     }
                 }
 
-                var path = AssemblyDirectory + "\\Log\\" + GetCurrentAccount().Login;
+                var path = AssemblyDirectory + "\\Log\\" + GetCurrentAccount().Login + "_" + GetCurrentAccount().Name;
                 if (!isReleaseVersion)
-                    path = AssemblyDirectory + "\\Plugins\\Quester\\Log\\" + GetCurrentAccount().Login;
+                    path = AssemblyDirectory + "\\Plugins\\Quester\\Log\\" + GetCurrentAccount().Login + "_" + GetCurrentAccount().Name;
 
                 File.AppendAllText(path + "_log.txt",
                     DateTime.Now.ToString(DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture) +
-                    ": " + Me.Name + "(" + Me.Level + ") " + "Встретил игрока(" + myPlayer.Count + ")   Дист: " + (int)Me.Distance(entity) + " Ник: " + myPlayer.Name + "(" + entity.Level + ")" + Environment.NewLine));
+                    ": " + Me.Name + "(" + Me.Level + ") " + "Встретил игрока(" + myPlayer.Count + ")   Дист: " + (int)Me.Distance(entity)
+                    + " Ник: " + myPlayer.Name + "(" + entity.Level + ")" + Environment.NewLine), System.Text.Encoding.UTF8);
 
                 //  log("Встретил игрока: " + myPlayer.Name + "(" + entity.Level + ")  Кол-во: " + myPlayer.Count + "   Дист: " + Me.Distance(entity), LogLvl.Error);
             }
         }
 
+        bool isneedSave;
+
+       
+
         internal void MyCheckNPC()
         {
             MyCheckPlayer();
-            if (GetBotLogin() != "Daredevi1")
+           // if (GetBotLogin() != "Daredevi1")
                 return;
             // log(PathNPCjson);
             foreach (var entity in GetEntities<Unit>())
             {
-                if (MyNpcLocss.NpcLocs.Any(collectionInvItem => entity.Id == collectionInvItem.Id))
+                if (entity.Id == 0)
                     continue;
+                if(entity.Type != EBotTypes.Unit)
+                    continue;
+                if (entity.IsSpellClick)
+                {
+                    /* if (AdvancedLog)
+                         log("Найден НПС SpellClick " + entity.Name + " " + Me.Distance(entity), LogLvl.Error);*/
+                }
 
+                if (MyNpcLocss.NpcLocs.Any(collectionInvItem => entity.Id == collectionInvItem.Id))
+                {
+                    
+                    foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
+                    {
+                        if (myNpcLoc.Id == entity.Id)
+                        {
+                            var newLoc = true;
+
+                            foreach (var vector3F in myNpcLoc.ListLoc)
+                            {
+                          /*      if (entity.Id == 37956)
+                                    log(entity.Name + "  Location:" + entity.Location + " vector3F: " + vector3F + "  дистанция: " + entity.Distance(vector3F) + " MyDistance: " + MyDistance(entity.Location, vector3F));
+                             */   if (MyDistance(entity.Location, vector3F) < 80)
+                                {
+                                   
+                                    newLoc = false;
+                                    break;
+                                }
+                                  
+                            }
+                            if (MyDistance(myNpcLoc.Loc, entity.Location) < 50)
+                                newLoc = false;
+                           
+
+                            if (newLoc)
+                            {
+                               
+                                myNpcLoc.ListLoc.Add(entity.Location);
+                                log("Найдена новая локация NPC [" + entity.Id + "]" + entity.Name + " " + entity.Location + "  " + myNpcLoc.ListLoc.Count, LogLvl.Important);
+                                isneedSave = true;
+                            }
+                         
+                        }
+                    }
+                    continue;
+                }
+                   
+                isneedSave = true;
                 log("Найден новый НПС " + entity.Name + " IsArmorer:" + entity.IsArmorer + " IsQuestGiver:" + entity.IsQuestGiver, LogLvl.Important);
                 MyNpcLocss.NpcLocs.Add(new MyNpcLoc
                 {
                     Id = entity.Id,
                     Loc = entity.Location,
                     IsArmorer = entity.IsArmorer,
-                    IsQuestGiver = entity.IsQuestGiver
-
+                    IsQuestGiver = entity.IsQuestGiver,
+                    ListLoc = new List<Vector3F>
+                    {
+                        entity.Location
+                    }
+                    
                 });
             }
 
-            ConfigLoader.SaveConfig(PathNpCjson, MyNpcLocss);
+            if (isneedSave)
+            {
+                File.Copy(PathNpCjson, PathNpCjsonCopy, true);
+                ConfigLoader.SaveConfig(PathNpCjson, MyNpcLocss);
+            }
+              
         }
 
         public List<MyNpcLoc> IsBadNpcLocs = new List<MyNpcLoc>();
 
-        internal bool MySell()
+        internal bool MySell(bool noMount = false)
         {
             try
             {
                 var mountSell = SpellManager.GetSpell(61447);//Тундровый мамонт путешественника
                 if (mountSell == null)
                     mountSell = SpellManager.GetSpell(61425);//Тундровый мамонт путешественника
-
+                if (noMount)
+                    mountSell = null;
                 if (mountSell != null)
                 {
 
@@ -1936,7 +1952,7 @@ namespace WowAI
                                 return false;
                     }
 
-
+                   
                     CommonModule.MyUnmount();
                     CanselForm();
                     CancelMoveTo();
@@ -2048,6 +2064,10 @@ namespace WowAI
                             continue;
                         if (myNpcLoc.Id == 3492)
                             continue;
+                        if (myNpcLoc.Id == 142427)
+                            continue;
+                        if (myNpcLoc.Id == 135072)
+                            continue;
 
                         if (IsBadNpcLocs.Contains(myNpcLoc))
                             continue;
@@ -2096,13 +2116,18 @@ namespace WowAI
                                 log("Открыл шоп");
                             }
                             Thread.Sleep(1000);
-
+                            foreach (var gossipOptionsData in GetNpcDialogs())
+                            {
+                                if (gossipOptionsData.Text.Contains("buy from you"))
+                                    SelectNpcDialog(gossipOptionsData);
+                                log(gossipOptionsData.Text);
+                            }
                             SellItems();
                             return true;
                         }
                     }
                     IsBadNpcLocs.Add(npcLoc);
-                    log("Не указаны координаты бакалейщика", LogLvl.Error);
+                    log("Не указаны координаты бакалейщика " + npcLoc.Id, LogLvl.Error);
                     Thread.Sleep(10000);
                     return false;
                 }
@@ -2203,6 +2228,7 @@ namespace WowAI
                 }
                 else
                 {
+                    CommonModule.MyUnmount();
                     MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
                         Thread.Sleep(50);
@@ -2332,19 +2358,19 @@ namespace WowAI
                     }
                 }
 
-                foreach (var i in GetThreats(Me))
+                foreach (var i in Me.GetThreats())
                 {
-                    if (!i.Obj.IsAlive)
+                    if (!i.IsAlive)
                         continue;
-                    if (Me.Distance(i.Obj) > 40 && i.Value == 0)
+                    if (Me.Distance(i) > 40)
                         continue;
-                    if (i.Obj.Id == 128604)
+                    if (i.Id == 128604)
                         continue;
 
                     //   log(i.Obj.Name + "  " + Me.Distance(i.Obj ) + "   " + i.Value);
-                    myListCreature.Add(i.Obj);
-                    if (!_listMobs.Contains(i.Obj) && IsAlive(i.Obj))
-                        _listMobs.Add(i.Obj);
+                    myListCreature.Add(i);
+                    if (!_listMobs.Contains(i) && IsAlive(i))
+                        _listMobs.Add(i);
                 }
 
 
@@ -2515,14 +2541,18 @@ namespace WowAI
                             continue;
                         foreach (var characterSettingsMyItemGlobal in CharacterSettings.MyItemGlobals)
                         {
-                            if (item.ItemClass == characterSettingsMyItemGlobal.Class &&
-                                item.ItemQuality == characterSettingsMyItemGlobal.Quality)
+                            if (item.ItemClass == characterSettingsMyItemGlobal.Class && item.ItemQuality == characterSettingsMyItemGlobal.Quality)
                             {
                                 var isNosell = false;
                                 foreach (var characterSettingsItemSetting in CharacterSettings.ItemSettings)
                                 {
-                                    if (item.Id == characterSettingsItemSetting.Id &&
-                                        characterSettingsItemSetting.Use == 4)
+                                    if (item.Id == characterSettingsItemSetting.Id && characterSettingsItemSetting.Use == 4)
+                                        isNosell = true;
+                                }
+
+                                if (characterSettingsMyItemGlobal.ItemLevel != 0)
+                                {
+                                    if (item.Level > characterSettingsMyItemGlobal.ItemLevel)
                                         isNosell = true;
                                 }
                                 if (!isNosell)
@@ -2569,7 +2599,12 @@ namespace WowAI
                 log("SellItems2: " + err);
             }
         }
-
+        public static int GetPercent(int b, int a)
+        {
+            if (b == 0)
+                return 0;
+            return (int)(a / (b / 100M));
+        }
 
         public void MyUseGameObject(uint id)
         {
@@ -2585,8 +2620,11 @@ namespace WowAI
                         break;
                     case 291008:
                         break;
+                    case 290773:
+                        CommonModule.MoveTo(go,6);
+                        break;
                     default:
-                        CommonModule.MoveTo(go);
+                        CommonModule.MoveTo(go, 3);
                         break;
                 }
 
@@ -2630,6 +2668,59 @@ namespace WowAI
         }
 
 
+        public void MyUseGameObject(GameObject go)
+        {          
+            if (go != null)
+            {
+                CommonModule.MyUnmount();
+                switch (go.Id)
+                {
+
+                    case 273992:
+
+                        break;
+                    case 291008:
+                        break;
+                    default:
+                        CommonModule.MoveTo(go);
+                        break;
+                }
+
+
+                MyCheckIsMovingIsCasting();
+                if (!(go as GameObject).Use())
+                {
+                    log("Не смог использовать " + go.Name + " " + GetLastError(), Host.LogLvl.Error);
+                    Thread.Sleep(5000);
+                    return;
+                }
+                else
+                {
+                    log("Использовал " + go.Name, LogLvl.Ok);
+                }
+
+                while (SpellManager.IsCasting)
+                {
+                    Thread.Sleep(100);
+                }
+                Thread.Sleep(500);
+                if (CanPickupLoot())
+                {
+                    if (!PickupLoot())
+                    {
+                        /* host.CommonModule.ForceMoveTo(m.Location, 1, 1);
+                         if (!m.PickUp())
+                         {*/
+
+                        log("Не смог поднять дроп " + GetLastError(), Host.LogLvl.Error);
+
+                        //   }
+                    }
+                }
+            }          
+        }
+
+
         /// <summary>
         /// Общая проверка
         /// </summary>
@@ -2666,19 +2757,6 @@ namespace WowAI
 
 
 
-        internal void ChangeForBestChanel()
-        {
-
-            try
-            {
-
-            }
-            catch (Exception e)
-            {
-                log(e.ToString());
-            }
-        }
-
         internal bool FindNearPointInRadius(double x, double y, double z, int radius)
         {
             foreach (var editorGpsPoint in GetEditorGpsPoints())
@@ -2709,31 +2787,6 @@ namespace WowAI
             return null;
         }
 
-        /*  internal bool IsPropExitis(int id)
-          {
-              foreach (var prop in GetEntities<Prop>())
-              {
-                  if (prop.Id != id)
-                      continue;
-
-                  return true;
-              }
-              return false;
-          }*/
-
-        /*
-        private int GetNearestBoss()
-        {
-            foreach (var creature in host.GetCreatures())
-            {
-                if (creature.Type != EBotTypes.Npc)
-                    continue;
-                if ((creature as Npc).Db.Grade != ENPCGradeType.Boss)
-                    continue;
-                return creature.Id;
-            }
-            return 0;
-        }
-*/
+       
     }
 }

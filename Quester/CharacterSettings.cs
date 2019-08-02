@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Markup;
 using Out.Utility;
 using WoWBot.Core;
@@ -18,23 +19,15 @@ namespace WowAI
         Normal, Hight, Ignore
     }
 
-
-
-
     [Serializable]
     public class CharacterSettings
     {
-
         [NonSerialized]
         public static string path = "test.json";
-
-        //Настройки
         public bool HideQuesterUi { get; set; } = false;
         public bool AutoEquip { get; set; } = true;
-
         public bool WaitSixMin = true;
         public bool FindBestPoint = true;
-
         public bool FightIfMobs = false;
         public bool UnmountMoveFail = true;
         public double QuesterTop = -1;
@@ -46,18 +39,14 @@ namespace WowAI
         public int AoeMobsCount { get; set; } = 0;
         public string FormForFight = "Не использовать";
         public string FormForMove = "Не использовать";
-
+        public bool WorldQuest = true;
         public float Price { get; set; } = (float)0.0;
         public int PriceKK { get; set; } = 100000;
         public string Valuta { get; set; } = "USD";
-
         public bool RunQuestHerbalism = false;
         public int InvFreeSlotCount { get; set; } = 5;
-
         public bool LaunchScript = false;
-
         public int BattlePetNumber { get; set; } = 0;
-        //Сбор
         public float GatherLocX { get; set; } = 0;
         public float GatherLocY { get; set; } = 0;
         public float GatherLocZ { get; set; } = 0;
@@ -65,38 +54,27 @@ namespace WowAI
         public int GatherLocAreaId { get; set; } = 0;
         public int GatherRadius { get; set; } = 0;
         public bool DebuffDeath { get; set; } = true;
-
         public bool SummonBattlePet = false;
-
-        //Фарм
         public float FarmLocX { get; set; } = 0;
         public float FarmLocY { get; set; } = 0;
         public float FarmLocZ { get; set; } = 0;
         public int FarmLocMapId { get; set; } = 0;
         public uint FarmLocAreaId { get; set; } = 0;
-        public int FarmRadius { get; set; } = 0;
-
-        //Маунт
+        public int FarmRadius { get; set; } = 0;     
+        public bool SummonMount = true;
         public float MountLocX { get; set; } = 0;
         public float MountLocY { get; set; } = 0;
         public float MountLocZ { get; set; } = 0;
         public int MountLocMapId { get; set; } = 0;
         public int MountLocAreaId { get; set; } = 0;
-
         public bool LogScriptAction { get; set; } = true;
-        public bool LogSkill { get; set; } = true;
-
-
-       
+        public bool LogSkill { get; set; } = true;       
         public bool ForceMoveScriptEnable { get; set; } = true;
         public int ForceMoveScriptDist { get; set; } = 15;
-
-
         public bool FightIfHPLess { get; set; } = true;
         public int FightIfHPLessCount { get; set; } = 50;
-
         public bool UseStoneForSellAndRepair = false;
-
+        public bool UseWhistleForSellAndRepair = false;
         public int RepairCount = 5;
         public bool CheckRepair = true;
         public bool UseMountMyLoc = false;
@@ -129,30 +107,35 @@ namespace WowAI
         public bool ScriptScheduleEnable = false;
         public bool ScriptReverse = false;
 
+
+        public bool SendMail;
+        public TimeSpan SendMailStartTime { get; set; }
+        public TimeSpan SendMailStopTime { get; set; }
+        public string SendMailName { get; set; }
+
+        public float SendMailLocX { get; set; } = 0;
+        public float SendMailLocY { get; set; } = 0;
+        public float SendMailLocZ { get; set; } = 0;
+        public int SendMailLocMapId { get; set; } = 0;
+        public int SendMailLocAreaId { get; set; } = 0;
+
+
         public bool AlternateAuk = false;
         //  public EMode Mode2 { get; set; } = EMode.Questing;
         /// <summary>
         /// 0 - Квестинг; 1 - Фарм; 2 - Сбор;
         /// </summary>
-        public EMode Mode { get; set; } = EMode.Questing;
-        /// <summary>
-        /// 0 - По списку; 1 - Рандомно; 2 - По дистанции;
-        /// </summary>
+        public EMode Mode { get; set; } = EMode.Questing;      
         public int QuestMode = 0;
-
         public bool PickUpLoot = true;
         public int IgnoreMob = 20000;
-
         public int FreeInvCountForAuk = 10;
         public bool CheckAuk = false;
         public uint FreeInvCountForAukId = 0;
-
-
+        public int AukTime = 0;
         public int StopQuestingLevel = 12;
         public bool StopQuesting = false;
-
-
-
+        public int EquipItemStat = 0;
         public string Script = "Не выбрано";
         public string Quest = "Не выбрано";
 
@@ -177,6 +160,7 @@ namespace WowAI
         public List<AukSettings> AukSettingses = new List<AukSettings>();
 
         public List<ScriptSchedule> ScriptSchedules = new List<ScriptSchedule>();
+        public List<EquipAuc> EquipAucs = new List<EquipAuc>();
 
         public enum EventsAction
         {
@@ -211,6 +195,16 @@ namespace WowAI
 
     [Serializable]
 
+    public class EquipAuc
+    {
+        public EEquipmentSlot Slot { get; set; }
+        public string Name { get; set; }
+        public ulong MaxPrice { get; set; }
+        public int Level { get; set; }
+        public int Stat1 { get; set; }
+        public int Stat2 { get; set; }
+    }
+
     public class ScriptSchedule
     {
         public TimeSpan ScriptStartTime { get; set; }
@@ -227,12 +221,7 @@ namespace WowAI
         public int Level { get; set; }
         public ulong MaxPrice { get; set; }
         public ulong Disscount { get; set; }
-      /*  public int Count { get; set; }
-        public int MinPrice { get; set; }
-        public int MaxPrixe { get; set; } = 9999999;
-        public bool FixPrice { get; set; }
-        public int FixPriceCount { get; set; }
-        public int SellTime { get; set; } = 3;*/
+        public uint MaxCount { get; set; }     
     }
 
     public class GameObjectIgnore
@@ -299,7 +288,7 @@ namespace WowAI
     }
     public class IgnoreQuest
     {
-        public int Id { get; set; }
+        public uint Id { get; set; }
         public string Name { get; set; }
     }
 
@@ -343,6 +332,7 @@ namespace WowAI
     {
         public EItemClass Class { get; set; }
         public EItemQuality Quality { get; set; }
+        public uint ItemLevel { get; set; }
     }
 
     public class ItemSettings
@@ -394,51 +384,3 @@ namespace WowAI
         public int TargetId { get; set; } = 0;
     }
 }
-
-
-/*[13.08.2016 10:45:21] OutSide: [Serializable]
-    internal class AppConfig
-    {
-        [NonSerialized]
-        public static string path = "settings.json";
-        private bool startClientMinimized = false;
-        
-        public bool StartClientMinimized
-        {
-            get
-            {
-                return startClientMinimized;
-            }
-            set
-            {
-                startClientMinimized = value;
-                ConfigLoader.SaveConfig(path, this);
-            }
-        }
-    }
-//[13.08.2016 10:45:34] OutSide: вот тебе простейший пример конфига (потом можно добавлять другие нужные переменные
-//[13.08.2016 10:45:43] OutSide: internal static class ConfigLoader
-    {
-        public static object LoadConfig(string path, Type targetType, object def)
-        {
-            if (!File.Exists(path))
-                File.WriteAllText(path, JObject.FromObject(def).ToString());
-            var obj = JObject.Parse(File.ReadAllText(path)).ToObject(targetType);
-            (obj as Config).InitAfterLoad();
-            return obj;
-        }
-
-        public static void SaveConfig(string path, object def)
-        {
-            File.WriteAllText(path, JObject.FromObject(def).ToString());
-        }
-    }
-
-//класс который его сохраняет\загружает
-[13.08.2016 10:46:01] OutSide: 
-сама загрузка
-var aconfig = new AppConfig();
-aconfig = (AppConfig)ConfigLoader.LoadConfig(AppConfig.path, typeof(AppConfig), aconfig);
-[13.08.2016 10:46:30] OutSide: читай сколько хочешь, хочешь чтото изменить - новое значение присвоил, и он его и сохранит сразу на диске
-[13.08.2016 10:47:16] OutSide: в референсах - Newtonsoft.Json
-*/

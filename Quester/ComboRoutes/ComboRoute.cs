@@ -105,22 +105,18 @@ namespace WowAI.ComboRoutes
         public int DeadCount;
         public int DeadCountInPVP;
 
-        public DateTime DeathTime = new DateTime();
+        public DateTime DeathTime;
 
         public bool EventDeath;
+        private int fixRes;
         public virtual void CheckWeDie()
         {
             try
             {
                 if (!host.IsAlive() || host.Me.IsDeadGhost)
                 {
-                    
-
                     host.log("Умер " + host.IsAlive() + " " + host.Me.IsDeadGhost);
                     EventDeath = true;
-
-
-
                     host.FarmModule.BestMob = null;
                     host.FarmModule.BestProp = null;
                     FarmState = FarmState.Disabled;
@@ -129,12 +125,12 @@ namespace WowAI.ComboRoutes
                     if (!host.IsAlive())
                         Thread.Sleep(3000);
 
-
-
                     if (!host.Me.IsDeadGhost)
                         if (!host.ReturnToRevivalBasePoint())
                         {
-                            host.log("IsAlive: " + host.IsAlive(host.Me) + " Воскрешение не удачно " + host.GetLastError(), Host.LogLvl.Error);
+                            host.log(
+                                "IsAlive: " + host.IsAlive(host.Me) + " Воскрешение не удачно " + host.GetLastError(),
+                                Host.LogLvl.Error);
                         }
                         else
                         {
@@ -146,6 +142,7 @@ namespace WowAI.ComboRoutes
                             {
                                 DeadCount++;
                             }
+
                             Thread.Sleep(2000);
                             while (host.GameState != EGameState.Ingame)
                                 Thread.Sleep(1000);
@@ -163,7 +160,8 @@ namespace WowAI.ComboRoutes
 
 
                     host.CommonModule.ResumeMove();
-                    host.log("Ищу свой труп " + host.ReviveCorpseInfo.IsValid + "  " + host.ReviveCorpseInfo.Location + "  " + host.MapID);
+                    host.log("Ищу свой труп " + host.ReviveCorpseInfo.IsValid + "  " + host.ReviveCorpseInfo.Location +
+                             "  " + host.MapID);
 
 
 
@@ -177,11 +175,13 @@ namespace WowAI.ComboRoutes
                     TimeSpan rez = begin - end;
                     Thread.Sleep(5000);
                     host.log("Последняя смерть " + rez.TotalMinutes);
-                    if (rez.TotalMinutes < 5)
+                    if (rez.TotalMinutes < 5 && host.CharacterSettings.Mode != EMode.Questing)
                     {
                         if (!host.ReturnToRevivalBasePoint())
                         {
-                            host.log("IsAlive: " + host.IsAlive(host.Me) + "Воскрешение не удачно " + host.GetLastError(), Host.LogLvl.Error);
+                            host.log(
+                                "IsAlive: " + host.IsAlive(host.Me) + "Воскрешение не удачно " + host.GetLastError(),
+                                Host.LogLvl.Error);
                         }
                         else
                         {
@@ -201,11 +201,22 @@ namespace WowAI.ComboRoutes
                                     }
                                     else
                                     {
-                                        host.log("Воскрешение на кладбище не успешно 1 " + host.GetLastError(), Host.LogLvl.Error);
+                                        host.log("Воскрешение на кладбище не успешно 1 " + host.GetLastError(),
+                                            Host.LogLvl.Error);
+                                        fixRes++;
+                                        if (fixRes > 2)
+                                        {
+                                            host.TerminateGameClient();
+                                            return;
+                                        }
+
+                                        Thread.Sleep(10000);
+                                        return;
                                     }
+
                                     Thread.Sleep(60 * 1000);
                                     if (host.CharacterSettings.DebuffDeath)
-                                        while (host.GetThreats(host.Me).Count == 0 && host.MainForm.On)
+                                        while (host.Me.GetThreats().Count == 0 && host.MainForm.On)
                                         {
                                             Thread.Sleep(5000);
                                             if (host.ClientAfk)
@@ -213,9 +224,10 @@ namespace WowAI.ComboRoutes
                                             var debuf = false;
                                             foreach (var aura in host.Me.GetAuras())
                                             {
-                                                if (aura.SpellId == 15007)//15007   
+                                                if (aura.SpellId == 15007) //15007   
                                                     debuf = true;
                                             }
+
                                             if (!debuf)
                                                 break;
                                         }
@@ -225,12 +237,14 @@ namespace WowAI.ComboRoutes
                     }
                     else
                     {
-                        if (!host.CommonModule.MoveTo(host.ReviveCorpseInfo.Location, 20, 20))
+                        if (!host.CommonModule.MoveTo(host.ReviveCorpseInfo.Location, 35, 35))
                             return;
                         Thread.Sleep(3000);
                         if (!host.ReviveWithCorpse())
                         {
-                            host.log("Воскрешение возле трупа не успешно  возвращаюсь на кладбище" + host.GetLastError(), Host.LogLvl.Error);
+                            host.log(
+                                "Воскрешение возле трупа не успешно  возвращаюсь на кладбище" + host.GetLastError(),
+                                Host.LogLvl.Error);
                             Thread.Sleep(10000);
                             while (host.GameState != EGameState.Ingame)
                             {
@@ -239,7 +253,9 @@ namespace WowAI.ComboRoutes
 
                             if (!host.ReturnToRevivalBasePoint())
                             {
-                                host.log("IsAlive: " + host.IsAlive(host.Me) + "Воскрешение не удачно " + host.GetLastError(), Host.LogLvl.Error);
+                                host.log(
+                                    "IsAlive: " + host.IsAlive(host.Me) + "Воскрешение не удачно " +
+                                    host.GetLastError(), Host.LogLvl.Error);
                             }
                             else
                             {
@@ -259,11 +275,13 @@ namespace WowAI.ComboRoutes
                                         }
                                         else
                                         {
-                                            host.log("Воскрешение на кладбище не успешно 2 " + host.GetLastError(), Host.LogLvl.Error);
+                                            host.log("Воскрешение на кладбище не успешно 2 " + host.GetLastError(),
+                                                Host.LogLvl.Error);
                                         }
+
                                         Thread.Sleep(60 * 1000);
                                         if (host.CharacterSettings.DebuffDeath)
-                                            while (host.GetThreats(host.Me).Count == 0 && host.MainForm.On)
+                                            while (host.Me.GetThreats().Count == 0 && host.MainForm.On)
                                             {
                                                 Thread.Sleep(5000);
                                                 if (host.ClientAfk)
@@ -274,18 +292,17 @@ namespace WowAI.ComboRoutes
                                                     if (aura.SpellId == 15007)
                                                         debuf = true;
                                                 }
+
                                                 if (!debuf)
                                                     break;
                                             }
                                     }
                                 }
                             }
+
                             // return;
                         }
                     }
-
-
-
 
 
                     DeathTime = DateTime.Now;
@@ -297,7 +314,7 @@ namespace WowAI.ComboRoutes
                         var needrevive = false;
                         if (host.Me.GetPet() != null)
                             if (!host.Me.GetPet().IsAlive)
-                            needrevive = true;
+                                needrevive = true;
                         if (needrevive)
                         {
                             var pet = host.SpellManager.CastSpell(982);
@@ -309,6 +326,7 @@ namespace WowAI.ComboRoutes
                             {
                                 host.log("Не удалось воскресить питомца " + pet, Host.LogLvl.Error);
                             }
+
                             Thread.Sleep(2000);
                             while (host.SpellManager.IsCasting)
                             {
@@ -325,11 +343,13 @@ namespace WowAI.ComboRoutes
 
 
             }
+           
             catch (ThreadAbortException) { }
             catch (Exception e)
             {
                 host.log(e.ToString());
             }
+            
         }
 
 
@@ -434,16 +454,17 @@ namespace WowAI.ComboRoutes
                 foreach (var mybuff in host.CharacterSettings.MyBuffSettings)
                 {
                     var aura = MyGetAura(mybuff.SkillId);
-                    if (aura == null || aura?.Remaining < 60000)
+                    if (aura == null || aura.Remaining < 60000)
                     {
                         Item buffItem = null;
                         foreach (var item in host.ItemManager.GetItems())
                         {
-                            if (item.Id == mybuff.ItemId)
-                            {
-                                buffItem = item;
-                                break;
-                            }
+                            if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 || item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 || item.Place == EItemPlace.InventoryItem)
+                                if (item.Id == mybuff.ItemId)
+                                {
+                                    buffItem = item;
+                                    break;
+                                }
                         }
                         if (buffItem != null)
                         {
@@ -456,11 +477,13 @@ namespace WowAI.ComboRoutes
 
                             if (isNeedUnmount)
                                 host.CommonModule.MyUnmount();
-                           
+
+
+
                             var result = host.SpellManager.UseItem(buffItem);
                             if (result != EInventoryResult.OK)
                             {
-                                host.log("Не смог использовать итем для бафа " + buffItem.Name + "  " + result, Host.LogLvl.Error);
+                                host.log("Не смог использовать итем для бафа " + buffItem.Name + "[" + buffItem.Id + "] " + result, Host.LogLvl.Error);
                             }
                             while (host.SpellManager.IsCasting)
                                 Thread.Sleep(100);
@@ -470,7 +493,7 @@ namespace WowAI.ComboRoutes
                 }
 
 
-                if (host.GetThreats(host.Me).Count == 0)
+                if (host.Me.GetThreats().Count == 0)
                 {
                     var auraSkill = MyGetAura(3714);
                     if (auraSkill == null)
@@ -560,17 +583,48 @@ namespace WowAI.ComboRoutes
                 }
 
             }
-
-            if (host.GetThreats().Count == 0 && host.Me.HpPercents < 50)
+            if (!host.Me.IsInCombat && host.Me.HpPercents < 80)
             {
-                var regenSpel = host.SpellManager.GetSpell(18562);
+                if (host.Me.Class == EClass.Mage)
+                {
+                    host.CommonModule.SuspendMove();
+                    try
+                    {
+                        if (host.MyGetItem(113509) == null)
+                        {
+
+                            var res = host.SpellManager.CastSpell(190336);
+                            if (res != ESpellCastError.SUCCESS)
+                                host.log("Не удалось использовать скилл для булочек  ");
+                            host.MyCheckIsMovingIsCasting();
+                        }
+
+                        var item = host.MyGetItem(113509);
+                        if (item != null)
+                        {
+                            host.MyUseItemAndWait(item);
+                            while (host.Me.HpPercents < 90)
+                            {
+                                Thread.Sleep(100);
+                                if (!host.MainForm.On)
+                                    return;
+                                if (host.Me.IsInCombat)
+                                    return;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        host.CommonModule.ResumeMove();
+                    }
+                }
+
+                var regenSpel = host.SpellManager.GetSpell(8004);
                 if (regenSpel != null)
                 {
                     host.CommonModule.SuspendMove();
-
                     if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
                         return;
-
                     try
                     {
 
@@ -595,7 +649,39 @@ namespace WowAI.ComboRoutes
                 }
             }
 
-            if (host.GetThreats().Count == 0 && host.Me.HpPercents < 80)
+            if (host.Me.GetThreats().Count == 0 && host.Me.HpPercents < 50)
+            {
+                var regenSpel = host.SpellManager.GetSpell(18562);
+                if (regenSpel != null)
+                {
+                    host.CommonModule.SuspendMove();
+                    if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
+                        return;
+                    try
+                    {
+
+                        host.MyCheckIsMovingIsCasting();
+                        host.CanselForm();
+                        host.CommonModule.MyUnmount();
+                        host.MyCheckIsMovingIsCasting();
+                        var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
+                        if (result != ESpellCastError.SUCCESS)
+                        {
+                            host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
+                            Thread.Sleep(2000);
+
+                        }
+                        while (host.SpellManager.IsCasting)
+                            Thread.Sleep(200);
+                    }
+                    finally
+                    {
+                        host.CommonModule.ResumeMove();
+                    }
+                }
+            }
+
+            if (host.Me.GetThreats().Count == 0 && host.Me.HpPercents < 80)
             {
                 var regenSpel = host.SpellManager.GetSpell(8936);
                 if (regenSpel != null)
@@ -631,9 +717,10 @@ namespace WowAI.ComboRoutes
                 }
 
             }
+
         }
 
-        private int _failMoveUseSpecialSkill = 0;
+        private int _failMoveUseSpecialSkill;
 
         public virtual void UseSpecialSkills(float specialDist)
         {
@@ -650,6 +737,10 @@ namespace WowAI.ComboRoutes
 
                 if (host.AutoQuests.BestQuestId == 49078 && host.Me.Target?.Id != 128071)
                     return;
+
+                if (host.AutoQuests.BestQuestId == 47943 && host.Me.Target?.Id != 123814)
+                    return;
+
 
                 if (host.AutoQuests.BestQuestId == 50771 && host.FarmModule.BestMob?.Id != 135080)
                     return;
@@ -735,10 +826,15 @@ namespace WowAI.ComboRoutes
                                             result = host.SpellManager.UseItem(spItem, host.Me.Target);
                                         }
                                         break;
+                                    case 151763:
+                                        {
+                                            result = host.SpellManager.UseItem(spItem, host.Me.Target);
+                                        }
+                                        break;
                                     case 160559:
-                                    {
-                                        result = host.SpellManager.UseItem(spItem, host.Me.Target);
-                                    }
+                                        {
+                                            result = host.SpellManager.UseItem(spItem, host.Me.Target);
+                                        }
                                         break;
                                     default:
                                         {
@@ -1047,11 +1143,16 @@ namespace WowAI.ComboRoutes
                         if (!m.IsLootable)
                             continue;
                         if (!host.CommonModule.ForceMoveTo(m, 2, 0.5, false))
+                        {
+                            if (host.GetAgroCreatures().Count != 0)
+                                return;
                             if (!host.CommonModule.ForceMoveTo(m, 2, 0.5, false))
                             {
                                 host.SetVar(m, "pickFailed", true);
                                 continue;
                             }
+                        }
+                          
 
 
                         host.MyCheckIsMovingIsCasting();
@@ -1116,6 +1217,17 @@ namespace WowAI.ComboRoutes
                                     if (item != null)
                                         host.MyUseItemAndWait(item, m);
                                 }
+
+
+
+                                if (m.Id == 134059 || m.Id == 134062 || m.Id == 134068)
+                                    if (host.CharacterSettings.Mode == EMode.Questing && host.AutoQuests.BestQuestId == 47577)
+                                    {
+                                        var item = host.MyGetItem(160585);
+                                        if (item != null)
+                                            host.MyUseItemAndWait(item, m);
+                                    }
+
 
                                 if (host.ComboRoute.MobsWithDropCount() < 2)
                                     Thread.Sleep(500);
@@ -1274,3 +1386,6 @@ namespace WowAI.ComboRoutes
 
     }
 }
+
+
+

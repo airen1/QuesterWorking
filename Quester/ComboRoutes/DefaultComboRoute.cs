@@ -30,6 +30,7 @@ namespace WowAI.ComboRoutes
 
         public override bool UseSkills()
         {
+           // host.log("Атака------------------------------------------------");
             foreach (var i in DeckSkills)
             {
                 if (host.IsAlive(host.FarmModule.BestMob))
@@ -91,7 +92,7 @@ namespace WowAI.ComboRoutes
 
                     host.CommonModule.MoveTo(host.FarmModule.BestProp.Location, 3);
 
-                    if (host.FarmModule.BestProp != null)
+                    if (host.FarmModule.BestProp != null && host.FarmModule.BestMob == null)
                     {
 
                         host.FarmModule.InteractWithProp(host.FarmModule.BestProp);
@@ -254,7 +255,7 @@ namespace WowAI.ComboRoutes
         {
             if (host.GetBotLogin() == "deathstar")
             {
-                if (host.GetThreats().Count > 1)
+                if (host.Me.GetThreats().Count > 1)
                     return null;
             }
 
@@ -297,7 +298,7 @@ namespace WowAI.ComboRoutes
             return null;
         }
 
-        public int IsNeedFight = 0;
+        public int IsNeedFight;
         public override void FightAttackOnlyAgroTick()
         {
             GlobalCheckBestMob();

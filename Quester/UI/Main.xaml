@@ -1,9 +1,12 @@
-﻿<controls:MetroWindow  x:Name="Main1" x:Class="WowAI.UI.Main"
+﻿<controls:MetroWindow
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+
+
+             xmlns:WowAI="clr-namespace:WowAI"   x:Name="Main1" x:Class="WowAI.UI.Main"
              
              
              mc:Ignorable="d" 
@@ -241,6 +244,7 @@
                                                 </ComboBox>
                                             </StackPanel>
                                             <CheckBox x:Name="CheckBoxLaunchSkript" Content="Запустить скрипт по завершению квестов" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
+                                            <CheckBox x:Name="CheckBoxWorldQuest" Content="Мировые квесты" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0" IsChecked="True"/>
                                         </StackPanel>
                                         <StackPanel Margin="5,5,0,0" Orientation="Vertical" VerticalAlignment="Bottom">
                                             <CheckBox x:Name="CheckBoxLogScript" Content="Лог режима скрипт(Действия)" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogScriptAction}"/>
@@ -251,8 +255,10 @@
                                 </GroupBox>
                                 <GroupBox x:Name="groupBoxGlobal" Header="Общее" Margin="0" Grid.Row="1">
                                     <StackPanel x:Name="StackPanelGlobal" Margin="0">
-
-                                        <CheckBox x:Name="CheckBoxAutoEquip" Content="Авто подбор экипировки" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding AutoEquip}" Margin="5,5,0,0"/>
+                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                            <CheckBox x:Name="CheckBoxAutoEquip" Content="Авто подбор экипировки " HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding AutoEquip}"/>
+                                            <TextBox x:Name="textBoxEquipStateWeapon" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="50" Text="0"/>
+                                        </StackPanel>
                                         <CheckBox x:Name="CheckBoxHideQuesterUI" Content="Сворачивать окно квестера после запуска" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding HideQuesterUi}"/>
                                         <CheckBox x:Name="CheckBoxNoAttackOnMount" Content="Не отбиваться на маунте" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding NoAttackOnMount}"/>
                                         <CheckBox x:Name="CheckBoxUseDash" Content="Использовать ускорение" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding UseDash}"/>
@@ -1812,8 +1818,8 @@
                                                 </ListView.View>
                                             </ListView>
                                         </GroupBox>
-                                        <ListView x:Name="ListViewActiveItems" ItemsSource="{Binding CollectionAllBuff}" Margin="0" Grid.Row="0" Grid.ColumnSpan="2"
-                                                Grid.Column="0" OverridesDefaultStyle="False" SelectionChanged="ListViewActiveItems_SelectionChanged">
+                                        <ListView x:Name="ListViewActiveItems" ItemsSource="{Binding CollectionMyBuffs}" Margin="0" Grid.Row="0" Grid.ColumnSpan="2"
+                                                Grid.Column="0"  SelectionChanged="ListViewActiveItems_SelectionChanged">
                                             <ListView.View>
                                                 <GridView>
 
@@ -1864,6 +1870,26 @@
                                                 </WrapPanel>
                                             </StackPanel>
                                         </GroupBox>
+                                        <StackPanel Margin="5,50,0,0" Orientation="Horizontal">
+                                            <CheckBox x:Name="CheckBoxSendMail" Content="Отправлять почту" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding LogScriptAction}" Margin="0,4,0,0"/>
+                                            <Label x:Name="LabelGoldInHour_Copy5" Content="с" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                            <TextBox x:Name="textBoxSendMailStartTime" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                            <Label x:Name="LabelGoldInHour_Copy6" Content="по" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                            <TextBox x:Name="textBoxSendMailEndTime" TextWrapping="Wrap" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
+                                            <Label x:Name="labelFarmLoc_Copy6" Content="на ник" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox x:Name="textBoxSendMailName" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="100"/>
+                                        </StackPanel>
+                                        <WrapPanel Margin="0,5,0,0">
+                                            <Label x:Name="labelMountLoc1" Content="Координаты для почты:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox x:Name="textBoxSendMailLocX" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,0,0" Text="0"/>
+                                            <TextBox x:Name="textBoxSendMailLocY" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="58" Margin="5,0,0,0" Text="0"/>
+                                            <TextBox x:Name="textBoxSendMailLocZ" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="46" Margin="5,0,0,0" Text="0"/>
+                                            <Label x:Name="labelFarmLocMapId3" Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox x:Name="textBoxSendMailLocMapId" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,0,0" Text="0"/>
+                                            <Label x:Name="labelFarmLocAreaId3" Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox x:Name="textBoxSendMailLocAreaId" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,0,0" Text="0"/>
+                                            <Button x:Name="buttonSendMailLocFill" Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonSendMailLocFill_Click" Margin="10,0,0,0"/>
+                                        </WrapPanel>
                                         <GroupBox x:Name="groupBoxMultiZone" Margin="0" Visibility="Hidden">
                                             <GroupBox.Header>
                                                 <RadioButton x:Name="radioButtonMultiZone" Content="Мульти зоны" Margin="0,0,-12,0" GroupName="Zone"/>
@@ -2140,7 +2166,11 @@
                                                         <Button x:Name="buttonFarmLocFill1" Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonFarmLocFill1_Click" Margin="10,0,0,0"/>
                                                     </WrapPanel>
                                                     <CheckBox x:Name="CheckBoxUseStoneForSellAndRepair" Content="Использовать камень телепорта для починки/продажи" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
-                                                    <CheckBox x:Name="CheckBoxUseSMountMyLoc" Content="Призывать маунта для починки/ремонта возле себя" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
+                                                    <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                        <CheckBox x:Name="CheckBoxUseSMountMyLoc" Content="Призывать маунта для починки/ремонта возле себя" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}"/>
+                                                        <CheckBox x:Name="CheckBoxSummonMount" Content="Призывать маунта " HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
+                                                    </StackPanel>
+                                                    <CheckBox x:Name="CheckBoxUseWhistleForSellAndRepair" Content="Использовать свисток для починки/продажи" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
                                                 </StackPanel>
                                             </GroupBox>
                                         </Grid>
@@ -2176,9 +2206,42 @@
                                                     <Label x:Name="label2_Copy2" Content="Качество" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                                     <ComboBox x:Name="comboBoxInvItemsGlobalQuality" HorizontalAlignment="Right" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxInvItemsGlobalQuality_PreviewMouseLeftButtonDown"/>
                                                 </StackPanel>
+                                                <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                                                    <Label x:Name="label2_Copy4" Content="Уровень предмета &lt;= " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                                    <TextBox x:Name="textBoxItemLevel" TextWrapping="Wrap" Text="0" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                                </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
                                                     <Button x:Name="buttonAddItemGlobal" Content="Добавить" Margin="5,0,0,0" Click="buttonAddItemGlobal_Click"/>
                                                     <Button x:Name="buttonInvItemsGlobalDel" Content="Удалить" Margin="10,0,0,0" Click="buttonInvItemsGlobalDel_Click"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Одевание с аука" Margin="0">
+                                <Grid>
+                                    <GroupBox x:Name="groupBox_Copy1" Header="{Binding CollectionItemGlobals.Count, Mode=OneWay}" Margin="0" HeaderStringFormat="Настройки Продажи: {0}">
+                                        <Grid Margin="0,0,0,-3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="481*"/>
+                                                <ColumnDefinition Width="596*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="439*"/>
+                                                <RowDefinition Height="193*"/>
+                                            </Grid.RowDefinitions>
+                                            <DataGrid x:Name="DataGridEquipAuction" Margin="0" ItemsSource="{Binding CollectionEquipAuc}"  Grid.ColumnSpan="2">
+
+                                            </DataGrid>
+                                            <StackPanel Margin="5,5,0,0" Grid.Row="1">
+                                                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                                    <Label x:Name="label2_Copy5" Content="Слот:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
+                                                    <ComboBox x:Name="comboBoxBuyAuc" Width="200" PreviewMouseLeftButtonDown="comboBoxBuyAuc_PreviewMouseLeftButtonDown" HorizontalAlignment="Right"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
+                                                    <Button x:Name="buttonAddEquipAuc" Content="Добавить" Margin="5,0,0,0" Click="buttonAddEquipAuc_Click"/>
+                                                    <Button x:Name="buttonEquipAucDel" Content="Удалить" Margin="10,0,0,0" Click="buttonEquipAucDel_Click"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </Grid>
@@ -2364,6 +2427,12 @@
                                                                 <ComboBoxItem Content="Почта" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Ремонт" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Крафт" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Купить нитки" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Токен" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Эквип на ауке" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Использовать портал" IsEnabled="True"/>
+                                                                <ComboBoxItem Content="Положить нитки на склад" IsEnabled="True"/>
+                                                                
                                                             </ComboBox>
                                                             <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
                                                             <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
@@ -2564,18 +2633,10 @@
                             <TabItem Header="Quest">
                                 <Grid>
                                     <StackPanel Margin="0" Orientation="Vertical">
-                                        <DataGrid x:Name="DataGridQuestTemplate" Margin="0,0,106,0" Height="100"/>
 
-                                        <StackPanel Orientation="Horizontal" Height="340">
 
-                                            <DataGrid x:Name="DataGridQuest" Margin="0" Width="700" SelectionChanged="DataGridQuest_SelectionChanged"/>
-                                            <DataGrid x:Name="DataGridQuestCounts" Margin="0" Width="376">
-
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Binding="{Binding LogTitle}" ClipboardContentBinding="{x:Null}" Header="LogTitle"/>
-                                                </DataGrid.Columns>
-                                            </DataGrid>
-                                        </StackPanel>
+                                        <DataGrid x:Name="DataGridQuest" ItemsSource="{Binding _collectionQuests}" SelectionChanged="DataGridQuest_SelectionChanged" SelectedCellsChanged="DataGridQuest_SelectedCellsChanged"   Margin="0" />
+                                        <DataGrid x:Name="DataGridQuestTemplate" ItemsSource="{Binding _collectionQuestTemplate}" Margin="0" AutoGenerateColumns="True" Height="300"/>
                                     </StackPanel>
                                 </Grid>
                             </TabItem>
@@ -2701,6 +2762,8 @@
                                         <TextBox x:Name="textBoxMaxPrice" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
                                         <Label x:Name="LabelDiscount" Content="Скидка от конкурента" Margin="0" Foreground="White" HorizontalAlignment="Left" />
                                         <TextBox x:Name="textBoxDiscount" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
+                                        <Label x:Name="LabelDiscount_Copy1" Content="Макс. кол-во" Margin="0" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="textBoxMaxCount" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0"/>
                                     </StackPanel>
                                     <WrapPanel Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top">
                                         <CheckBox x:Name="CheckBoxCheckAuk" Content="Бежать на аук если предметов с Id" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
@@ -2728,6 +2791,12 @@
                                         <TextBox x:Name="textBoxCheckAukEndTime" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00"/>
                                     </WrapPanel>
                                     <CheckBox x:Name="CheckBoxAlternateAuk" Content="Использовать второй аук в столице" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" Style="{DynamicResource CheckBoxStyle1}" Margin="5,5,0,0"/>
+                                    <ComboBox x:Name="ComboBoxAukTime" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Width="154" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
+                                        <ComboBoxItem Content="12 часов" Background="#FF36393E" Foreground="White"/>
+                                        <ComboBoxItem Content="24 часов" Background="#FF36393E" Foreground="White"/>
+                                        <ComboBoxItem Content="48 часа" Background="#FF36393E" Foreground="White"/>
+
+                                    </ComboBox>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -2797,7 +2866,7 @@
             <ComboBoxItem Content="Фарм ресурсов" Background="#FF36393E" Foreground="White"/>
             <ComboBoxItem Content="Скрипт" Background="#FF36393E" Foreground="White"/>
             <ComboBoxItem Content="Отбивание" Background="#FF36393E" Foreground="White"/>
-
+           
 
 
         </ComboBox>

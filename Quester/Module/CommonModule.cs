@@ -26,12 +26,7 @@ namespace WowAI.Modules
                 Host.onUserNavMeshPreMove -= NavMeshPreMove;
                 Host.onMoveTick -= MyonMoveTick;
                 Host.onCastFailedMessage -= MyonCastFailedMessage;
-                // host.onCreatureAttacked -= MyCreatureAttacked;
-                // host.onSkillLaunched -= MeSkillLaunched;
-                // host.onChatNotify -= OnChatNotify;
-                // host.onPartyInvite -= MyonPartyInvite;
-                // host.onGuildInvite -= MyonGuildInvite;
-                //  host.onFoundGameMaster -= MyonFoundGameMaster;
+                Host.onSpellDamage -= MyonSpellDamage;
                 base.Stop();
             }
             catch (Exception e)
@@ -45,38 +40,18 @@ namespace WowAI.Modules
             try
             {
                 base.Start(host);
-                //_navUpdate = host.GetUnixTime();
-                //Грузим базу с многоугольниками, описывающими зоны
                 ZonesGps = new GpsBase();
-                GpsBase.LoadDataBase(Resources.helpGps);
-                /*   var point1 = GpsBase.AddPoint(1654, -4351, 26, "");
-                   var point2 = GpsBase.AddPoint(1625, -4366, 24, "");
-                   var point3 = GpsBase.AddPoint(1622, -4375, 24, "");
-                   var point4 = GpsBase.AddPoint(1612, -4373, 24, "выход");
-                   var point5 = GpsBase.AddPoint(1602, -4378, 20, "");
-                   var point6 = GpsBase.AddPoint(1609, -4415, 14, "Вход на аук");
-                   var point7 = GpsBase.AddPoint(1635, -4445, 17, "Аук");
-                   GpsBase.AddLink(point1, point2);
-                   GpsBase.AddLink(point2, point3);
-                   GpsBase.AddLink(point3, point4);
-                   GpsBase.AddLink(point4, point5);
-                   GpsBase.AddLink(point5, point6);
-                   GpsBase.AddLink(point6, point7);*/
-
-
-
-                //ZonesGps.LoadDataBase(Resources.zones);
-                //  LoadCurrentZoneMesh(host.Me.Location.X, host.Me.Location.Y);
-                // host.onSkillLaunched += MeSkillLaunched;
-                // host.onCreatureAttacked += MyCreatureAttacked;
+                if (!File.Exists(Host.PathGps))
+                {
+                    Host.log("Не найден файл " + Host.PathGps);
+                    Host.StopPluginNow();
+                }
+                GpsBase.LoadDataBase(Host.PathGps);
                 host.onUserNavMeshPreMoveFull += NavMeshPreMoveFull;
                 Host.onUserNavMeshPreMove += NavMeshPreMove;
                 Host.onMoveTick += MyonMoveTick;
                 Host.onCastFailedMessage += MyonCastFailedMessage;
-                //  host.onChatNotify += OnChatNotify;
-                //  host.onPartyInvite += MyonPartyInvite;
-                // host.onGuildInvite += MyonGuildInvite;
-                // host.onFoundGameMaster += MyonFoundGameMaster;
+                Host.onSpellDamage += MyonSpellDamage;
             }
             catch (Exception e)
             {
@@ -84,12 +59,24 @@ namespace WowAI.Modules
             }
         }
 
-        public void MyonCastFailedMessage(uint SpellID, ESpellCastError Reason, int FailedArg1, int FailedArg2)
+        void MyonSpellDamage(WowGuid casterGuid, WowGuid targetGuid, uint spellID, EAttackerStateFlags flags, int damage)
+        {
+            var target = Host.GetEntity(targetGuid);
+            var caster = Host.GetEntity(casterGuid);
+            if (casterGuid == Host.Me.Guid)
+            {
+                Host.AllDamage = Host.AllDamage + damage;
+            }
+            if (Host.AdvancedLog)
+                Host.Log(caster.Name + "->" + target.Name + "[" + spellID + "][" + damage + "]" + " [" + flags + "]", "Damage");
+        }
+
+        public void MyonCastFailedMessage(uint spellId, ESpellCastError reason, int failedArg1, int failedArg2)
         {
             try
             {
-                Host.log(SpellID + " " + Reason + " " + FailedArg1 + " " + FailedArg2);
-                if (SpellID == 131476 && Reason == ESpellCastError.NOT_FISHABLE)
+                Host.log(spellId + " " + reason + " " + failedArg1 + " " + failedArg2);
+                if (spellId == 131476 && reason == ESpellCastError.NOT_FISHABLE)
                 {
                     Host.SetMoveStateForClient(true);
                     Host.TurnLeft(true);
@@ -98,7 +85,7 @@ namespace WowAI.Modules
                     Host.SetMoveStateForClient(false);
                     Host.AutoQuests.StartWait = false;
                 }
-                if (SpellID == 131476 && Reason == ESpellCastError.TOO_SHALLOW)
+                if (spellId == 131476 && reason == ESpellCastError.TOO_SHALLOW)
                 {
                     Host.SetMoveStateForClient(true);
                     Host.TurnLeft(true);
@@ -114,87 +101,16 @@ namespace WowAI.Modules
             }
         }
 
-
-        public void MyonFoundGameMaster(string name, Vector3F pos)
-        {
-            try
-            {
-                Host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + Host.Me.Name + "(" + Host.Me.Level + ")" + " Внимание сработало событие GM " + name + " дист " + Host.Me.Distance(pos), "События");
-
-                foreach (var eventSetting in Host.CharacterSettings.EventSettings)
-                {
-                    if (eventSetting.TypeEvents == CharacterSettings.EventsType.GMServer)
-                    {
-                        ActionEvent(eventSetting);
-                        if (eventSetting.ActionEvent == CharacterSettings.EventsAction.Log)
-                        {
-                            Host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + Host.Me.Name + "(" + Host.Me.Level + ")" + " Внимание сработало событие GM " + name + " дист " + Host.Me.Distance(pos), "События");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-            }
-        }
-
-        /* public void MyonPartyInvite(string inviterName, EPartyType partyType)
-         {
-             foreach (var eventSetting in host.CharacterSettings.EventSettings)
-             {
-                 if (eventSetting.TypeEvents == CharacterSettings.EventsType.PartyInvite)
-                 {
-                     ActionEvent(eventSetting);
-                     if (eventSetting.ActionEvent == CharacterSettings.EventsAction.Log)
-                     {
-                         host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + host.Me.Name + "(" + host.Me.Level + ")" + " Внимание сработало событие " + inviterName + " пригласил в " + partyType, "События");
-                     }
-                 }
-             }
-         }*/
-
-        /*public void MyonGuildInvite(string guildName, string inviterName)
-        {
-            if (host.CharacterSettings.MyClan && guildName == host.CharacterSettings.MyClanName)
-            {
-                Thread.Sleep(5000);
-                host.AcceptGuildInvite();
-            }
-               
-
-            foreach (var eventSetting in host.CharacterSettings.EventSettings)
-            {
-                if (eventSetting.TypeEvents == CharacterSettings.EventsType.ClanInvite)
-                {
-                    ActionEvent(eventSetting);
-                    if (eventSetting.ActionEvent == CharacterSettings.EventsAction.Log)
-                    {
-                        host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + host.Me.Name + "(" + host.Me.Level + ")" + " Внимание сработало событие " + inviterName + " пригласил в " + guildName, "События");
-                    }
-                }
-            }
-        }*/
-
-
-
         public void MyUnmount()
         {
             try
             {
                 if (!Host.IsAlive(Host.Me) || Host.Me.MountId == 0)
                     return;
-
                 foreach (var s in Host.Me.GetAuras())
-                {
                     if (s.IsPartOfSkillLine(777))
-                    {
                         if (!s.Cancel())
                             Host.log("Не удалось отозвать маунта " + Host.GetLastError(), Host.LogLvl.Error);
-
-                    }
-
-                }
             }
             catch (ThreadAbortException) { }
             catch (Exception e)
@@ -203,21 +119,13 @@ namespace WowAI.Modules
             }
         }
 
-
-        DateTime _lastMountTime = DateTime.Now - TimeSpan.FromMinutes(1);
-
-
-
         public Aura MyGetAura(uint id)
         {
             try
             {
                 foreach (var aura in Host.Me.GetAuras())
-                {
                     if (aura.SpellId == id)
                         return aura;
-                }
-
             }
             catch (ThreadAbortException) { }
             catch (Exception e)
@@ -232,9 +140,8 @@ namespace WowAI.Modules
         {
             try
             {
-                /* if (_lastMountTime.AddMinutes(1) > DateTime.Now)//"Сбор ресурсов")
-                     return;
-                 */
+                if (Host.MyGetAura(269564) != null)
+                    return;
                 if (Host.Me.Distance(loc) < 2)
                     return;
                 if (Host.FarmModule.BestMob != null)
@@ -243,13 +150,16 @@ namespace WowAI.Modules
                 {
                     if (Host.AutoQuests.BestQuestId == 47880)
                         return;
+                    if (Host.Me.Distance(loc) < 50)
+                        return;
                 }
-
+                //   Host.log("Маунт " + Host.CharacterSettings.CheckBoxAttackForSitMount + " " + Host.GetThreats(Host.Me).Count + " " + Host.Me.MountId);
                 if (Host.CharacterSettings.Mode == EMode.Script)
                 {
-                    if (Host.CharacterSettings.CheckBoxAttackForSitMount && Host.GetThreats(Host.Me).Count > 0 && Host.Me.MountId == 0 )
+
+                    if (Host.CharacterSettings.CheckBoxAttackForSitMount && Host.Me.GetThreats().Count > 0 && Host.Me.MountId == 0)
                     {
-                        
+                        //  Host.log("Атака");
                         Host.FarmModule.farmState = FarmState.AttackOnlyAgro;
                         return;
                     }
@@ -269,9 +179,9 @@ namespace WowAI.Modules
                         }
                     }
                 }
-                   
 
-                if(Host.MapID == 1643 && Host.AutoQuests.BestQuestId == 47098)
+
+                if (Host.MapID == 1643 && Host.AutoQuests.BestQuestId == 47098)
                     return;
                 if (Host.MapID == 1904 || Host.MapID == 1929)
                 {
@@ -343,7 +253,7 @@ namespace WowAI.Modules
 
                                 }
 
-                                if (formId == 783 && Host.GetThreats().Count == 0)
+                                if (formId == 783 && Host.Me.GetThreats().Count == 0)
                                 {
                                     if (Host.Me.RunSpeed < 13 && Host.Me.SwimSpeed < 9)
                                     {
@@ -436,6 +346,7 @@ namespace WowAI.Modules
                 if (result != ESpellCastError.SUCCESS)
                 {
                     Host.log("Не удалось призвать маунта " + mountSpell.Name + "  " + result, Host.LogLvl.Error);
+
                 }
                 else
                     Host.log("Призвал маунта", Host.LogLvl.Ok);
@@ -499,203 +410,11 @@ namespace WowAI.Modules
             return false;
         }
 
-        private readonly List<uint> _obstacle = new List<uint>();
-
-
-        /*   private void OnChatNotify(EChatChannel channel, string talker, string message)
-           {
-               if (channel == EChatChannel.Whisper || channel == EChatChannel.Normal)
-               {
-                   foreach (var eventSetting in host.CharacterSettings.EventSettings)
-                   {
-                       if (eventSetting.TypeEvents == CharacterSettings.EventsType.ChatMessage)
-                       {
-                           ActionEvent(eventSetting);
-                           if (eventSetting.ActionEvent == CharacterSettings.EventsAction.Log)
-                           {
-                               host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + host.Me.Name + "(" + host.Me.Level + ")" + " Внимание сработало событие чата " + talker + ": " + message, "События");
-                           }
-                       }
-                   }
-               }
-           }*/
-
-
-        //private void MeSkillLaunched(Creature obj, Creature objTarget, int skillId, Vector3F location, Vector3F targetLocation)
-        //{
-        //    try
-        //    {
-        //        if (!host.CharacterSettings.ShiftAoe)
-        //            return;
-        //        if (obj?.Type != EBotTypes.Npc)
-        //            return;
-        //        if (!obj.IsEnemy)
-        //            return;
-        //        if ((obj as Npc).Db.Grade == ENPCGradeType.Normal && obj.Id != 125029)
-        //            return;
-
-        //        //Скилы в данже 20
-        //        if (skillId == 9001811)
-        //            return;
-        //        if (skillId == 9001031)
-        //            return;
-        //        if (skillId == 100652)
-        //            return;
-
-        //        /*   host.Log(host.CachedDbNpcInfos[obj.Id].LocalName + " " + host.CachedDbNpcInfos[obj.Id].Grade + " кастует " + host.CahedDbNpcSkillInfos[skillId].LocalName + " на " + objTarget?.Name);
-        //           host.Log("location: " + location + "       targetLocation: " + targetLocation + "          Me.Location: " + host.Me.Location + "  Дистанция:  " +host.Me.Distance(targetLocation.X, targetLocation.Y, targetLocation.Z));
-        //           host.Log("ApplyMoment: " + host.CahedDbNpcSkillInfos[skillId].ApplyMoment +
-        //                     " ApplyingType: " + host.CahedDbNpcSkillInfos[skillId].ApplyingType +
-        //                     " FiringTime: " + host.CahedDbNpcSkillInfos[skillId].FiringTime +
-        //                     " ShapeRadiusMax: " + host.CahedDbNpcSkillInfos[skillId].ShapeRadiusMax 
-        //                    // " ShapeRadiusMin  " + host.CahedDbNpcSkillInfos[skillId].ShapeRadiusMin
-        //                );
-        //           host.Log("---------------------------------------------------------------------------------------");*/
-
-        //        if (host.GameDB.DBNpcSkillInfos[skillId].ApplyingType == EApplyingType.SelfArea && host.Me.Distance(obj) < host.GameDB.DBNpcSkillInfos[skillId].ShapeRadiusMax
-        //            || host.GameDB.DBNpcSkillInfos[skillId].ApplyingType == EApplyingType.Area && host.Me.Distance(targetLocation.X, targetLocation.Y, targetLocation.Z) < host.GameDB.DBNpcSkillInfos[skillId].ShapeRadiusMax
-        //            )
-        //        {
-        //            if (host.Me.ClassType == EClass.Berserker && host.Me.Energy < 20)
-        //                return;
-        //            if (host.Me.ClassType == EClass.Assassin && host.Me.Energy < 25)
-        //                return;
-        //            if (host.Me.ClassType == EClass.Ranger && host.Me.Energy < 35)
-        //                return;
-        //            if (host.Me.ClassType == EClass.Mage && host.Me.Energy < 35)
-        //                return;
-        //            if (host.Me.ClassType == EClass.Mystic && host.Me.Energy < 35)
-        //                return;
-        //            if (host.Me.Energy < 10)
-        //                return;
-        //            var delayAoe = Math.Round(host.GameDB.DBNpcSkillInfos[skillId].ApplyMoment * 1000);
-        //            //  var percent = delayAoe * 0.50;
-        //            int resdelayAoe = 0/*Convert.ToInt32(delayAoe - percent)*/;
-
-        //            if (delayAoe > host.CharacterSettings.DelayAoe)
-        //                resdelayAoe = Convert.ToInt32(delayAoe - host.CharacterSettings.DelayAoe);
-        //            else
-        //                resdelayAoe = 0;
-
-        //            NpcLaunchAoeAttack = true;
-        //            //  host.Log("АОЕ!!!!!!!  " + resdelayAoe + " " + skillId);
-        //            Thread.Sleep(resdelayAoe);
-
-        //            host.StartVoluntaryAction();
-        //            Thread.Sleep(300);
-        //            host.EndVoluntaryAction();
-        //            host.TurnDirectly(host.Me.Target);
-        //            host.SetCamRotation(host.Me.Rotation.Y);
-
-        //            ShapeRadiusMax = host.GameDB.DBNpcSkillInfos[skillId].ShapeRadiusMax;
-        //            FiringTime = host.GameDB.DBNpcSkillInfos[skillId].FiringTime;
-
-        //            NpcLaunchAoeAttack = false;
-
-        //        }
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        host.log(e.ToString());
-        //    }
-        //}
-
-        // public Creature AttackerEscort;
-
         public bool AttackPlayer = false;
-        //public DateTime AttackPlayerTime;
         public bool EventAttackPlayer;
-        //private void MyCreatureAttacked(AttackInfo info)
-        //{
-        //    try
-        //    {
-        //        //  string attacklog = "";
-        //        if(info.Attacker == null)
-        //            return;
 
-        //        // attacklog = attacklog + info.Attacker.Name + " атакует ";
-        //        //  host.log(attacklog);
 
-        //        //Вражеская фракци
-        //        if (info.Attacker.Type == EBotTypes.Player && host.FarmModule.bestMob?.Type != EBotTypes.Player)
-        //            foreach (var attackTargetInfo in info.AttackTargetInfo)
-        //            {
-        //                if (attackTargetInfo.Target == host.Me)
-        //                {
-        //                    if (host.GetPlayerFraction(info.Attacker) != host.GetPlayerFraction(host.Me) && host.CharacterSettings.Mode != "Данж(п)")
-        //                    {
-        //                        host.log("Нападение игрока " + info.Attacker.Name);
-        //                        host.FarmModule.bestMob = info.Attacker;
-        //                        host.SetTarget(info.Attacker);
-        //                        host.CancelMoveTo();
-        //                        host.CommonModule.SuspendMove();
-        //                        AttackPlayer = true;
-        //                        EventAttackPlayer = true;
-        //                        AttackPlayerTime = DateTime.Now;
-        //                    }
-
-        //                }
-        //            }
-        //        //Проверка на бой
-        //        if (info.Attacker != null)
-        //        {
-        //            host.SetVar(info.Attacker, "InFight", true);
-        //            host.SetVar(info.Attacker, "Time", info.Time);
-        //        }
-        //        foreach (var attackTargetInfo in info.AttackTargetInfo)
-        //        {
-        //            if (attackTargetInfo.Target != null)
-        //            {
-        //                host.SetVar(attackTargetInfo.Target, "InFight", true);
-        //                host.SetVar(attackTargetInfo.Target, "Time", info.Time);
-        //            }
-        //        }
-
-        //        if (host.Me.Escortor != null)
-        //        {
-        //            foreach (var attackTargetInfo in info.AttackTargetInfo)
-        //            {
-        //                if (attackTargetInfo.Target == host.Me.Escortor)
-        //                {
-        //                    AttackerEscort = info.Attacker;
-        //                    break;
-        //                }
-        //            }
-        //        }
-
-        //        //  string attacklog = "";
-        //        if (info.Attacker != host.Me)
-        //            return;
-
-        //        //   attacklog = "DPS: " + host.AllDamage/host.TimeInFight + " ";
-
-        //        //  attacklog = attacklog + info.Attacker.Name + " атакует ";
-        //        foreach (var attackTargetInfo in info.AttackTargetInfo)
-        //        {
-        //            if (attackTargetInfo.Target == host.Me)
-        //                return;
-        //            //  attacklog = attacklog + attackTargetInfo.Target.Name + "  AttackChance: " + attackTargetInfo.AttackChance;
-        //            foreach (var attackDamageInfo in attackTargetInfo.AttackDamageInfo)
-        //            {
-        //                // attacklog = attacklog + " и наносит " + attackDamageInfo.Damage + " по " + attackDamageInfo.Type;
-        //                host.AllDamage = host.AllDamage + attackDamageInfo.Damage;
-        //            }
-        //        }
-        //        //  attacklog = attacklog + " SkillId: " + info.SkillId + " " /*+ host.CachedDbSkillInfos[info.SkillId].LocalName*/;
-        //        //attacklog = attacklog + " время: " + info.Time;
-
-        //        //  host.Log(attacklog);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        host.log(e.ToString());
-        //    }
-        //}
-
-        //private long _navUpdate;
-
-        private Vector3F ObstaclePoint = new Vector3F();
+       // private Vector3F _obstaclePoint;
         private void NavMeshPreMove(Vector3F point)
         {
 
@@ -706,8 +425,8 @@ namespace WowAI.Modules
                 return;
             if (Host.MapID == 1904)
                 return;
-            ObstaclePoint = point;
-            //   Host.log("Тест 2");
+          //  _obstaclePoint = point;
+
             if (Host.CharacterSettings.Attack)
             {
                 foreach (var entity in Host.GetEntities<Unit>())
@@ -755,15 +474,6 @@ namespace WowAI.Modules
                         }
                         if (mobsIgnore)
                             continue;
-
-                        /*  foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
-                          {
-                              if (entity.Guid.GetEntry() == characterSettingsMobsSetting.Id)
-                                  if (characterSettingsMobsSetting.Priority == 2)
-                                      return entity;
-                          }
-                          if (Host.FarmModule.farmState == FarmState.Disabled)
-                              return null;*/
                     }
 
                     if (entity != Host.FarmModule.BestMob)
@@ -799,73 +509,95 @@ namespace WowAI.Modules
                         break;
                     }
                 }
-            }
-        }
-        private void NavMeshPreMoveFull(Vector3F[] points)
-        {
-            try
-            {
 
-
-
-                /*  if (host.GetUnixTime() < _navUpdate + 1000)
-                      return true;*/
-                // _navUpdate = host.GetUnixTime();
                 if (Host.FarmModule.BestMob != null && Host.FarmModule.BestMob.HpPercents < 100)
                     return;
 
                 if (Host.FarmModule.farmState == FarmState.Disabled)
                     return;
-              
+
+                if (Host.CharacterSettings.NoAttackOnMount)
+                {
+                    if (Host.Me.MountId != 0)
+                    {
+                        return;
+                    }
+                }
+
+                foreach (var agromob in Host.GetAgroCreatures())
+                {
+                    if (Host.GetAgroCreatures().Contains(Host.FarmModule.BestMob) && Host.IsAlive(Host.FarmModule.BestMob))
+                        return;
+
+                    var zRange = Math.Abs(Host.Me.Location.Z - agromob.Location.Z);
+
+                    if (zRange > 10)
+                        continue;
+                    if (!Host.IsAlive(agromob))
+                        continue;
+
+
+                    Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+
+                    Host.CancelMoveTo();
+                    Host.CommonModule.SuspendMove();
+                    Host.log("Агр: " + Host.FarmModule.BestMob.Name + " дист:" + Host.Me.Distance(agromob) + " всего:" + Host.GetAgroCreatures().Count, Host.LogLvl.Error);
+                    return;
+                }
+
+            }
+
+            if (Host.Me.Class == EClass.DeathKnight && !Host.Me.IsInCombat && Host.IsAlive() && Host.Me.MountId == 0)
+            {
+
+                var skill = Host.SpellManager.GetSpell(48265);
+                if (Host.SpellManager.IsSpellReady(skill))
+                {
+                    var result = Host.SpellManager.CastSpell(skill.Id);
+                    if (result != ESpellCastError.SUCCESS)
+                        Host.log("Не смог использовать скилл ускорения" + result, Host.LogLvl.Error);
+                }
+            }
+
+        }
+        private void NavMeshPreMoveFull(Vector3F[] points)
+        {
+            try
+            {
+                if (Host.FarmModule.BestMob != null && Host.FarmModule.BestMob.HpPercents < 100)
+                    return;
+
+                if (Host.FarmModule.farmState == FarmState.Disabled)
+                    return;
+
                 if (Host.MapID == 1904)
                     return;
-                //  Host.log("Тест");
 
-                /*  if (Host.CharacterSettings.Mode == EMode.Script)//"Данж.(п)")
-                      return;*/
-
-                /*   switch (host.Me.ConditionPhase)
-                   {
-                       case EConditionPhase.Spirit:
-                           return true;
-                       case EConditionPhase.Dead:
-                           return true;
-                       case EConditionPhase.Alive:
-                           break;
-                       case EConditionPhase.Stealth:
-                           break;
-                       case EConditionPhase.All:
-                           break;
-                       default:
-                           throw new ArgumentOutOfRangeException();
-                   }*/
-
-                /*  if (host.Me.Escortor != null && host.GetAgroCreatures().Count == 0)
-                  {
-                      foreach (var attackerEscortor in host.GetCreatures())
-                      {
-                          if (host.Me.GetItemsCount(50318) > 0)
-                              break;
-
-                          if (attackerEscortor.IsEnemy
-                              && host.IsAlive(attackerEscortor)
-                              && host.Me.Distance(attackerEscortor) < 10
-                              && host.GetAgroCreatures().Count == 0
-                              && host.FarmModule.bestMob == null)
-                          {
-                              host.FarmModule.bestMob = attackerEscortor;
-                              host.SetTarget(attackerEscortor);
-                              host.CancelMoveTo();
-                              host.CommonModule.SuspendMove();
-                              break;
-                          }
-                      }
-                  }*/
                 if (Host.CharacterSettings.Attack)
                 {
                     foreach (var entity in Host.GetEntities<Unit>())
                     {
-                        if (Host.CharacterSettings.Mode == EMode.Questing)
+                        var needbreak = false;
+                        switch (entity.Id)
+                        {
+                            case 153962:
+                                {
+
+                                }
+                                break;
+                            case 153960:
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+                                    if (Host.CharacterSettings.Mode == EMode.Questing)
+                                        needbreak = true;
+                                }
+                                break;
+                        }
+                        if (needbreak)
                             break;
                         /*  if (Host.Me.Target != null && Host.Me.Target.HpPercents < 100)
                               break;*/
@@ -948,8 +680,7 @@ namespace WowAI.Modules
 
                 foreach (var agromob in Host.GetAgroCreatures())
                 {
-                    if (Host.GetAgroCreatures().Contains(Host.FarmModule.BestMob)
-                        && Host.IsAlive(Host.FarmModule.BestMob))
+                    if (Host.GetAgroCreatures().Contains(Host.FarmModule.BestMob) && Host.IsAlive(Host.FarmModule.BestMob))
                         return;
 
                     var zRange = Math.Abs(Host.Me.Location.Z - agromob.Location.Z);
@@ -967,120 +698,18 @@ namespace WowAI.Modules
                     Host.log("Агр: " + Host.FarmModule.BestMob.Name + " дист:" + Host.Me.Distance(agromob) + " всего:" + Host.GetAgroCreatures().Count, Host.LogLvl.Error);
                     return;
                 }
-
-
-                //if (host.GetAgroCreatures().Count == 0)
-                //{
-                //    var interceptionlist = new List<Creature>();
-                //    foreach (var point in points)
-                //    {
-                //        if (host.Me.Distance(point.X, point.Y, point.Z) > 30)
-                //            break;
-
-                //        foreach (var interception in host.GetCreatures())
-                //        {
-                //            if (!host.IsExists(interception))
-                //                continue;
-                //            var zRange = Math.Abs(host.Me.Location.Z - interception.Location.Z);
-
-                //            if (zRange > 10)
-                //                continue;
-                //            if (interception.Type != EBotTypes.Npc)
-                //                continue;
-
-                //            if (host.Me.Distance(interception) > 30)
-                //                continue;
-                //            if (interception.Id == 370007)
-                //                continue;
-                //            if (interception.Id == 201040)
-                //                continue;
-                //            if (interception.Id == 611502)
-                //                continue;
-                //            if (host.CheckBuff(2000881, interception)) //баф на иммунитет
-                //                continue;
-                //            if (interceptionlist.Contains(interception))
-                //                continue;
-                //            if (!interception.IsEnemy)
-                //                continue;
-                //            if (!host.IsAlive(interception))
-                //                continue;
-                //            if (interception.HpPercents < 100)
-                //                continue;
-
-                //            if (!interception.IsVisible)
-                //                continue;
-
-                //            if (host.Me.Target != null && host.Me.Target.HpPercents < 100)
-                //                break;
-                //            if (host.FarmModule.bestMob != null && host.Me.Distance(host.FarmModule.bestMob) < host.Me.Distance(interception))
-                //                continue;
-
-                //            if (interception == host.FarmModule.bestMob)
-                //                continue;
-
-
-                //            if (host.GetVar(interception, "InFight") != null)
-                //            {
-                //                var infight = (bool)(host.GetVar(interception, "InFight"));
-                //                if (infight)
-                //                {
-                //                    //  host.log(interception.Name + " В бою!!", Host.LogLvl.Error);
-                //                    continue;
-                //                }
-                //            }
-
-
-                //            if ((interception as Npc).Db.Grade == ENPCGradeType.Elite)
-                //                continue;
-
-                //            if ((interception as Npc).Db.AggressiveType == EAggressiveType.Aggressive
-                //                && host.Distance(point.X, point.Y, point.Z, interception.Location.X, interception.Location.Y, interception.Location.Z) <
-                //                (interception as Npc).Db.AudibleRange + 1)
-                //            {
-                //                //  host.log("Нас могут перехватить: " + interception.Name + "[" + interception.Sid + "]" + " дист:" + host.Me.Distance(interception), Host.LogLvl.Important);
-                //                interceptionlist.Add(interception);
-                //            }
-                //        }
-                //    }
-
-
-                //    //Найти ближайшего моба из тех кто может ссагрится
-                //    double finalDist = 999999;
-                //    Creature finalMob = null;
-
-
-                //    foreach (var bestinterception in interceptionlist)
-                //        if (finalDist > host.Me.Distance(bestinterception))
-                //        {
-                //            finalDist = host.Me.Distance(bestinterception);
-                //            finalMob = bestinterception;
-                //        }
-
-                //    if (finalMob != null && finalMob != host.FarmModule.bestMob)
-                //    {
-                //        host.FarmModule.bestMob = finalMob;
-                //        host.CommonModule.SuspendMove();
-                //        host.CancelMoveTo();
-                //        host.SetTarget(host.FarmModule.bestMob);
-                //        //  host.log("Ближайший моб из перехвата: " + finalMob.Name + " дист:" + host.Me.Distance(finalMob), Host.LogLvl.Error);
-                //    }
-                //}
-                // host.log("Мобов проверил за                               " + sw.ElapsedMilliseconds + " мс");
             }
             catch (Exception err)
             {
                 Host.log(err.ToString());
             }
-            return;
         }
-
 
 
         private void UseItemsMountAndPet()
         {
             try
             {
-
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
@@ -1129,10 +758,12 @@ namespace WowAI.Modules
                     return EEquipmentSlot.Neck;
                 case EInventoryType.Shoulders:
                     return EEquipmentSlot.Shoulders;
+
                 case EInventoryType.Body:
                     return EEquipmentSlot.Body;
                 case EInventoryType.Chest:
                     return EEquipmentSlot.Chest;
+
                 case EInventoryType.Waist:
                     return EEquipmentSlot.Waist;
                 case EInventoryType.Legs:
@@ -1169,7 +800,7 @@ namespace WowAI.Modules
                 case EInventoryType.OffHandWeapon:
                     return EEquipmentSlot.OffHand;
                 case EInventoryType.Holdable:
-                    return EEquipmentSlot.MainHand;
+                    return EEquipmentSlot.OffHand;
                 /*  case EInventoryType.Ammo:
                       break;*/
                 /*  case EInventoryType.Thrown:
@@ -1185,12 +816,10 @@ namespace WowAI.Modules
             return EEquipmentSlot.Ranged;
         }
 
-
         private void EquipBestArmorAndWeapon()
         {
             try
             {
-               
                 var equipCells = new Dictionary<EEquipmentSlot, Item>();
                 // host.log("Тест  EquipBestArmorAndWeapon");
 
@@ -1222,11 +851,54 @@ namespace WowAI.Modules
                                 continue;
 
                             var itemEquipType = GetItemEPlayerPartsType(item.InventoryType);
+                            /* if (item.ItemClass == EItemClass.Armor)
+                             {
+                                 if (!item.CanEquipItem())
+                                     Host.log(item.Name + "  " + itemEquipType + "  " + (EItemSubclassArmor)item.ItemSubClass + "   " + item.InventoryType, Host.LogLvl.Error);
+                                 else
+                                 {
+                                     Host.log(item.Name + "  " + itemEquipType + "  " + (EItemSubclassArmor)item.ItemSubClass + "   " + item.InventoryType, Host.LogLvl.Important);
+                                 }
+                             }*/
+
+                            if (item.ItemClass == EItemClass.Weapon && !WeaponType.Contains((EItemSubclassWeapon)item.ItemSubClass))
+                                continue;
+                            if (item.ItemClass == EItemClass.Armor && !ArmorType.Contains((EItemSubclassArmor)item.ItemSubClass))
+                                continue;
+
+
+
+                            if (item.ItemClass == EItemClass.Weapon)
+                            {
+                                if (Host.CharacterSettings.EquipItemStat != 0)
+                                {
+                                    if (!item.ItemStatType.Contains((EItemModType)Host.CharacterSettings.EquipItemStat))
+                                        continue;
+                                }
+                            }
+
+
+                            if (!WeaponAndShield)
+                                if (itemEquipType == EEquipmentSlot.OffHand)
+                                    continue;
                             /* if (itemEquipType == EEquipmentSlot.Unk17)
                                  continue;*/
-                            //  Host.log(item.Name + "  " + itemEquipType);
+                            /*   if (item.ItemClass == EItemClass.Weapon)
+                               {
+                                   if (!item.CanEquipItem())
+                                       Host.log(item.Name + "  " + itemEquipType + "  " + (EItemSubclassWeapon)item.ItemSubClass + "   " + item.InventoryType, Host.LogLvl.Error);
+                                   else
+                                   {
+                                       Host.log(item.Name + "  " + itemEquipType + "  " + (EItemSubclassWeapon)item.ItemSubClass + "   " + item.InventoryType, Host.LogLvl.Important);
+                                   }
+                               }*/
+
+
+
                             if (equipCells[itemEquipType] == null)
+                            {
                                 equipCells[itemEquipType] = item;
+                            }
                             else
                             {
                                 double bestCoef = 0;
@@ -1238,19 +910,87 @@ namespace WowAI.Modules
                                 if (bestCoef < curCoef)
                                     equipCells[itemEquipType] = item;
                             }
-
                         }
-
-
-
                 }
 
+
+                foreach (var item in Host.ItemManager.GetItems())
+                {
+                    if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
+                        item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
+                        item.Place == EItemPlace.InventoryItem || item.Place == EItemPlace.Equipment)
+                        if (item.ItemClass == EItemClass.Armor && (EItemSubclassArmor)item.ItemSubClass == EItemSubclassArmor.MISCELLANEOUS)
+                        {
+                            if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                                continue;
+
+                            if (item.RequiredLevel > Host.Me.Level)
+                                continue;
+                            if (item.InventoryType != EInventoryType.Finger)
+                                continue;
+                            if (equipCells.ContainsValue(item))
+                                continue;
+
+                            if (equipCells[EEquipmentSlot.Finger2] == null)
+                            {
+                                equipCells[EEquipmentSlot.Finger2] = item;
+                            }
+                            else
+                            {
+                                double bestCoef = 0;
+                                double curCoef = 0;
+
+                                bestCoef = equipCells[EEquipmentSlot.Finger2].Level;
+
+                                curCoef = item.Level;
+                                if (bestCoef < curCoef)
+                                    equipCells[EEquipmentSlot.Finger2] = item;
+                            }
+                        }
+                }
+
+                foreach (var item in Host.ItemManager.GetItems())
+                {
+                    if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
+                        item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
+                        item.Place == EItemPlace.InventoryItem || item.Place == EItemPlace.Equipment)
+                        if (item.ItemClass == EItemClass.Armor && (EItemSubclassArmor)item.ItemSubClass == EItemSubclassArmor.MISCELLANEOUS)
+                        {
+                            if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                                continue;
+
+                            if (item.RequiredLevel > Host.Me.Level)
+                                continue;
+                            if (item.InventoryType != EInventoryType.Trinket)
+                                continue;
+                            if (equipCells.ContainsValue(item))
+                                continue;
+                            if (equipCells[EEquipmentSlot.Trinket2] == null)
+                            {
+                                equipCells[EEquipmentSlot.Trinket2] = item;
+                            }
+                            else
+                            {
+                                double bestCoef = 0;
+                                double curCoef = 0;
+
+                                bestCoef = equipCells[EEquipmentSlot.Trinket2].Level;
+
+                                curCoef = item.Level;
+                                if (bestCoef < curCoef)
+                                    equipCells[EEquipmentSlot.Trinket2] = item;
+                            }
+                        }
+                }
+
+
+                //  Host.log("-----------------------------------------");
                 /* foreach (var equipCell in equipCells)
                  {
 
-                     Host.log(equipCell.Key + " " + equipCell.Value?.Name + "  " + equipCell.Value?.Place + "  " + equipCell.Value?.Place);
+                     Host.log(equipCell.Key + " " + equipCell.Value?.Name + "  " + equipCell.Value?.Place + "  " + "  ");
                  }*/
-                //  Host.log("-----------------------------------------");
+
                 foreach (var b in equipCells.Keys.ToList())
                 {
                     if (equipCells[b] != null && equipCells[b].Place != EItemPlace.Equipment)
@@ -1260,10 +1000,9 @@ namespace WowAI.Modules
                             Host.log("Одеваю " + equipCells[b].InventoryType + "  best item = " + equipCells[b].Name, Host.LogLvl.Ok);
                             Thread.Sleep(Host.RandGenerator.Next(555, 1555));
                         }
-
                         else
                         {
-                            Host.log("Error. Can't equip " + equipCells[b].InventoryType + "  best item = " +
+                            Host.log("Error. Can't equip " + equipCells[b].InventoryType + "  " + b + "  best item = " +
                                         equipCells[b].Name + ". Reason = " + Host.GetLastError(),
                                         Host.LogLvl.Error);
                             Thread.Sleep(Host.RandGenerator.Next(555, 1555));
@@ -1341,51 +1080,44 @@ namespace WowAI.Modules
             }
         }
 
-
-
-        private bool FindGmAssHer()
+        public class MyObstacle
         {
-            /* foreach (var creature in host.GetCreatures())
-             {
-                 if (creature.Type == EBotTypes.Npc)
-                     continue;
-                 if (creature.Name.IndexOf("ass", StringComparison.CurrentCultureIgnoreCase) != -1
-                     || creature.Name.IndexOf("gm", StringComparison.CurrentCultureIgnoreCase) != -1)
-                 {
-                     host.Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + host.Me.Name + "(" + host.Me.Level + ")" + " Внимание сработало событие на ГМ: " + creature.Name, "События");
-                     return true;
-                 }
-             }*/
-            return false;
+            public Vector3F Loc;
+            public int hight;
+            public int radius;
         }
 
-        public void SummonPet()
+        public List<MyObstacle> MyObstacles = new List<MyObstacle>
         {
-            /* if (!host.IsAlive(host.Me))
-                 return;
-             if (host.Me.Pet == null)
-             {
-                 foreach (var characterSettingsPetSetting in host.CharacterSettings.PetSettings)
-                 {
-                     foreach (var pet in host.Me.GetPets())
-                     {
-                         if (pet.Id != characterSettingsPetSetting.Id)
-                             continue;
-                         if (pet.Fatigue > pet.Db.FatigueMax / 2)
-                         {
-                             if (pet.Use())
-                             {
-                                 host.log("Призываю " + pet.Db.LocalName + " Бодрость: " + pet.Fatigue);
-                             }
-                             else
-                             {
-                                 host.log("Не удалось призвать " + pet.Db.LocalName + " Бодрость: " + pet.Fatigue + "  " + host.GetLastError(), Host.LogLvl.Error);
-                             }
-                         }
-                     }
-                 }
-             }*/
-        }
+            new MyObstacle{Loc = new Vector3F(-1383.33, -5153.40, 7.56), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(2063.42, 2956.96, 37.55), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(519.97, -163.17, -194.33), radius = 12, hight = 12},
+            new MyObstacle{Loc = new Vector3F(4039.70, 372.60, 69.14), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(-661.77, 89.38, 274.51), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(-896.24, -193.22, 222.11), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(1770.84, -4512.96, 27.43), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(-213.00, 396.73, 201.68), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(2452.94, 827.52, 10.89), radius = 1, hight = 1},
+            new MyObstacle{Loc = new Vector3F(2240.47, 4345.53, 37.74), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(2220.45, 4345.64, 38.29), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(2896.73, 2534.25, 61.64), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(1475.53, 1596.20, 45.40), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(2047.28, 1666.26, 22.94), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(1012.61, 1382.93, 22.30), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(-1431.77, 1261.11, 193.38), radius = 8, hight = 8},
+            new MyObstacle{Loc = new Vector3F(2658.31, 3391.74, 133.48), radius = 4, hight = 4},
+            new MyObstacle{Loc = new Vector3F(993.22, 3239.45, 92.20), radius = 2, hight = 2},
+
+        };
+
+        public List<uint> NoObstacle = new List<uint>
+        {
+            271556,
+            271170,
+            271557,
+            231074,
+            282637,
+        };
 
         public void ModuleTick()
         {
@@ -1394,93 +1126,44 @@ namespace WowAI.Modules
                 if (Host.GameState == EGameState.Ingame && Host.IsAlive(Host.Me) && Host.Me.Level > 0)
                 {
 
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (Host.GetVar(entity, "obstacle") != null)
+                            continue;
+                        if (entity.Id == 131789 || entity.Id == 131753 || entity.Id == 135875)
+                        {
+                            if (Host.IsInsideNavMesh(new Vector3F(entity.Location.X, entity.Location.Y, entity.Location.Z)))
+                            {
+                                Host.log("Ставлю обстакл " + entity.CollisionHeight + " " + entity.CollisionScale + " " + entity.ObjectSize + " " + entity.ObjectSize2 + " " + entity.Scale);
+                                Host.AddObstacle(new Vector3F(entity.Location.X, entity.Location.Y, entity.Location.Z), 30, 30);
+                                Host.SetVar(entity, "obstacle", true);
+                            }
+                        }
+                    }
+
                     foreach (var gameObject in Host.GetEntities<GameObject>())
                     {
-                        if (gameObject.Id == 303217)//Почтовый ящик
+                        if (Host.GetVar(gameObject, "obstacle") != null)
+                            continue;
+                        if (NoObstacle.Contains(gameObject.Id))
+                            continue;
+                        if (gameObject.GameObjectType == EGameObjectType.Mailbox)//Почтовый ящик
                         {
                             if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
                             {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
+                                //  Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
+                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 1, 1);
+                                Host.SetVar(gameObject, "obstacle", true);
+                            }
+                        }
+
+                        if (gameObject.GameObjectType == EGameObjectType.Generic)
+                        {
+                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
+                            {
+                                // Host.log("Ставлю обстакл " + gameObject.Name + " " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
                                 Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 3, 3);
-                            }
-                        }
-
-                        if (gameObject.Id == 202589)//Почтовый ящик
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 3, 3);
-                            }
-                        }
-                        if (gameObject.Id == 142109)//Почтовый ящик
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 3, 3);
-                            }
-                        }
-
-                        if (gameObject.Id == 31407)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 5, 5);
-                            }
-                        }
-                        if (gameObject.Id == 289694)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 5, 5);
-                            }
-                        }
-
-                        if (gameObject.Id == 195146)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 2, 2);
-                            }
-                        }
-
-                        if (gameObject.Id == 31573)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 2, 2);
-                            }
-                        }
-
-                        if (gameObject.Id == 31578)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 2, 2);
-                            }
-                        }
-
-                        if (gameObject.Id == 204135)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 2, 2);
-                            }
-                        }
-
-                        if (gameObject.Id == 31411)
-                        {
-                            if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
-                            {
-                                Host.log("Ставлю обстакл " + gameObject.CollisionHeight + " " + gameObject.CollisionScale + " " + gameObject.ObjectSize + " " + gameObject.ObjectSize2 + " " + gameObject.Scale);
-                                Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 5, 5);
+                                Host.SetVar(gameObject, "obstacle", true);
                             }
                         }
 
@@ -1489,105 +1172,22 @@ namespace WowAI.Modules
                             // Host.log("Проверяю обстаклы " + Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)));
                             if (Host.IsInsideNavMesh(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z)))
                             {
-                                Host.log("Ставлю обстакл");
+                                //  Host.log("Ставлю обстакл");
                                 Host.AddObstacle(new Vector3F(gameObject.Location.X, gameObject.Location.Y, gameObject.Location.Z), 8, 8);
+                                Host.SetVar(gameObject, "obstacle", true);
                             }
                         }
                     }
 
-                    if (Host.Me.Distance(-896.24, -193.22, 222.11) < 100)
+                    foreach (var myObstacle in MyObstacles)
                     {
-                        if (Host.IsInsideNavMesh(new Vector3F(-896.24, -193.22, 222.11)))
+                        if (Host.Me.Distance(myObstacle.Loc) < 150)
                         {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(-896.24, -193.22, 222.11), 4, 4);
-                        }
-                    }
-
-                    if (Host.Me.Distance(1770.84, -4512.96, 27.43) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(1770.84, -4512.96, 27.43)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(1770.84, -4512.96, 27.43), 4, 4);
-                        }
-                    }
-
-                    if (Host.Me.Distance(-213.00, 396.73, 201.68) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(-213.00, 396.73, 201.68)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(-213.00, 396.73, 201.68), 4, 4);
-                        }
-                    }
-
-                    if (Host.Me.Distance(2452.94, 827.52, 10.89) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(2452.94, 827.52, 10.89)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(2452.94, 827.52, 10.89), 1, 1);
-                        }
-                    }
-
-                    if (Host.Me.Distance(2240.47, 4345.53, 37.74) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(2240.47, 4345.53, 37.74)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(2240.47, 4345.53, 37.74), 8, 8);
-                        }
-                    }
-
-                    if (Host.Me.Distance(2220.45, 4345.64, 38.29) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(2220.45, 4345.64, 38.29)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(2220.45, 4345.64, 38.29), 8, 8);
-                        }
-                    }
-                    if (Host.Me.Distance(2896.73, 2534.25, 61.64) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(2896.73, 2534.25, 61.64)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(2896.73, 2534.25, 61.64), 8, 8);
-                        }
-                    }
-                    if (Host.Me.Distance(1475.53, 1596.20, 45.40) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(1475.53, 1596.20, 45.40)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(1475.53, 1596.20, 45.40), 8, 8);
-                        }
-                    }
-
-                    if (Host.Me.Distance(2047.28, 1666.26, 22.94) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(2047.28, 1666.26, 22.94)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(2047.28, 1666.26, 22.94), 8, 8);
-                        }
-                    }
-
-                    if (Host.Me.Distance(1012.61, 1382.93, 22.30) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(1012.61, 1382.93, 22.30)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(1012.61, 1382.93, 22.30), 8, 8);
-                        }
-                    }
-                    if (Host.Me.Distance(-1431.77, 1261.11, 193.38) < 100)
-                    {
-                        if (Host.IsInsideNavMesh(new Vector3F(-1431.77, 1261.11, 193.38)))
-                        {
-                            Host.log("Ставлю обстакл ");
-                            Host.AddObstacle(new Vector3F(-1431.77, 1261.11, 193.38), 8, 8);
+                            if (Host.IsInsideNavMesh(new Vector3F(myObstacle.Loc)))
+                            {
+                                //  Host.log("Ставлю обстакл ");
+                                Host.AddObstacle(myObstacle.Loc, myObstacle.hight, myObstacle.radius);
+                            }
                         }
                     }
 
@@ -1625,10 +1225,7 @@ namespace WowAI.Modules
                         Host.EventInactiveCount = 0;
                         Host.EventInactive = false;
                     }
-                    if (eventSetting.TypeEvents == CharacterSettings.EventsType.GMAssHer && FindGmAssHer())
-                    {
-                        ActionEvent(eventSetting);
-                    }
+
 
                     if (eventSetting.TypeEvents == CharacterSettings.EventsType.AttackPlayer && Host.CommonModule.EventAttackPlayer)
                     {
@@ -1647,49 +1244,7 @@ namespace WowAI.Modules
 
         //Загрузка зоны
         public GpsBase ZonesGps;
-        private string _curMesh = "";
 
-        internal void LoadCurrentZoneMesh(double x, double y)
-        {
-            try
-            {
-                // var sw = new Stopwatch();
-                //  sw.Start();
-                foreach (var p in ZonesGps.GetAllGpsPolygons())
-                {
-                    if (p.PointInZone(x, y))
-                    {
-                        if (_curMesh != p.Name)
-                        {
-                            _curMesh = p.Name;
-                            var meshName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Quester\\Meshes\\" + _curMesh + ".nav";
-                            if (File.Exists(meshName))
-                            {
-                                Host.LoadNavMesh(meshName);
-                                Host.log("Load zone " + meshName, Host.LogLvl.Ok);
-                            }
-                            else
-                                Host.log("Не нашел файл " + meshName, Host.LogLvl.Error);
-                        }
-                        break;
-                    }
-                }
-                // host.log("Загрузка зоны                                               " + sw.ElapsedMilliseconds);
-            }
-            catch (ThreadAbortException) { }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-            }
-        }
-
-        public string GetZoneByCoords(double x, double y)
-        {
-            foreach (var p in ZonesGps.GetAllGpsPolygons())
-                if (p.PointInZone(x, y))
-                    return p.Name;
-            return "";
-        }
 
 
         private bool _isMovementSuspended;
@@ -1765,11 +1320,21 @@ namespace WowAI.Modules
                         _moveFailCount++;
                         Host.log("Застрял: " + Host.GetLastError() + "(" + _moveFailCount + ")" + " " + Host.Me.MovementFlagExtra + " " + Host.Me.MovementFlags + " " + Host.Me.SwimBackSpeed +
                             " " + Host.Me.SwimSpeed, Host.LogLvl.Error);
+                        if (Host.Me.MovementFlags == EMovementFlag.Pending_root)
+                        {
+                            _moveFailCount = 0;
+                            return;
+                        }
+
                         while ((Host.Me.MovementFlags & EMovementFlag.DisableGravity) == EMovementFlag.DisableGravity && (Host.Me.MovementFlags & EMovementFlag.Root) == EMovementFlag.Root)
                         {
+                            if (!Host.MainForm.On)
+                                return;
+                            if (Host.MyGetAura(269564) != null)
+                                break;
                             Host.log("Ожидаю возврата движения " + Host.Me.MovementFlags);
                             Thread.Sleep(5000);
-                            _moveFailCount = 0;
+
                         }
                     }
                     else
@@ -1797,16 +1362,16 @@ namespace WowAI.Modules
                             var obstacleRadius = 1;
                             if (_moveFailCount > 7)
                                 obstacleRadius = 2;
-                            if (Host.Me.Distance(ObstaclePoint) < 6)
+                          /*  if (Host.Me.Distance(_obstaclePoint) < 6)
                             {
-                                Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(ObstaclePoint));
-                                Host.AddObstacle(ObstaclePoint, obstacleRadius, 10);
+                                Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(_obstaclePoint));
+                                Host.AddObstacle(_obstaclePoint, obstacleRadius, 10);
                             }
                             else
                             {
-                                Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(ObstaclePoint));
+                                Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(_obstaclePoint));
                                 Host.AddObstacle(Host.Me.Location, obstacleRadius, 10);
-                            }
+                            }*/
                         }
                     }
                 }
@@ -1889,15 +1454,15 @@ namespace WowAI.Modules
 
                 if (_moveFailCount > 10)
                 {
-                    if(Host.Me.IsDeadGhost)
-                    Host.ComboRoute.DeathTime = DateTime.Now;
+                    if (Host.Me.IsDeadGhost)
+                        Host.ComboRoute.DeathTime = DateTime.Now;
                 }
 
                 if (_moveFailCount > 20 || Host.Me.Distance(1477.98, 1591.57, 39.66) < 5)
                 {
                     Host.CanselForm();
                     Host.CancelMoveTo();
-                   Host.MyCheckIsMovingIsCasting();
+                    Host.MyCheckIsMovingIsCasting();
                     Thread.Sleep(2000);
                     foreach (var item in Host.ItemManager.GetItems())
                     {
@@ -2008,22 +1573,27 @@ namespace WowAI.Modules
         }
 
 
-        public bool ForceMoveTo2(Vector3F loc, double dist = 1, double doneDist = 0.5)
+        public bool ForceMoveTo2(Vector3F loc, double dist = 1, bool useMount = true)
         {
             try
             {
 
                 // if (host.Me.Distance(loc.X, loc.Y, loc.Z) > 50)
-                MySitMount(loc);
 
+                if (useMount)
+                    MySitMount(loc);
+                else
+                {
+                    MyUnmount();
+                }
                 if (!Host.MainForm.On)
                     return false;
 
                 IsMoveToNow = true;
-                doneDist = Host.Me.RunSpeed / 5.0;
-                Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
+                double doneDist = Host.Me.RunSpeed / 5.0;
+                //  Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
                 var result = Host.ForceComeTo(loc, dist, doneDist);
-                Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
+                // Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
 
                 //  
@@ -2095,40 +1665,56 @@ namespace WowAI.Modules
                 IsMoveToNow = true;
                 doneDist = Host.Me.RunSpeed / 5.0;
 
-                if (Host.GetNavMeshHeight(new Vector3F(x, y, 0)) == 0 && Host.Me.Distance(x,y,z) > 300)
+                if (Host.GetNavMeshHeight(new Vector3F(x, y, 0)) == 0 && Host.Me.Distance(x, y, z) > 300)
                 {
-                    var x0 = Host.Me.Location.X;
-                    var y0 = Host.Me.Location.Y;
-                    var x1 = x;
-                    var y1 = y;
-                    var distance = Host.Me.Distance(x, y, z) - 400;
-                    var expectedDistance = Host.Me.Distance(x, y, z) - distance;
+                    /* var x0 = Host.Me.Location.X;
+                     var y0 = Host.Me.Location.Y;
+                     var x1 = x;
+                     var y1 = y;
+                     var distance = Host.Me.Distance(x, y, z) - 400;
+                     var expectedDistance = Host.Me.Distance(x, y, z) - distance;
 
-                    //находим длину исходного отрезка
-                    var dx = x1 - x0;
-                    var dy = y1 - y0;
-                    var l = Math.Sqrt(dx * dx + dy * dy);
-                    //находим направляющий вектор
-                    var dirX = dx / l;
-                    var dirY = dy / l;
-                    //умножаем направляющий вектор на необх длину
-                    dirX *= expectedDistance;
-                    dirY *= expectedDistance;
-                    //находим точку
-                    var resX = dirX + x0;
-                    var resY = dirY + y0;
-                    var z1 = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
-                    if (z1 > 0)
+                     //находим длину исходного отрезка
+                     var dx = x1 - x0;
+                     var dy = y1 - y0;
+                     var l = Math.Sqrt(dx * dx + dy * dy);
+                     //находим направляющий вектор
+                     var dirX = dx / l;
+                     var dirY = dy / l;
+                     //умножаем направляющий вектор на необх длину
+                     dirX *= expectedDistance;
+                     dirY *= expectedDistance;
+                     //находим точку
+                     var resX = dirX + x0;
+                     var resY = dirY + y0;
+                     var z1 = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
+                     if (z1 > 0)
+                     {
+                         Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z1));
+                         CheckMoveFailed(Host.ComeTo(resX, resY, z1, 50, 50));
+                         return false;
+                     }
+                     else
+                     {
+                         Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z1) + " " + expectedDistance);
+                         CheckMoveFailed(Host.ComeTo(resX, resY, z1, 250, 250));
+                         return false;
+                     }*/
+                    var path = Host.GetServerPath(Host.Me.Location, new Vector3F(x, y, z));
+                    for (int i = 0; i < path.Path.Count - 1; i++)
                     {
-                        Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z1));
-                        CheckMoveFailed(Host.ComeTo(resX, resY, z1, 50, 50));
-                        return false;
-                    }
-                    else
-                    {
-                        Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z1) + " " + expectedDistance);
-                        CheckMoveFailed(Host.ComeTo(resX, resY, z1, 250, 250));
-                        return false;
+                        if (Host.Me.Distance(path.Path[i]) < 50)
+                            continue;
+                        if (!Host.Me.IsAlive)
+                            return false;
+                        if (!Host.MainForm.On)
+                            return false;
+                        if (!Host.ComeTo(path.Path[i], dist, doneDist))
+                        {
+                            CheckMoveFailed(false);
+                            return false;
+                        }
+
                     }
                 }
 
@@ -2147,10 +1733,21 @@ namespace WowAI.Modules
 
         public bool MoveToBadLoc(Vector3F loc)
         {
+            if (loc.Distance(1798.27, -4363.27, 102.85) < 20 && Host.Me.Distance(1567.82, -4400.66, 16.20) < 30)
+            {
+                Host.FlyForm();
+                Host.ForceFlyTo(1565.31, -4401.46, 175.71);
+                Host.ForceFlyTo(1783.75, -4323.89, 155.91);
+                Host.ForceFlyTo(1802.62, -4366.94, 102.61);
+            }
 
             if (Host.Me.Distance(-1130.89, 805.10, 500.08) < 20 && Host.Me.Location.Z > 480 && loc.Distance(-1130.89, 805.10, 500.08) > 30 && Host.AutoQuests.BestQuestId != 46930)
             {
                 Host.log("Прыгаю вниз");
+                if (!Host.ForceComeTo(-1100.62, 795.14, 497.08))
+                    return false;
+                if (!Host.ForceComeTo(-1087.30, 765.32, 487.73))
+                    return false;
                 if (!Host.ForceComeTo(-1046.30, 769.34, 435.33))
                     return false;
                 return true;
@@ -2322,15 +1919,18 @@ namespace WowAI.Modules
             return true;
         }
 
-        public bool MoveTo(Vector3F loc, double dist = 1, double doneDist = 0.5)
+        public bool MoveTo(Vector3F loc, double dist = 1, double doneDist = 0.5, bool UseMount = true)
         {
             if (IsMovementSuspended)
                 return false;
             try
             {
-                MyUseGps(loc);
+
+                if (!MyUseGps(loc, UseMount))
+                    return false;
                 // if (host.Me.Distance(loc.X, loc.Y, loc.Z) > 50)
-                MySitMount(loc);
+                if (UseMount)
+                    MySitMount(loc);
 
                 if (!Host.MainForm.On)
                     return false;
@@ -2343,43 +1943,74 @@ namespace WowAI.Modules
                     return false;
                 }
 
-               // if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
-                    if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
+                // if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
+                if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
+                {
+                    var path = Host.GetServerPath(Host.Me.Location, loc);
+                    if (path == null)
                     {
-                        var x0 = Host.Me.Location.X;
-                        var y0 = Host.Me.Location.Y;
-                        var x1 = loc.X;
-                        var y1 = loc.Y;
-                        var distance = Host.Me.Distance(loc) - 400;
-                        var expectedDistance = Host.Me.Distance(loc) - distance;
+                        Host.log("Не нашел путь " + Host.Me.Distance(loc) + " " + loc);
+                   
+                        // loc.Z = 0;
+                        // Host.log("Бегу по серверным мешам " + Host.Me.Location + " в " + loc);
+                         var x0 = Host.Me.Location.X;
+                         var y0 = Host.Me.Location.Y;
+                         var x1 = loc.X;
+                         var y1 = loc.Y;
+                         var distance = Host.Me.Distance(loc) - 400;
+                         var expectedDistance = Host.Me.Distance(loc) - distance;
+    
+                         //находим длину исходного отрезка
+                         var dx = x1 - x0;
+                         var dy = y1 - y0;
+                         var l = Math.Sqrt(dx * dx + dy * dy);
+                         //находим направляющий вектор
+                         var dirX = dx / l;
+                         var dirY = dy / l;
+                         //умножаем направляющий вектор на необх длину
+                         dirX *= expectedDistance;
+                         dirY *= expectedDistance;
+                         //находим точку
+                         var resX = dirX + x0;
+                         var resY = dirY + y0;
+                         var z = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
+                         if (z > 0)
+                         {
+                             Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z));
+                             CheckMoveFailed(Host.ComeTo(resX, resY, z, 50, 50));
+                             return false;
+                         }
+                         else
+                         {
+                             Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z) + " " + expectedDistance);
+                             CheckMoveFailed(Host.ComeTo(resX, resY, z, 250, 250));
+                             return false;
+                         }
+                        // loc.Z = 116;
+                    }
+                    Host.log("Бегу по серверным мешам " + Host.Me.Location + " в " + loc + "  всего точек " + path.Path.Count);
+                    foreach (var vector3F in path.Path)
+                    {
+                        // Host.log(vector3F + " дистанция:" + Host.Me.Distance(vector3F));
+                    }
 
-                        //находим длину исходного отрезка
-                        var dx = x1 - x0;
-                        var dy = y1 - y0;
-                        var l = Math.Sqrt(dx * dx + dy * dy);
-                        //находим направляющий вектор
-                        var dirX = dx / l;
-                        var dirY = dy / l;
-                        //умножаем направляющий вектор на необх длину
-                        dirX *= expectedDistance;
-                        dirY *= expectedDistance;
-                        //находим точку
-                        var resX = dirX + x0;
-                        var resY = dirY + y0;
-                        var z = Host.GetNavMeshHeight(new Vector3F(resX, resY, 0));
-                        if (z > 0)
-                        {
-                            Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z));
-                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 50, 50));
+                    for (int i = 0; i < path.Path.Count - 2; i++)
+                    {
+                        if (Host.Me.Distance(path.Path[i]) < 150)
+                            continue;
+                        if (!Host.Me.IsAlive)
                             return false;
-                        }
-                        else
+                        if (!Host.MainForm.On)
+                            return false;
+                        if (!Host.ComeTo(path.Path[i], dist, doneDist))
                         {
-                            Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z) + " " + expectedDistance);
-                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 250, 250));
+                            CheckMoveFailed(false);
                             return false;
                         }
                     }
+
+                    return false;
+                }
 
 
 
@@ -2390,8 +2021,27 @@ namespace WowAI.Modules
                     Host.MoveTo(749.13, 3099.93, 133.11);
 
                 Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
-                var result = Host.ComeTo(loc, dist, doneDist);
-                 Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
+
+                bool result;
+               /* if (Host.CharacterSettings.Mode == EMode.Questing)
+                {
+                    Host.log("Бегу без учета застреваний");
+                    // MoveParams.LookTo = loc;
+                    MoveParams.Location = loc;
+                    MoveParams.Dist = dist;
+                    MoveParams.DoneDist = doneDist;
+                    MoveParams.IgnoreStuckCheck = true;
+                    MoveParams.ForceRandomJumps = false;
+                    MoveParams.UseNavCall = true;
+
+                    result = Host.MoveTo(MoveParams);
+                }
+                else
+                {*/
+                    result = Host.ComeTo(loc, dist, doneDist);
+             //   }
+
+                Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
 
                 //  
@@ -2411,7 +2061,7 @@ namespace WowAI.Modules
             }
         }
 
-        public void MyUseGps(Vector3F loc)
+        public bool MyUseGps(Vector3F loc, bool UseMount = true)
         {
             var pointNeatMe = false;
             var pointNearDest = false;
@@ -2423,34 +2073,39 @@ namespace WowAI.Modules
                     pointNearDest = true;
             }
 
+            if (Host.MyGetAura(269564) != null)
+                UseMount = false;
             if (pointNearDest && pointNeatMe)
             {
                 var path = GpsBase.GetPath(loc, Host.Me.Location);
                 foreach (var vector3F in path)
                 {
-                 /*   if(Host.FarmModule.farmState == FarmState.AttackOnlyAgro && Host.GetThreats().Count > 0)
-                        return;*/
-                    if(!Host.Me.IsAlive)
-                        return;
+                    /*   if(Host.FarmModule.farmState == FarmState.AttackOnlyAgro && Host.GetThreats().Count > 0)
+                           return;*/
+                    if (!Host.Me.IsAlive)
+                        return false;
                     if (!Host.MainForm.On)
-                        return;
+                        return false;
                     Host.log(path.Count + "  Путь " + Host.Me.Distance(vector3F));
-                    ForceMoveTo2(vector3F);
+                    if (!ForceMoveTo2(vector3F, 1, UseMount))
+                        return false;
                 }
+
             }
 
-           /* if (Host.Me.Distance(loc) > 300)
-            {
-                var path = Host.GetServerPath(Host.Me.Location, loc);
-                Host.log("Слишком далеко, использую GetServerPath из " + Host.Me.Location + " в " + loc + " Путь:" + path.Path.Count);
+            return true;
+            /* if (Host.Me.Distance(loc) > 300)
+             {
+                 var path = Host.GetServerPath(Host.Me.Location, loc);
+                 Host.log("Слишком далеко, использую GetServerPath из " + Host.Me.Location + " в " + loc + " Путь:" + path.Path.Count);
 
 
-                foreach (var vector3F in path.Path)
-                {
-                    Host.log(path.Path.Count + "  Путь " + Host.Me.Distance(vector3F));
-                    ForceMoveTo2(vector3F);
-                }
-            }*/
+                 foreach (var vector3F in path.Path)
+                 {
+                     Host.log(path.Path.Count + "  Путь " + Host.Me.Distance(vector3F));
+                     ForceMoveTo2(vector3F);
+                 }
+             }*/
 
         }
 
@@ -2460,6 +2115,8 @@ namespace WowAI.Modules
                 return false;
             try
             {
+                if (!MyUseGps(obj.Location, false))
+                    return false;
 
                 IsMoveToNow = true;
                 if (!MoveToBadLoc(obj.Location))
@@ -2526,7 +2183,8 @@ namespace WowAI.Modules
                 MySitMount(obj.Location);
             }
 
-
+            if (!MyUseGps(obj.Location))
+                return false;
             // doneDist = Host.Me.RunSpeed / 5.0;
             //  Host.log("Начал бег в " + obj.Location + "  дист: " + Host.Me.Distance(obj.Location) + "   dist: " + dist + "/" + doneDist);
             if (obj.Location.Distance(-247.85, -5120.16, 42.72) < 3 && Host.Me.Location.Z < 40)
@@ -2551,6 +2209,7 @@ namespace WowAI.Modules
                 MoveParams.IgnoreStuckCheck = true;
                 MoveParams.ForceRandomJumps = false;
                 MoveParams.UseNavCall = true;
+
                 result = Host.MoveTo(MoveParams);
             }
             else
@@ -2564,10 +2223,76 @@ namespace WowAI.Modules
 
 
         public bool StopCommonModule;
+
+        public List<EItemSubclassWeapon> WeaponType = new List<EItemSubclassWeapon>();
+        public List<EItemSubclassArmor> ArmorType = new List<EItemSubclassArmor>();
+        public bool WeaponAndShield;
+
         public override void Run(CancellationToken ct)
         {
             try
             {
+                switch (Host.Me.Class)
+                {
+                    case EClass.None:
+                        break;
+                    case EClass.Warrior:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE2, EItemSubclassWeapon.SWORD2, EItemSubclassWeapon.MACE2 };
+                        }
+                        break;
+                    case EClass.Paladin:
+                        break;
+                    case EClass.Hunter:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.BOW, EItemSubclassWeapon.GUN };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.Rogue:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.DAGGER, EItemSubclassWeapon.SWORD };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.LEATHER, EItemSubclassArmor.CLOTH, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.Priest:
+                        break;
+                    case EClass.DeathKnight:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE2, EItemSubclassWeapon.SWORD2, EItemSubclassWeapon.POLEARM, EItemSubclassWeapon.MACE2 };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.Shaman:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE, EItemSubclassWeapon.DAGGER, EItemSubclassWeapon.MACE };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.MAIL, EItemSubclassArmor.SHIELD, EItemSubclassArmor.CLOTH, EItemSubclassArmor.MISCELLANEOUS };
+                            WeaponAndShield = true;
+                        }
+                        break;
+                    case EClass.Mage:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.STAFF };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.Warlock:
+                        break;
+                    case EClass.Monk:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.STAFF, EItemSubclassWeapon.POLEARM };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.Druid:
+                        {
+                            WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.STAFF, EItemSubclassWeapon.POLEARM };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER, EItemSubclassArmor.MISCELLANEOUS };
+                        }
+                        break;
+                    case EClass.DemonHunter:
+                        break;
+                }
                 StopCommonModule = false;
                 while (!Host.cancelRequested && !ct.IsCancellationRequested)
                 {

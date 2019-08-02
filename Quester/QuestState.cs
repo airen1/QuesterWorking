@@ -14,7 +14,7 @@ namespace WowAI
         public List<uint> QuestState = new List<uint>();
     }
 
-   /* public class QuestState
+  /*  public class QuestState
     {
         public uint QuestId { get; set; }     
         public string State { get; set; }

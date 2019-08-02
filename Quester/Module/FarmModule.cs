@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using Out.Internal.Core;
 using Out.Utility;
@@ -279,7 +280,7 @@ namespace WowAI.Modules
 
 
 
-        public int GatherCount = 0;
+        public int GatherCount;
         internal bool InteractWithProp(GameObject prop)
         {
             try
@@ -300,7 +301,7 @@ namespace WowAI.Modules
                     Host.log("Слишком далеко " + Host.Me.Distance(prop), Host.LogLvl.Error);
                     if (Host.CommonModule._moveFailCount > 3)
                     {
-                        SetBadProp(prop, 300000);
+                        SetBadProp(prop, 60000);
                     }
 
                     return false;
@@ -613,7 +614,7 @@ namespace WowAI.Modules
         }
 
         private int _attackMoveFailCount;
-        public bool AutoAttackStart = false;
+        public bool AutoAttackStart;
 
 
         internal bool UseSkillAndWait(uint id, Entity target = null)
@@ -651,6 +652,28 @@ namespace WowAI.Modules
         }
 
         DateTime UseQuestSpell = DateTime.MinValue;
+        bool IsSpellInstant(uint id)
+        {
+            var spell = Host.SpellManager.GetSpell(id);
+            if (spell == null)
+                return true;
+            return spell.CastTime == 0;
+        }
+        bool RandDirLeft;
+        DateTime NextRandomMovesDirChange = DateTime.UtcNow;
+        void UpdateRandomMoveTimes()
+        {
+            if (NextRandomMovesDirChange < DateTime.UtcNow)
+            {
+                NextRandomMovesDirChange = DateTime.UtcNow.AddSeconds(Host.RandGenerator.Next(5, 20));
+                RandDirLeft = !RandDirLeft;
+            }
+        }
+        public double GetRandomNumber(double minimum, double maximum)
+        {
+            return Host.RandGenerator.NextDouble() * (maximum - minimum) + minimum;
+        }
+
         //Использование скилов
         internal bool UseSkillAndWait(SkillSettings skill, bool selfTarget = false, bool suspendMovements = false)
         {
@@ -664,15 +687,37 @@ namespace WowAI.Modules
                 if (!skill.Checked)
                     return false;
 
+
+
+                if (Host.MyGetAura(45438) != null)
+                    return false;
+
                 if (!Host.SpellManager.IsSpellReady(skill.Id))
                 {
-                    // if (useskilllog) Host.log("Скилл не готов [" + skill.Id + "] " + skill.Name, Host.LogLvl.Error);
+                    //   if (useskilllog) Host.log("Скилл не готов [" + skill.Id + "] " + skill.Name, Host.LogLvl.Error);
+                    return false;
+                }
+
+                if (Host.AutoQuests.BestQuestId == 49126)
+                {
+                    if (Host.MyGetAura(259742) != null)
+                    {
+                        var npc = Host.GetNpcById(131613);
+                        if (npc != null)
+                        {
+                            Host.SpellManager.CastPetSpell(npc.Guid, 259747);
+                            Thread.Sleep(1500);
+                            Host.SpellManager.CastPetSpell(npc.Guid, 259769);
+                            Thread.Sleep(3000);
+                        }
+                    }
+
                     return false;
                 }
 
                 if (Host.AutoQuests.BestQuestId == 47311)
                 {
-                    if(UseQuestSpell  < DateTime.UtcNow)
+                    if (UseQuestSpell < DateTime.UtcNow)
                     {
                         UseQuestSpell = DateTime.UtcNow.AddSeconds(5);
                         var questSpell = Host.SpellManager.GetSpell(245398);
@@ -686,12 +731,30 @@ namespace WowAI.Modules
                             }
                         }
                     }
-                   
+                }
+
+               
+                if (Host.AutoQuests.BestQuestId == 48996)
+                {
+                    if (UseQuestSpell < DateTime.UtcNow)
+                    {
+                        UseQuestSpell = DateTime.UtcNow.AddSeconds(5);
+                        var questSpell = Host.SpellManager.GetSpell(272331);
+                        if (questSpell != null)
+                        {
+                            if (Host.SpellManager.GetSpellCooldown(questSpell) == 0 && Host.SpellManager.CheckCanCast(questSpell.Id, Host.Me.Target) == ESpellCastError.SUCCESS)
+                            {
+                                var res = Host.SpellManager.CastSpell(questSpell.Id);
+                                if (res != ESpellCastError.SUCCESS)
+                                    Host.log("Не смог использовать скилл для квеста " + questSpell.Name + "[" + questSpell.Id + "] " + res + " " + Host.GetLastError(), Host.LogLvl.Error);
+                            }
+                        }
+                    }
                 }
 
                 //17130 ураган
                 //18313 меч
-                List<uint> listArea = new List<uint> { 17130, 18313, 17129 };
+                List<uint> listArea = new List<uint> { 17130, 18313, 17129, 3282 };
                 foreach (var areaTrigger in Host.GetEntities<AreaTrigger>())
                 {
                     if (listArea.Contains(areaTrigger.Id) && Host.Me.Distance(areaTrigger) < 4)
@@ -748,7 +811,9 @@ namespace WowAI.Modules
                     }
                 }
 
-                if (BestMob?.Id == 131522 && Host.GetThreats().Count == 0)
+               
+
+                if (BestMob?.Id == 131522 && Host.Me.GetThreats().Count == 0)
                 {
                     if (Host.SpellManager.GetSpell(8921) != null && Host.Me.Distance(BestMob) < 40)
                         Host.SpellManager.CastSpell(8921);
@@ -757,19 +822,102 @@ namespace WowAI.Modules
                 if (BestMob?.Id == 126502)
                 {
                     var item = Host.ItemManager.GetItemById(152572);
-                    if (item != null && BestMob.HpPercents == 100)
-                        if (Host.Me.Distance(BestMob) < 15 && !Host.SpellManager.IsCasting)
-                            Host.MyUseItemAndWait(item, BestMob);
+                    if (item != null)
+                    {
+                        var use = true;
+                        foreach (var aura in BestMob.GetAuras())
+                        {
+                            if (aura.SpellId == 251286)
+                                use = false;
+                        }
+                        if (use)
+                            if (Host.Me.Distance(BestMob) < 15 && !Host.SpellManager.IsCasting)
+                                Host.MyUseItemAndWait(item, BestMob);
+                    }
+
                 }
 
                 if (Host.GetAgroCreatures().Count > 0 && !Host.GetAgroCreatures().Contains(BestMob) || (Host.GetAgroCreatures().Count > 1))
                     BestMob = GetBestAgroMob();
+
+                if (BestMob?.Id == 127298)
+                {
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (!entity.IsAlive)
+                            continue;
+                        if (entity.Id != 127407)
+                            continue;
+                        BestMob = entity;
+                        break;
+                    }
+                }
 
                 if (Host.Me.MountId != 0)
                 {
                     Host.log("Отзываю маунта для боя");
                     Host.CommonModule.MyUnmount();
                 }
+
+
+                if (Host.Me.Class == EClass.DeathKnight)
+                {
+                    var needsummon = true;
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (entity.Owner != Host.Me)
+                            continue;
+                        needsummon = false;
+                    }
+
+                    if (needsummon && Host.CharacterSettings.SummonBattlePet)
+                    {
+                        var pet = Host.SpellManager.CastSpell(46584);
+                        if (pet == ESpellCastError.SUCCESS)
+                        {
+                            Host.log("Призвал питомца", Host.LogLvl.Ok);
+                            Thread.Sleep(1000);
+                        }
+                        else
+                        {
+                            Host.log("Не удалось призвать питомца " + pet, Host.LogLvl.Error);
+                        }
+                        while (Host.SpellManager.IsCasting)
+                        {
+                            Thread.Sleep(100);
+                        }
+                    }
+                }
+
+                if (Host.Me.Class == EClass.Mage)
+                {
+                    var needsummon = true;
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (entity.Owner != Host.Me)
+                            continue;
+                        needsummon = false;
+                    }
+
+                    if (needsummon && Host.CharacterSettings.SummonBattlePet)
+                    {
+                        var pet = Host.SpellManager.CastSpell(31687);
+                        if (pet == ESpellCastError.SUCCESS)
+                        {
+                            Host.log("Призвал питомца", Host.LogLvl.Ok);
+                            Thread.Sleep(1000);
+                        }
+                        else
+                        {
+                            Host.log("Не удалось призвать питомца " + pet, Host.LogLvl.Error);
+                        }
+                        while (Host.SpellManager.IsCasting)
+                        {
+                            Thread.Sleep(100);
+                        }
+                    }
+                }
+
 
                 if (Host.Me.Class == EClass.Hunter)
                 {
@@ -923,9 +1071,15 @@ namespace WowAI.Modules
                                         return false;
                                     }
 
-                                    var resultForm = Host.SpellManager.CastSpell(spell.Id);
+                                    var resultForm = Host.SpellManager.CastSpell(spell.Id, null);
                                     if (resultForm != ESpellCastError.SUCCESS)
                                     {
+                                        if (Host.Me.Target == null)
+                                            Host.log("Target null");
+                                        else
+                                        {
+                                            Host.log("Цель: " + Host.Me.Target.Name);
+                                        }
                                         Host.log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
                                     }
                                     else
@@ -944,7 +1098,21 @@ namespace WowAI.Modules
 
                 if (BestMob == null)
                     return false;
-
+                var spellInstant = IsSpellInstant(skill.Id);
+                /*  if (Host.Me.Distance(BestMob) < 10 && spellInstant && !Host.Me.IsMoving)
+                  {
+                      UpdateRandomMoveTimes();
+                      double angle = Host.Me.Rotation.Y;
+                      if (RandDirLeft)
+                          angle += Math.PI / 2f;
+                      else
+                          angle -= Math.PI / 2f;
+                      var Pos = new Vector3F(BestMob.Location.X + GetRandomNumber(2.5, 5) * Math.Cos(angle), BestMob.Location.Y + GetRandomNumber(2.5, 5) * Math.Sin(angle), Host.Me.Location.Z);
+                      new Task(() =>
+                      {
+                          Host.ForceMoveToWithLookTo(Pos, Host.Me.Target.Location);
+                      }).Start();
+                  }*/
                 /* if (host.SpellManager.HasGlobalCooldown(skill.Id))
                      return false;*/
 
@@ -1020,16 +1188,16 @@ namespace WowAI.Modules
 
 
 
-                if (Host.DistanceNoZ(Host.Me.Location.X, Host.Me.Location.Y, BestMob.Location.X, BestMob.Location.Y) < 2)
-                    if (Host.Me.Distance(BestMob) > 10)
-                    {
-                        Host.log("Плохая цель 2:" + BestMob.Name);
-                        SetBadTarget(BestMob, 60000);
-                        BestMob = null;
-                        _attackMoveFailCount = 0;
+                /* if (Host.DistanceNoZ(Host.Me.Location.X, Host.Me.Location.Y, BestMob.Location.X, BestMob.Location.Y) < 2)
+                     if (Host.Me.Distance(BestMob) > 10)
+                     {
+                         Host.log("Плохая цель 2:" + BestMob.Name);
+                         SetBadTarget(BestMob, 60000);
+                         BestMob = null;
+                         _attackMoveFailCount = 0;
 
-                        return true;
-                    }
+                         return true;
+                     }*/
 
                 /*  if (!IsCreatureOccupierMeOrNull(bestMob) && !host.GetAgroCreatures().Contains(bestMob))
                   {
@@ -1070,7 +1238,17 @@ namespace WowAI.Modules
                   {
                       target = null;
                   }*/
+                if (skill.Id == 197835)
+                    target = null;
+                if (skill.Id == 63560)
+                    target = null;
 
+                if (skill.Id == 45438)
+                    target = null;
+                if (skill.Id == 11426)
+                    target = null;
+                if (skill.Id == 12472)
+                    target = null;
                 var preResult = Host.SpellManager.CheckCanCast(skill.Id, target);
 
                 if (preResult != ESpellCastError.SUCCESS)
@@ -1118,6 +1296,8 @@ namespace WowAI.Modules
                             {
                                 if (useskilllog)
                                     Host.log("Плохой угол, поворачиваюсь UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
+                                Host.ForceMoveToWithLookTo(new Vector3F(Host.Me.Location.X + 1, Host.Me.Location.Y,
+                                    Host.Me.Location.Z), BestMob.Location);
                                 Host.TurnDirectly(BestMob);
                                 Thread.Sleep(100);
                                 if (useskilllog)
@@ -1175,7 +1355,7 @@ namespace WowAI.Modules
                     }
 
                 }
-                // Host.log("Пытаюсь использовать скилл  " + skill.Name + skill.Id + "   " + Host.SpellManager.HasGlobalCooldown(skill.Id) + "  " + Host.SpellManager.IsSpellReady(skill.Id) + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds);
+                // Host.log("Пытаюсь использовать скилл  " + skill.Name + skill.Id + "   " + Host.SpellManager.HasGlobalCooldown(skill.Id) + "  " + Host.SpellManager.IsSpellReady(skill.Id) + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds + " Приоритет: " + skill.Priority);
 
                 if (Host.CommonModule.InFight() && !skill.UseInFight)
                 {
@@ -1352,7 +1532,9 @@ namespace WowAI.Modules
                                 }
                                 if (useskilllog)
                                     Host.log("Закончил бег " + "  дист: " + Host.Me.Distance(BestMob));
-                                Host.CancelMoveTo();
+                                if (!spellInstant)
+                                    Host.CancelMoveTo();
+
                                 if (Host.GetLastError() == ELastError.Movement_MovePossibleFullStop)
                                     _attackMoveFailCount++;
                                 else
@@ -1438,38 +1620,57 @@ namespace WowAI.Modules
 
 
 
+                switch (Host.Me.Class)
+                {
+                    case EClass.Mage:
+                        break;
+                    default:
+                        {
+                            if (!AutoAttackStart)
+                            {
+                                if (!Host.SpellManager.StartAutoAttack(Host.Me.Target))
+                                    Host.log("Авто атака " + Host.GetLastError(), Host.LogLvl.Important);
+                                AutoAttackStart = true;
+                                /*  var auto = Host.SpellManager.GetSpell(75);
+                                  if(auto != null)
+                                  {
+                                      var res = Host.SpellManager.CastSpell(auto.Id);
+                                      Host.log("Авто атака " + res, Host.LogLvl.Important);
+                                      AutoAttackStart = true;
+                                  }*/
+
+                            }
+                        }
+                        break;
+                }
+
+                if (skill.Id == 275699)
+                {
+                    var use = false;
+                    foreach (var aura in BestMob.GetAuras())
+                    {
+                        if (aura.SpellId == 194310 && aura.StackOrCharges > 3)
+                            use = true;
+                    }
+
+                    if (!use)
+                        return false;
+                }
 
 
-                /*  if(!AutoAttackStart)
-                  {
-                      var auto = host.SpellManager.GetSpell(75);
-                      if(auto != null)
-                      {
-                          var res = host.SpellManager.CastSpell(auto.Id);
-                          host.log("Авто атака " + res, Host.LogLvl.Important);
-                          AutoAttackStart = true;
-                      }
-
-                  }
-                  */
 
                 var result = new ESpellCastError();
 
 
 
 
-
-
-
-
-
                 if (useskilllog)
-                    Host.log("Пытаюсь использовать: [" + skill.Id + "] " + skill.Name + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds, Host.LogLvl.Important);
+                    Host.log("Пытаюсь использовать: [" + skill.Id + "] " + skill.Name + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds + " Приоритет:" + skill.Priority, Host.LogLvl.Important);
 
-
-                Host.CancelMoveTo();
-                Host.MyCheckIsMovingIsCasting();
-                while (Host.SpellManager.IsCasting || Host.Me.IsMoving || Host.SpellManager.IsChanneling || Host.SpellManager.HasGlobalCooldown(skill.Id))
+                if (!spellInstant)
+                    Host.CancelMoveTo();
+                Host.MyCheckIsMovingIsCasting(spellInstant);
+                while (Host.SpellManager.IsCasting || Host.SpellManager.IsChanneling || Host.SpellManager.HasGlobalCooldown(skill.Id))
                 {
                     if (!Host.Me.IsAlive)
                         return false;
@@ -1482,13 +1683,25 @@ namespace WowAI.Modules
                     Thread.Sleep(50);
                 }
 
-
+                if (Host.CharacterSettings.Mode == EMode.Questing)
+                {
+                    if (Host.SpellManager.GetSpell(301690) != null)
+                    {
+                        if (Host.SpellManager.CheckCanCast(301690, Host.Me.Target) == ESpellCastError.SUCCESS)
+                        {
+                            result = Host.SpellManager.CastSpell(301690);
+                            if (result != ESpellCastError.SUCCESS)
+                                Host.log("Не смог использовать скил 301690 " + result + " " + Host.GetLastError(), Host.LogLvl.Error);
+                            return false;
+                        }
+                    }
+                }
 
 
                 result = Host.SpellManager.CastSpell(skill.Id, target/*, host.Me.Target.Location*/);
                 // Thread.Sleep(1000);
                 //использую скилл
-                while (Host.SpellManager.IsCasting || Host.Me.IsMoving || Host.SpellManager.IsChanneling)
+                while (Host.SpellManager.IsCasting || Host.SpellManager.IsChanneling)
                 {
                     if (!Host.Me.IsAlive)
                         return false;
@@ -1545,6 +1758,7 @@ namespace WowAI.Modules
                         case ESpellCastError.UNIT_NOT_INFRONT:
                             {
                                 Host.log("Плохой угол, поворачиваюсь UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
+                                Host.ForceMoveToWithLookTo(new Vector3F(Host.Me.Location.X + 1, Host.Me.Location.Y, Host.Me.Location.Z), BestMob.Location);
                                 Host.TurnDirectly(BestMob);
                                 Host.log("Плохой угол, повернулся UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
                             }
