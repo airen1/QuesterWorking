@@ -789,10 +789,11 @@ namespace WowAI.Modules
                                 safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
                         }
                         Host.log("Пытаюсь отойти от тригера" + safePoint.Count);
-                        if (safePoint.Count > 0)
+                        if (safePoint.Count > 0 && Host.Me.Target != null)
                         {
                             var bestPoint = safePoint[Host.RandGenerator.Next(safePoint.Count)];
                             Host.ForceMoveToWithLookTo(bestPoint, Host.Me.Target.Location);
+                            Host.ForceMoveTo(bestPoint);
                         }
 
                     }
@@ -830,9 +831,14 @@ namespace WowAI.Modules
                             if (aura.SpellId == 251286)
                                 use = false;
                         }
+
                         if (use)
-                            if (Host.Me.Distance(BestMob) < 15 && !Host.SpellManager.IsCasting)
+                        {
+                            Host.CommonModule.ForceMoveTo(BestMob, 30);
+                            if (Host.Me.Distance(BestMob) < 40 && !Host.SpellManager.IsCasting)
                                 Host.MyUseItemAndWait(item, BestMob);
+                        }
+                           
                     }
 
                 }
@@ -1080,11 +1086,11 @@ namespace WowAI.Modules
                                         {
                                             Host.log("Цель: " + Host.Me.Target.Name);
                                         }
-                                        Host.log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
+                                        if (Host.AdvancedLog)
+                                            Host.log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
                                     }
-                                    else
-                                    if (useskilllog)
-                                        Host.log("Поменял форму " + spell.Name, Host.LogLvl.Ok);
+                                    
+                                    
 
                                     while (Host.SpellManager.IsCasting)
                                         Thread.Sleep(100);
@@ -1249,6 +1255,8 @@ namespace WowAI.Modules
                     target = null;
                 if (skill.Id == 12472)
                     target = null;
+                if (skill.Id == 192081)
+                    target = Host.Me;
                 var preResult = Host.SpellManager.CheckCanCast(skill.Id, target);
 
                 if (preResult != ESpellCastError.SUCCESS)

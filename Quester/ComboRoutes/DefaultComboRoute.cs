@@ -221,10 +221,7 @@ namespace WowAI.ComboRoutes
                             host.FarmModule.InteractWithProp(host.FarmModule.BestProp);
                         }
                     }
-
-                   
-                   
-
+                    
                     if (host.CommonModule.IsMoveSuspended() /*&& (host.FarmModule.bestMob == null || !host.IsAlive(host.FarmModule.bestMob)) */&& host.FarmModule.BestProp == null /*&& !host.CommonModule.InFight() && host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0*/)
                         host.CommonModule.ResumeMove();
 

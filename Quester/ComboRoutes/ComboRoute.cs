@@ -343,13 +343,13 @@ namespace WowAI.ComboRoutes
 
 
             }
-           
+
             catch (ThreadAbortException) { }
             catch (Exception e)
             {
                 host.log(e.ToString());
             }
-            
+
         }
 
 
@@ -740,6 +740,23 @@ namespace WowAI.ComboRoutes
 
                 if (host.AutoQuests.BestQuestId == 47943 && host.Me.Target?.Id != 123814)
                     return;
+
+                if (host.AutoQuests.BestQuestId == 48532)
+                {
+                    var use = false;
+                    foreach (var entity in host.GetEntities())
+                    {
+                        if (host.Me.Distance(entity) > 10)
+                            continue;
+                        if (entity.Id == 126610 || entity.Id == 126627)
+                        {
+                            use = true;
+                        }
+
+                    }
+                    if (!use)
+                        return;
+                }
 
 
                 if (host.AutoQuests.BestQuestId == 50771 && host.FarmModule.BestMob?.Id != 135080)
@@ -1152,7 +1169,7 @@ namespace WowAI.ComboRoutes
                                 continue;
                             }
                         }
-                          
+
 
 
                         host.MyCheckIsMovingIsCasting();
@@ -1299,7 +1316,7 @@ namespace WowAI.ComboRoutes
                         _timeAttack = host.GetUnixTime();
                     }
 
-                    if (host.Me.IsMoving || host.CommonModule.InFight())
+                    if (host.Me.IsMoving /*|| host.CommonModule.InFight()*/)
                     {
                         _badBestMobHp = host.FarmModule.BestMob.HpPercents;
                         _timeAttack = host.GetUnixTime();

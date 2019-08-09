@@ -14,6 +14,7 @@ using WowAI.Modules;
 using WowAI.UI;
 using System.Diagnostics;
 using System.Text;
+using System.Windows.Threading;
 using WoWBot.Core;
 using Out.Internal.Core;
 using Newtonsoft.Json.Linq;
@@ -182,7 +183,7 @@ namespace WowAI
         public uint StartExp;
         public bool AdvancedLog;
         public string PathGps;
-
+        // private Thread formThread { get; set; }
         public class MyQuestBase
         {
             public List<MyQuestBaseItem> MyQuestBases = new List<MyQuestBaseItem>();
@@ -231,7 +232,7 @@ namespace WowAI
                     AdvancedLog = true;
                 }
 
-
+                //BuildQuad(Me.Location.X, Me.Location.Y, 0, 0, 0);
 
 
                 ClearLogs(GetCurrentAccount().Name);
@@ -241,7 +242,7 @@ namespace WowAI
                     log("Ожидаю вход в игру... Status: " + GameState);
                     Thread.Sleep(5000);
                 }
-               // Thread.Sleep(5000);
+                // Thread.Sleep(5000);
                 var sw = new Stopwatch();
                 if (AdvancedLog)
                     sw.Start();
@@ -285,15 +286,15 @@ namespace WowAI
                 if (!Directory.Exists(PathQuestSet))
                     Directory.CreateDirectory(PathQuestSet);
 
-                 if (isReleaseVersion)
-                     PathQuestState = AssemblyDirectory + "\\QuestState\\";
-                 else
-                 {
-                     PathQuestState = AssemblyDirectory + "\\Plugins\\Quester\\QuestState\\";
-                 }
+                if (isReleaseVersion)
+                    PathQuestState = AssemblyDirectory + "\\QuestState\\";
+                else
+                {
+                    PathQuestState = AssemblyDirectory + "\\Plugins\\Quester\\QuestState\\";
+                }
 
-                 if (!Directory.Exists(PathQuestState))
-                     Directory.CreateDirectory(PathQuestState);
+                if (!Directory.Exists(PathQuestState))
+                    Directory.CreateDirectory(PathQuestState);
 
 
                 DateTime lastChanged = File.GetLastWriteTime(AssemblyDirectory + "\\WowAI.dll");
@@ -412,16 +413,65 @@ namespace WowAI
                 }
 
 
-                   if (File.Exists(PathQuestState + Me.Name + "[].json"))
+                if (File.Exists(PathQuestState + Me.Name + "[].json"))
+                {
+                    QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + CurrentServer.Name + "].json", typeof(QuestStates), QuestStates);
+                    File.Delete(PathQuestState + Me.Name + "[].json");
+                    ConfigLoader.SaveConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", QuestStates);
+                }
+                else
+                {
+                    QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", typeof(QuestStates), QuestStates);
+                }
+
+               
+
+                /*   if (!isReleaseVersion)
                    {
-                       QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + CurrentServer.Name + "].json", typeof(QuestStates), QuestStates);
-                       File.Delete(PathQuestState + Me.Name + "[].json");
-                       ConfigLoader.SaveConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", QuestStates);
+                       formThread = new Thread(() =>
+                       {
+                           try
+                           {
+                               SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+                               MainForm = new Main();
+                               MainForm.Show();
+                               FormInitialized = true;
+                               Dispatcher.Run();
+
+                           }
+                           catch (TaskCanceledException) { }
+                           catch (ThreadAbortException) { }
+                           catch (Exception error)
+                           {
+                               Log(error.ToString());
+                           }
+                       });
+                       formThread.SetApartmentState(ApartmentState.STA);
+                     //  formThread.IsBackground = true;
+                       formThread.Start();
                    }
                    else
                    {
-                       QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", typeof(QuestStates), QuestStates);
-                   }
+                       var d = GetMainDispatcher();
+                       if (d == null)
+                       {
+                           Log("Failed to get dispatcher");
+                           return;
+                       }
+                       d.Invoke(() =>
+                       {
+                           try
+                           {
+                               MainForm = new Main();
+                               MainForm.Show();
+                               FormInitialized = true;
+                           }
+                           catch (Exception e)
+                           {
+                               log(e + "");
+                           }
+                       });
+                   }*/
 
 
 
@@ -431,10 +481,12 @@ namespace WowAI
                     log("Failed to get dispatcher");
                     return;
                 }
+
+                //Main.Host = this;
                 d.Invoke(() =>
                 {
                     try
-                    {                      
+                    {
                         MainForm = new Main();
                         MainForm.Show();
 
@@ -696,6 +748,13 @@ namespace WowAI
                     if (questlog)
                         foreach (var quest in GetQuests())
                         {
+                            if (quest.Id == 42421)
+                                continue;
+                            if (quest.Id == 48641)
+                                continue;
+                            if (quest.Id == 42170)
+                                continue;
+                            
                             if (quest.Template == null)
                             {
                                 log(quest.Id + " ");
@@ -967,7 +1026,7 @@ namespace WowAI
                   AddNonUnloadableMesh(725, 31, 29);
                   AddNonUnloadableMesh(725, 31, 30);
                   AddNonUnloadableMesh(725, 31, 31);*/
-
+               
                 #endregion
 
                 var timer = 0;
@@ -1286,6 +1345,8 @@ namespace WowAI
                 }
                 log(err.ToString());
             }
+
+
         }
 
         public void StopPluginNow()
