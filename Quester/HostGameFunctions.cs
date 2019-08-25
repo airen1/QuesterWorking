@@ -17,13 +17,9 @@ namespace WowAI
         static public bool IsBetween(this TimeSpan time, TimeSpan startTime, TimeSpan endTime)
         {
             if (endTime == startTime)
-            {
                 return true;
-            }
             if (endTime < startTime)
-            {
                 return time <= endTime || time >= startTime;
-            }
             return time >= startTime && time <= endTime;
         }
     }
@@ -87,18 +83,29 @@ namespace WowAI
 
         public bool MyDialog(Entity npc, string text)
         {
+
+            if (GetBotLogin() == "Daredevi1")
+            {
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   " + text);
+                }
+                log("Надо убрать этот код");
+                return false;
+            }
+               
             var result = false;
             ForceMoveTo(npc.Location);
             Thread.Sleep(1000);
             if (!OpenDialog(npc))
-                log("Не смог открыть диалог " + GetLastError(), Host.LogLvl.Error);
+                log("Не смог открыть диалог " + GetLastError(), LogLvl.Error);
 
             if (GetNpcDialogs().Count == 0)
             {
                 SendKeyPress(0x1b);
                 Thread.Sleep(1000);
                 if (!OpenDialog(npc))
-                    log("Не смог открыть диалог 2 " + GetLastError(), Host.LogLvl.Error);
+                    log("Не смог открыть диалог 2 " + GetLastError(), LogLvl.Error);
             }
 
 
@@ -107,15 +114,12 @@ namespace WowAI
             {
                 if (gossipOptionsData.Text.Contains("Подгород") || gossipOptionsData.Text.Contains(text))
                 {
-
                     if (!SelectNpcDialog(gossipOptionsData))
-                        log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
-                    // Thread.Sleep(1000);
+                        log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);                   
                     result = true;
                 }
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   " + text);
             }
-
             return result;
         }
 
@@ -127,17 +131,15 @@ namespace WowAI
             ForceMoveTo(npc.Location);
             Thread.Sleep(1000);
             if (!OpenDialog(npc))
-                log("Не смог открыть диалог " + GetLastError(), Host.LogLvl.Error);
+                log("Не смог открыть диалог " + GetLastError(), LogLvl.Error);
 
             if (GetNpcDialogs().Count == 0)
             {
                 SendKeyPress(0x1b);
                 Thread.Sleep(1000);
                 if (!OpenDialog(npc))
-                    log("Не смог открыть диалог 2 " + GetLastError(), Host.LogLvl.Error);
+                    log("Не смог открыть диалог 2 " + GetLastError(), LogLvl.Error);
             }
-
-
 
             foreach (var gossipOptionsData in GetNpcDialogs())
             {
@@ -145,7 +147,7 @@ namespace WowAI
                 {
                     log("Выбираю диалог");
                     if (!SelectNpcDialog(gossipOptionsData))
-                        log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
+                        log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
                     result = true;
                 }
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
@@ -158,10 +160,8 @@ namespace WowAI
                 {
                     if (gossipOptionsData.ClientOption == index)
                     {
-
                         if (!SelectNpcDialog(gossipOptionsData))
-                            log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
-                        // Thread.Sleep(1000);
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
                         result = true;
                     }
                     log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
@@ -175,18 +175,61 @@ namespace WowAI
                 {
                     if (gossipOptionsData.ClientOption == index)
                     {
-
                         if (!SelectNpcDialog(gossipOptionsData))
-                            log("Не смог выбрать диалог " + GetLastError(), Host.LogLvl.Error);
-                        // Thread.Sleep(1000);
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
                         result = true;
                     }
                     log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
                 }
             }
 
-
-
+            if (npc.Id == 281536)
+            {
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    if (gossipOptionsData.ClientOption == 4)
+                    {
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+                }
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    if (gossipOptionsData.ClientOption == 0)
+                    {
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+                }
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    if (gossipOptionsData.ClientOption == 3)
+                    {
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+                }
+                Thread.Sleep(1000);
+                foreach (var gossipOptionsData in GetNpcDialogs())
+                {
+                    if (gossipOptionsData.ClientOption == 1)
+                    {
+                        if (!SelectNpcDialog(gossipOptionsData))
+                            log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        result = true;
+                    }
+                    log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " + gossipOptionsData.ClientOption + "  " + "   ");
+                }
+            }
             return result;
         }
 
@@ -211,25 +254,22 @@ namespace WowAI
                             if (resultForm != ESpellCastError.SUCCESS)
                             {
                                 if (AdvancedLog)
-                                    log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
+                                    log("Не удалось поменять форму " + spell.Name + "  " + resultForm, LogLvl.Error);
                                 if (resultForm == ESpellCastError.NOT_MOUNTED)
                                     CommonModule.MyUnmount();
                             }
-
 
                             while (SpellManager.IsCasting)
                                 Thread.Sleep(100);
                             Thread.Sleep(2000);
                         }
                     }
-
                 }
             }
 
             while (Me.Class != EClass.Druid)
             {
                 Thread.Sleep(1000);
-
                 if (Me.MountId != 0)
                     return;
                 Spell mountSpell = null;
@@ -237,12 +277,8 @@ namespace WowAI
                 {
                     if (!s.SkillLines.Contains(777))
                         continue;
-                    // var IsNeedMount = false;
-
                     if (s.Id != 32297)
                         continue;
-
-
                     mountSpell = s;
                     break;
                 }
@@ -255,12 +291,10 @@ namespace WowAI
                 var result = SpellManager.CastSpell(mountSpell.Id);
 
                 if (result != ESpellCastError.SUCCESS)
-                {
-                    log("Не удалось призвать маунта " + mountSpell.Name + "  " + result, Host.LogLvl.Error);
-                }
+                    log("Не удалось призвать маунта " + mountSpell.Name + "  " + result, LogLvl.Error);
                 else
                 {
-                    log("Призвал маунта", Host.LogLvl.Ok);
+                    log("Призвал маунта", LogLvl.Ok);
                     while (SpellManager.IsCasting)
                         Thread.Sleep(100);
                     return;
@@ -393,7 +427,7 @@ namespace WowAI
 
             if (npc == null)
             {
-                log("Нет НПС для аука", Host.LogLvl.Error);
+                log("Нет НПС для аука", LogLvl.Error);
                 Thread.Sleep(5000);
                 return;
             }
@@ -417,7 +451,6 @@ namespace WowAI
         public bool NeedAuk;
         public bool MyUseStone(bool auk = false)
         {
-
             Thread.Sleep(2000);
             while (GetAgroCreatures().Count > 0)
             {
@@ -427,10 +460,8 @@ namespace WowAI
             }
 
             if (auk)
-            {
                 if (MapID == 0 || MapID == 1)
                     return true;
-            }
             foreach (var item in ItemManager.GetItems())
             {
                 if (item.Id == 6948 || item.Id == 8690)
@@ -467,12 +498,12 @@ namespace WowAI
                     var result = SpellManager.UseItem(item);
                     if (result != EInventoryResult.OK)
                     {
-                        log("Не удалось использовать камень " + item.Name + " " + result + " " + GetLastError(), Host.LogLvl.Error);
+                        log("Не удалось использовать камень " + item.Name + " " + result + " " + GetLastError(), LogLvl.Error);
                         return false;
                     }
                     else
                     {
-                        log("Использовал камень ", Host.LogLvl.Ok);
+                        log("Использовал камень ", LogLvl.Ok);
                     }
                     MyCheckIsMovingIsCasting();
                     while (SpellManager.IsCasting)
@@ -492,7 +523,6 @@ namespace WowAI
 
         public bool MyUseStone2(bool auk = false)
         {
-
             Thread.Sleep(2000);
             while (GetAgroCreatures().Count > 0)
             {
@@ -526,12 +556,12 @@ namespace WowAI
                     var result = SpellManager.UseItem(item);
                     if (result != EInventoryResult.OK)
                     {
-                        log("Не удалось использовать свисток " + item.Name + " " + result + " " + GetLastError(), Host.LogLvl.Error);
+                        log("Не удалось использовать свисток " + item.Name + " " + result + " " + GetLastError(), LogLvl.Error);
                         return false;
                     }
                     else
                     {
-                        log("Использовал свисток ", Host.LogLvl.Ok);
+                        log("Использовал свисток ", LogLvl.Ok);
                     }
                     MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
@@ -569,48 +599,24 @@ namespace WowAI
             return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
         }
 
-        /// <summary>
-        /// Возвращает дистанцию между координатами
-        /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="z1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="z2"></param>
-        /// <returns></returns>
         public double Distance(double x1, double y1, double z1, double x2, double y2, double z2)
         {
             return Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2));
         }
-
         public double MyDistance(Vector3F loc1, Vector3F loc2)
         {
             return Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) + Math.Pow((loc1.Z - loc2.Z), 2));
         }
-
         public double DistanceGpcPoint(GpsPoint loc1, GpsPoint loc2)
         {
-            return
-                Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) +
-                          Math.Pow((loc1.Z - loc2.Z), 2));
+            return Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) + Math.Pow((loc1.Z - loc2.Z), 2));
         }
 
         public double DistanceVectorGpsPoint(Vector3F loc1, GpsPoint loc2)
         {
-            return
-                Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) +
-                          Math.Pow((loc1.Z - loc2.Z), 2));
+            return Math.Sqrt(Math.Pow((loc1.X - loc2.X), 2) + Math.Pow((loc1.Y - loc2.Y), 2) + Math.Pow((loc1.Z - loc2.Z), 2));
         }
 
-        /// <summary>
-        /// Возвращает дистанцию между координатами без учета Z
-        /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <returns></returns>
         public double DistanceNoZ(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2));
@@ -648,11 +654,6 @@ namespace WowAI
 
         }
 
-        /// <summary>
-        /// Возвращает Creature по Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         internal Entity GetNpcById(uint id)
         {
             try
@@ -666,9 +667,7 @@ namespace WowAI
                         continue;
 
                     if (npc.Id == 138449 && npc.Distance(3899.11, 405.34, 148.84) < 5)
-                        continue;
-                    /*if (!npc.IsVisible)
-                        continue;*/
+                        continue;                 
                     if (npc.Id == id)
                         return npc;
                     if (npc.Guid.GetEntry() == id)
@@ -687,13 +686,9 @@ namespace WowAI
         {
             foreach (var item in ItemManager.GetItems())
             {
-                if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
-                    item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
-                    item.Place == EItemPlace.InventoryItem)
+                if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 || item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 || item.Place == EItemPlace.InventoryItem)
                     if (item.Id == id)
-                    {
                         return item;
-                    }
             }
             return null;
         }
@@ -741,9 +736,7 @@ namespace WowAI
                             continue;
                         if (i.Id == 1961 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
                             continue;
-                        if (i.Id == 2078 && CharacterSettings.Mode != EMode.Questing)//  Disabled Quest Path 6437: 8.0 Nazmir - Q49082 - Flight out of Hir'eek's Lair -LWB  1642  0  0  2015
-                            continue;
-
+                      
                         if (i.Id == 2080 && CharacterSettings.Mode != EMode.Questing && Me.Team == ETeam.Horde)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
                             continue;
                         if (i.Id == 2062 && CharacterSettings.Mode != EMode.Questing)//Grimwatt's Crash, Nazmir  1642  0  245.250076293945  2080
@@ -812,11 +805,15 @@ namespace WowAI
                             continue;
                         if (i.Id == 2282 && CharacterSettings.Mode != EMode.Questing)
                             continue;
+                        if (i.Id == 2144)
+                            continue;
+                        if (i.Id == 2110)
+                            continue;
                         /* if (i.Id == 1642 && CharacterSettings.Mode != EMode.Questing)
                              continue;*/
 
 
-                        log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id);
+                        log(i.Name + "  " + i.MapId + "  " + i.Cost + "  " + Me.Distance(i.Location) + "  " + i.Id + " " );
                         bestNode = i;
                         bestDist = Me.Distance(i.Location);
                     }
@@ -874,11 +871,12 @@ namespace WowAI
                         node = canLandNode;
                     }
                 }
-                log("Выбрал точку " + node.Name + " " + node.Id + "  " + node.MapId, LogLvl.Ok);
+              
 
 
                 if (node != null)
                 {
+                    log("Выбрал точку " + node.Name + " " + node.Id + "  " + node.MapId, LogLvl.Ok);
                     Thread.Sleep(2000);
                     log(node.Id + "  " + node.Name + " " + node.MapId + "  " + node.Cost + "   " + node.Location);
                     var result = UseTaxi(node.Id);
@@ -926,7 +924,7 @@ namespace WowAI
                 }
 
                 Thread.Sleep(5000);
-                return false;
+                return true;
             }
             catch (Exception e)
             {
@@ -949,11 +947,8 @@ namespace WowAI
                         continue;
                     if (npc.AreaId != Area.Id)
                         continue;
-
                     if (!npc.IsVendor)
                         continue;
-
-
                     if (Me.Distance(npc.Loc) < bestDist)
                     {
                         bestNpc = npc;
@@ -967,12 +962,8 @@ namespace WowAI
                     {
                         if (npc.MapId != MapID)
                             continue;
-
-
                         if (!npc.IsVendor)
-                            continue;
-
-
+                            continue;                       
                         if (Me.Distance(npc.Loc) < bestDist)
                         {
                             bestNpc = npc;
@@ -980,8 +971,6 @@ namespace WowAI
                         }
                     }
                 }
-
-
             }
             catch (Exception e)
             {
@@ -994,10 +983,8 @@ namespace WowAI
         {
             var count = 0;
             foreach (var item in ItemManager.GetItems())
-            {
                 if (item.Id == id)
                     count = count + item.Count;
-            }
 
             return count;
         }
@@ -1014,11 +1001,8 @@ namespace WowAI
                         continue;
                     if (npc.AreaId != Area.Id)
                         continue;
-
                     if (!npc.IsArmorer)
                         continue;
-
-
                     if (Me.Distance(npc.Loc) < bestDist)
                     {
                         bestNpc = npc;
@@ -1032,12 +1016,8 @@ namespace WowAI
                     {
                         if (npc.MapId != MapID)
                             continue;
-
-
                         if (!npc.IsArmorer)
                             continue;
-
-
                         if (Me.Distance(npc.Loc) < bestDist)
                         {
                             bestNpc = npc;
@@ -1067,22 +1047,25 @@ namespace WowAI
         bool isRuLang = false;
         public void SellAll()
         {
+            var minimumCountForProcess = new Dictionary<EItemQuality, uint>
+            {
+                [EItemQuality.Normal] = 200,
+                [EItemQuality.Uncommon] = 200,
+                [EItemQuality.Rare] = 5,
+                [EItemQuality.Epic] = 5
+            };
 
-            Dictionary<EItemQuality, uint> MinimumCountForProcess = new Dictionary<EItemQuality, uint>();
-            MinimumCountForProcess[EItemQuality.Normal] = 200;
-            MinimumCountForProcess[EItemQuality.Uncommon] = 200;
-            MinimumCountForProcess[EItemQuality.Rare] = 5;
-            MinimumCountForProcess[EItemQuality.Epic] = 5;
-
-            Dictionary<EItemQuality, int> MinimumCheckingCount = new Dictionary<EItemQuality, int>();
-            MinimumCheckingCount[EItemQuality.Normal] = 2000;
-            MinimumCheckingCount[EItemQuality.Uncommon] = 500;
-            MinimumCheckingCount[EItemQuality.Rare] = 200;
-            MinimumCheckingCount[EItemQuality.Epic] = 1;
-            List<uint> ItemIDsForSell = new List<uint>();
+            var minimumCheckingCount = new Dictionary<EItemQuality, int>
+            {
+                [EItemQuality.Normal] = 2000,
+                [EItemQuality.Uncommon] = 500,
+                [EItemQuality.Rare] = 200,
+                [EItemQuality.Epic] = 1
+            };
+            var itemIDsForSell = new List<uint>();
             foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
             {
-                if (ItemIDsForSell.Contains(Convert.ToUInt32(characterSettingsAukSettingse.Id)))
+                if (itemIDsForSell.Contains(Convert.ToUInt32(characterSettingsAukSettingse.Id)))
                     continue;
                 if (characterSettingsAukSettingse.MaxCount != 0)
                 {
@@ -1097,13 +1080,13 @@ namespace WowAI
                         continue;
                 }
 
-                ItemIDsForSell.Add(Convert.ToUInt32(characterSettingsAukSettingse.Id));
+                itemIDsForSell.Add(Convert.ToUInt32(characterSettingsAukSettingse.Id));
             }
 
-            if (ItemIDsForSell.Count == 0)
+            if (itemIDsForSell.Count == 0)
                 return;
-            Dictionary<uint, List<Item>> Items = new Dictionary<uint, List<Item>>();
-            Dictionary<uint, ulong> Averages = new Dictionary<uint, ulong>();
+            var items = new Dictionary<uint, List<Item>>();
+            var averages = new Dictionary<uint, ulong>();
             foreach (var item in ItemManager.GetItems())
             {
                 if (item.ItemQuality == EItemQuality.Epic)
@@ -1122,11 +1105,11 @@ namespace WowAI
                 }
                 if (item.Place >= EItemPlace.InventoryBag && item.Place <= EItemPlace.Bag4)
                 {
-                    if (ItemIDsForSell.Contains(item.Id))
+                    if (itemIDsForSell.Contains(item.Id))
                     {
-                        if (!Items.ContainsKey(item.Id))
-                            Items[item.Id] = new List<Item>();
-                        Items[item.Id].Add(item);
+                        if (!items.ContainsKey(item.Id))
+                            items[item.Id] = new List<Item>();
+                        items[item.Id].Add(item);
                     }
                 }
 
@@ -1140,7 +1123,7 @@ namespace WowAI
                   {360, 0 }
               };*/
 
-            Dictionary<KeyValuePair<uint, uint>, ulong> epicPrices = new Dictionary<KeyValuePair<uint, uint>, ulong>();
+            var epicPrices = new Dictionary<KeyValuePair<uint, uint>, ulong>();
             foreach (var characterSettingsAukSettingse in CharacterSettings.AukSettingses)
             {
                 if (characterSettingsAukSettingse.Level != 0)
@@ -1158,33 +1141,35 @@ namespace WowAI
 
             }
 
-            foreach (var id in ItemIDsForSell)
+            foreach (var id in itemIDsForSell)
             {
-                if (!Items.ContainsKey(id))
+                if (!items.ContainsKey(id))
                     continue;
-                int totalCount = 0;
-                foreach (var item in Items[id])
+                var totalCount = 0;
+                foreach (var item in items[id])
                     totalCount += item.Count;
-                var firstItem = Items[id][0];
+                var firstItem = items[id][0];
                 var quality = firstItem.ItemQuality;
-                string name = firstItem.Name;
+                var name = firstItem.Name;
                 if (isRuLang)
                     name = firstItem.NameRu;
                 log("Проверяем предмет: " + name + "[" + firstItem.Id + "]. Суммарное количество в инвентаре: " + totalCount + ", размер стака: " + firstItem.MaxStackCount);
-                log("Минимально ищем: " + MinimumCheckingCount[firstItem.ItemQuality]);
-                var req = new AuctionSearchRequest();
-                req.MaxReturnItems = 50;
-                req.SearchText = name;
-                req.ExactMatch = true;
+                log("Минимально ищем: " + minimumCheckingCount[firstItem.ItemQuality]);
+                var req = new AuctionSearchRequest
+                {
+                    MaxReturnItems = 50,
+                    SearchText = name,
+                    ExactMatch = true
+                };
 
                 ulong priceSumm = 0;
-                int itemsCount = 0;
+                var itemsCount = 0;
 
 
 
-                Dictionary<ulong, int> normalPrices = new Dictionary<ulong, int>();
+                var normalPrices = new Dictionary<ulong, int>();
                 ulong mylotPrice = 0;
-                while (itemsCount < MinimumCheckingCount[firstItem.ItemQuality])
+                while (itemsCount < minimumCheckingCount[firstItem.ItemQuality])
                 {
                     if (!MainForm.On)
                         return;
@@ -1238,10 +1223,10 @@ namespace WowAI
 
 
 
-                if (itemsCount >= MinimumCheckingCount[quality])
+                if (itemsCount >= minimumCheckingCount[quality])
                 {
 
-                    ulong averagePrice = priceSumm / (uint)itemsCount;
+                    var averagePrice = priceSumm / (uint)itemsCount;
                     if (quality == EItemQuality.Epic)
                     {
                         if (epicPrices.ContainsKey(new KeyValuePair<uint, uint>(firstItem.Id, firstItem.Level)))
@@ -1309,26 +1294,26 @@ namespace WowAI
                         {
                             if (normalPrice.Value < 399)
                                 continue;
-                            Averages[firstItem.Id] = normalPrice.Key - 1;
+                            averages[firstItem.Id] = normalPrice.Key - 1;
                             if (mylotPrice == normalPrice.Key)
-                                Averages[firstItem.Id] = normalPrice.Key;
-                            log("Цена " + normalPrice.Key + "  Кол-во " + normalPrice.Value + "  " + Averages[firstItem.Id]);
+                                averages[firstItem.Id] = normalPrice.Key;
+                            log("Цена " + normalPrice.Key + "  Кол-во " + normalPrice.Value + "  " + averages[firstItem.Id]);
                             break;
                         }
-                        log("Средняя цена для " + itemsCount + " " + name + "{" + firstItem.Level + "}[" + firstItem.Id + "] = " + (Averages[firstItem.Id] / 10000f).ToString("F2"));
+                        log("Средняя цена для " + itemsCount + " " + name + "{" + firstItem.Level + "}[" + firstItem.Id + "] = " + (averages[firstItem.Id] / 10000f).ToString("F2"));
 
                     }
                 }
             }
 
-            log("Проверяем итемы " + Items.Count);
-            foreach (var k in Items)
+            log("Проверяем итемы " + items.Count);
+            foreach (var k in items)
             {
                 foreach (var item in k.Value)
                 {
                     log("Проверяем итем [" + item.Id + "] в количестве " + item.Count);
                     if (item.ItemQuality < EItemQuality.Epic)
-                        if (!Averages.ContainsKey(item.Id))
+                        if (!averages.ContainsKey(item.Id))
                             continue;
                     var count = (uint)item.Count;
                     log("можем продать " + count);
@@ -1336,14 +1321,14 @@ namespace WowAI
                     {
                         if (!MainForm.On)
                             return;
-                        var countToSell = Math.Min(count, MinimumCountForProcess[item.ItemQuality]);
+                        var countToSell = Math.Min(count, minimumCountForProcess[item.ItemQuality]);
                         /*  if(countToSell < MinimumCheckingCount[item.ItemQuality])
                               break;*/
                         count -= countToSell;
                         ulong sellPrice = 0;
                         if (item.ItemQuality < EItemQuality.Epic)
-                            sellPrice = Averages[item.Id] * countToSell;
-                        string name = item.Name;
+                            sellPrice = averages[item.Id] * countToSell;
+                        var name = item.Name;
                         if (isRuLang)
                             name = item.NameRu;
                         var minbid = sellPrice;
@@ -1353,7 +1338,7 @@ namespace WowAI
                             minbid = sellPrice - (sellPrice / 100 * 20);
                         }
 
-                        EAuctionSellTime time = EAuctionSellTime.TwelveHours;
+                        var time = EAuctionSellTime.TwelveHours;
                         if (CharacterSettings.AukTime == 1)
                             time = EAuctionSellTime.TwentyFourHours;
                         if (CharacterSettings.AukTime == 2)
@@ -1382,6 +1367,8 @@ namespace WowAI
             {
                 if (MapID == 1904)
                     return false;
+                if (MapID == 1220 && CharacterSettings.Mode == EMode.Questing)
+                    return false;
                 if (!CharacterSettings.CheckRepair)
                     return false;
                 foreach (var item in ItemManager.GetItems())
@@ -1395,13 +1382,11 @@ namespace WowAI
                         log("Нужен ремонт " + item.Name + "  " + item.Durability + "/" + item.MaxDurability, LogLvl.Important);
                         return true;
                     }
-
                 }
             }
             catch (Exception e)
             {
                 log(e.ToString());
-
             }
             return false;
         }
@@ -1411,7 +1396,6 @@ namespace WowAI
             var result = false;
             try
             {
-
                 foreach (var item in ItemManager.GetItems())
                 {
                     if (item.Place != EItemPlace.Equipment)
@@ -1423,7 +1407,6 @@ namespace WowAI
                         log("Ремонтируюсь, так как в городе " + item.Name + "  " + item.Durability + "/" + item.MaxDurability, LogLvl.Important);
                         return true;
                     }
-
                 }
             }
             catch (Exception e)
@@ -1445,7 +1428,7 @@ namespace WowAI
                 if (!MyAllItemsRepair())
                     return true;
 
-                if (CharacterSettings.SummonMount)
+                if (CharacterSettings.SummonMount && IsOutdoors)
                 {
                     var mountSell = SpellManager.GetSpell(61447);//Тундровый мамонт путешественника
                     if (mountSell == null)
@@ -1478,11 +1461,11 @@ namespace WowAI
 
                         if (result != ESpellCastError.SUCCESS)
                         {
-                            log("Не удалось призвать маунта " + mountSell.Name + "  " + result, Host.LogLvl.Error);
+                            log("Не удалось призвать маунта " + mountSell.Name + "  " + result, LogLvl.Error);
                             return false;
                         }
                         else
-                            log("Призвал маунта", Host.LogLvl.Ok);
+                            log("Призвал маунта", LogLvl.Ok);
                         Thread.Sleep(2000);
                         while (SpellManager.IsCasting)
                             Thread.Sleep(100);
@@ -1541,51 +1524,15 @@ namespace WowAI
                 }
 
 
-
-                var Vendor = FindNpcForActionArmored();
-                if (Vendor == null)
+                var vendor = FindNpcForActionArmored();
+                if (vendor == null)
                 {
                     double bestDist = 9999999;
                     MyNpcLoc npcLoc = null;
                     foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
                     {
-                        if (myNpcLoc.Id == 3319)
-                            continue;
-                        if (myNpcLoc.Id == 46512)
-                            continue;
-                        if (myNpcLoc.Id == 46359)
-                            continue;
-                        if (myNpcLoc.Id == 54657)
-                            continue;
-                        if (myNpcLoc.Id == 69977)
-                            continue;
-                        if (myNpcLoc.Id == 69978)
-                            continue;
-                        if (myNpcLoc.Id == 3314)
-                            continue;
-                        if (myNpcLoc.Id == 32641)
-                            continue;
-                        if (myNpcLoc.Id == 3331)
-                            continue;
-                        if (myNpcLoc.Id == 5816)
-                            continue;
-                        if (myNpcLoc.Id == 3330)
-                            continue;
-                        if (myNpcLoc.Id == 3315)
-                            continue;
-                        if (myNpcLoc.Id == 3317)
-                            continue;
-                        if (myNpcLoc.Id == 3321)
-                            continue;
-                        if (myNpcLoc.Id == 3316)
-                            continue;
-                        if (myNpcLoc.Id == 3493)
-                            continue;
-                        if (myNpcLoc.Id == 135072)
-                            continue;
-                        if (myNpcLoc.Id == 131800)
-                            continue;
-
+                        if (_badNpcForSell.Contains(myNpcLoc.Id))
+                            continue;                       
                         if (IsBadNpcLocs.Contains(myNpcLoc))
                             continue;
                         if (!myNpcLoc.IsArmorer)
@@ -1663,15 +1610,15 @@ namespace WowAI
                     Thread.Sleep(10000);
                     return false;
                 }
-                log("Выбран НПС для ремонта  " + Vendor.Name, LogLvl.Ok);
+                log("Выбран НПС для ремонта  " + vendor.Name, LogLvl.Ok);
 
-                if (Vendor.AreaId != Area.Id)
+                if (vendor.AreaId != Area.Id)
                 {
-                    MyUseTaxi(Vendor.AreaId, Vendor.Loc);
+                    MyUseTaxi(vendor.AreaId, vendor.Loc);
                     return false;
                 }
 
-                if (!CommonModule.MoveTo(Vendor.Loc, 10))
+                if (!CommonModule.MoveTo(vendor.Loc, 10))
                     return false;
 
                 var listUnit = GetEntities<Unit>();
@@ -1744,12 +1691,10 @@ namespace WowAI
                     SellItems();
                     return true;
                 }
-
             }
             catch (Exception e)
             {
                 log(e.ToString());
-
             }
             return false;
         }
@@ -1765,7 +1710,6 @@ namespace WowAI
             public uint Id;
             public Vector3F Loc;
             public bool IsArmorer;
-            public bool IsQuestGiver;
             public List<Vector3F> ListLoc = new List<Vector3F>();
             public int MapId = -1;
         }
@@ -1774,7 +1718,6 @@ namespace WowAI
 
         public class MyPlayer
         {
-
             public string Name;
             public int Count;
             public DateTime Time;
@@ -1787,10 +1730,8 @@ namespace WowAI
             {
                 MyPlayer myPlayer = null;
                 foreach (var player in MyPlayers)
-                {
                     if (player.Name == entity.Name)
                         myPlayer = player;
-                }
 
                 if (myPlayer != null && myPlayer.Time.AddSeconds(10) > DateTime.Now)
                 {
@@ -1837,23 +1778,23 @@ namespace WowAI
             }
         }
 
-        bool isneedSave;
+        bool _isneedSave;
 
         public List<Vector3F> BuildQuad(double x, double y, int r, double xr, double yr, Unit obj)
         {
             var sw = new Stopwatch();
             sw.Start();
-            var range = 20;
-            List<Vector3F> listPoint = new List<Vector3F>();
+            var range = 30;
+            var listPoint = new List<Vector3F>();
             for (var x1 = x - range; x1 < x + range; x1 = x1 + 4)
             {
                 for (var y1 = y - range; y1 < y + range; y1 = y1 + 4)
                 {
                     //  var z = GetNavMeshHeight(new Vector3F(x1, y1, obj.Location.Z));
-                    if (!IsInsideNavMesh(new Vector3F((float)x1, (float)y1, obj.Location.Z)))
-                        continue;
+                /*    if (!IsInsideNavMesh(new Vector3F((float)x1, (float)y1, obj.Location.Z)))
+                        continue;*/
 
-                    double d = Math.Sqrt(Math.Pow(xr - x1, 2) + Math.Pow(yr - y1, 2));
+                    var d = Math.Sqrt(Math.Pow(xr - x1, 2) + Math.Pow(yr - y1, 2));
                     if (d <= r + 1)
                     {
                         continue;
@@ -1923,7 +1864,7 @@ namespace WowAI
                             {
                                 myNpcLoc.MapId = entity.Guid.GetMapId();
                                 log("Добавляю MapId " + entity.Guid.GetMapId());
-                                isneedSave = true;
+                                _isneedSave = true;
                             }
 
                             foreach (var vector3F in myNpcLoc.ListLoc)
@@ -1948,7 +1889,7 @@ namespace WowAI
 
                                 myNpcLoc.ListLoc.Add(entity.Location);
                                 log("Найдена новая локация NPC [" + entity.Id + "]" + entity.Name + " " + entity.Location + "  " + myNpcLoc.ListLoc.Count, LogLvl.Important);
-                                isneedSave = true;
+                                _isneedSave = true;
                             }
 
                         }
@@ -1956,7 +1897,7 @@ namespace WowAI
                     continue;
                 }
 
-                isneedSave = true;
+                _isneedSave = true;
                 log("Найден новый НПС " + entity.Name + " IsArmorer:" + entity.IsArmorer + " IsQuestGiver:" + entity.IsQuestGiver, LogLvl.Important);
                 MyNpcLocss.NpcLocs.Add(new MyNpcLoc
                 {
@@ -1964,7 +1905,7 @@ namespace WowAI
                     Id = entity.Id,
                     Loc = entity.Location,
                     IsArmorer = entity.IsArmorer,
-                    IsQuestGiver = entity.IsQuestGiver,
+                    //IsQuestGiver = entity.IsQuestGiver,
                     MapId = entity.Guid.GetMapId(),
                     ListLoc = new List<Vector3F>
                     {
@@ -1974,7 +1915,7 @@ namespace WowAI
                 });
             }
 
-            if (isneedSave)
+            if (_isneedSave)
             {
                 File.Copy(PathNpCjson, PathNpCjsonCopy, true);
                 ConfigLoader.SaveConfig(PathNpCjson, MyNpcLocss);
@@ -1983,6 +1924,34 @@ namespace WowAI
         }
 
         public List<MyNpcLoc> IsBadNpcLocs = new List<MyNpcLoc>();
+
+        private readonly List<uint> _badNpcForSell = new List<uint>
+        {
+            143875,
+            3319,
+            46512,
+            46359,
+            54657,
+            69977,
+            69978,
+            3314,
+            32641,
+            3331,
+            5816,
+            3330,
+            3315,
+            3317,
+            3321,
+            3316,
+            3493,
+            3492,
+            142427,
+            135072,
+            131800,
+            138151,
+            141813
+        };
+
 
         internal bool MySell(bool noMount = false)
         {
@@ -1993,7 +1962,7 @@ namespace WowAI
                     mountSell = SpellManager.GetSpell(61425);//Тундровый мамонт путешественника
                 if (noMount)
                     mountSell = null;
-                if (mountSell != null)
+                if (mountSell != null && IsOutdoors)
                 {
 
                     if (CharacterSettings.UseMountMyLoc)
@@ -2017,11 +1986,11 @@ namespace WowAI
 
                     if (result != ESpellCastError.SUCCESS)
                     {
-                        log("Не удалось призвать маунта " + mountSell.Name + "  " + result, Host.LogLvl.Error);
+                        log("Не удалось призвать маунта " + mountSell.Name + "  " + result, LogLvl.Error);
                         return false;
                     }
                     else
-                        log("Призвал маунта", Host.LogLvl.Ok);
+                        log("Призвал маунта", LogLvl.Ok);
                     Thread.Sleep(2000);
                     while (SpellManager.IsCasting)
                         Thread.Sleep(100);
@@ -2077,7 +2046,6 @@ namespace WowAI
                     }
                 }
 
-
                 var vendor = FindNpcForActionVendor();
                 if (vendor == null)
                 {
@@ -2085,47 +2053,8 @@ namespace WowAI
                     MyNpcLoc npcLoc = null;
                     foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
                     {
-                        if (myNpcLoc.Id == 3319)
-                            continue;
-                        if (myNpcLoc.Id == 46512)
-                            continue;
-                        if (myNpcLoc.Id == 46359)
-                            continue;
-                        if (myNpcLoc.Id == 54657)
-                            continue;
-                        if (myNpcLoc.Id == 69977)
-                            continue;
-                        if (myNpcLoc.Id == 69978)
-                            continue;
-                        if (myNpcLoc.Id == 3314)
-                            continue;
-                        if (myNpcLoc.Id == 32641)
-                            continue;
-                        if (myNpcLoc.Id == 3331)
-                            continue;
-                        if (myNpcLoc.Id == 5816)
-                            continue;
-                        if (myNpcLoc.Id == 3330)
-                            continue;
-                        if (myNpcLoc.Id == 3315)
-                            continue;
-                        if (myNpcLoc.Id == 3317)
-                            continue;
-                        if (myNpcLoc.Id == 3321)
-                            continue;
-                        if (myNpcLoc.Id == 3316)
-                            continue;
-                        if (myNpcLoc.Id == 3493)
-                            continue;
-                        if (myNpcLoc.Id == 3492)
-                            continue;
-                        if (myNpcLoc.Id == 142427)
-                            continue;
-                        if (myNpcLoc.Id == 135072)
-                            continue;
-                        if (myNpcLoc.Id == 131800)
-                            continue;
-
+                        if (_badNpcForSell.Contains(myNpcLoc.Id))
+                            continue;                      
                         if (IsBadNpcLocs.Contains(myNpcLoc))
                             continue;
                         if (!myNpcLoc.IsArmorer)
@@ -2182,16 +2111,16 @@ namespace WowAI
                             SellItems();
                             return true;
                         }
+                        IsBadNpcLocs.Add(npcLoc);
+                        log("Не указаны координаты бакалейщика " + npcLoc.Id, LogLvl.Error);
                     }
-                    IsBadNpcLocs.Add(npcLoc);
-                    log("Не указаны координаты бакалейщика " + npcLoc.Id, LogLvl.Error);
+                   
                     Thread.Sleep(10000);
                     return false;
                 }
 
 
                 log("Выбран НПС для продажи " + vendor.Name, LogLvl.Ok);
-
                 if (vendor.AreaId != Area.Id)
                 {
                     MyUseTaxi(vendor.AreaId, vendor.Loc);
@@ -2260,7 +2189,7 @@ namespace WowAI
                     log("Нет предмета");
                     return false;
                 }
-
+                
                 switch (item.Id)
                 {
                     case 152572:
@@ -2294,12 +2223,12 @@ namespace WowAI
                     var result = SpellManager.UseItem(item, target);
                     if (result == EInventoryResult.OK)
                     {
-                        log("Использую " + item.Name + "[" + item.Id + "] " + item.Place, Host.LogLvl.Ok);
+                        log("Использую " + item.Name + "[" + item.Id + "] " + item.Place, LogLvl.Ok);
                         //  FarmModule.SetBadTarget(host.FarmModule.bestMob, 120000);
                     }
 
                     else
-                        log("Не получилось использовать " + item.Name + "[" + item.Id + "]  " + result + "  " + GetLastError(), Host.LogLvl.Error);
+                        log("Не получилось использовать  1 " + item.Name + "[" + item.Id + "]  " + result + "  " + GetLastError(), LogLvl.Error);
                     Thread.Sleep(1000);
                     MyCheckIsMovingIsCasting();
                     while (SpellManager.IsChanneling)
@@ -2321,72 +2250,10 @@ namespace WowAI
             }
             return false;
         }
-        /// <summary>
-        /// Возвращает Creature по Name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        /*  internal Entity GetNpcByName(string name)
-          {
-              try
-              {
-                  foreach (var npc in GetEntities())
-                  {
-                      if (!npc.IsVisible)
-                          continue;
-                      if (npc.Type == EBotTypes.Npc && npc.Name == name)
-                          return npc;
-                  }
-              }
-              catch (Exception e)
-              {
-                  log(e.ToString());
-              }
-              return null;
-          }*/
+       
 
-
-        public int ResTimer = 0;
-        /// <summary>
-        /// Воскрешение
-        /// </summary>
-        /// <returns></returns>
-        internal bool RessurectTalkWithNpc()
-        {
-            try
-            {
-                Thread.Sleep(5000);
-                while (GameState != EGameState.Ingame)
-                    Thread.Sleep(1000);
-                CancelMoveTo();
-
-                Thread.Sleep(RandGenerator.Next(150, 400));
-                if (!IsAlive(Me))
-                    return false;
-                else
-                {
-                    return true;
-                }
-
-            }
-            catch (ThreadAbortException)
-            {
-                return false;
-            }
-            catch (Exception e)
-            {
-                log(e.ToString());
-                return false;
-            }
-        }
 
         private List<Unit> _listMobs = new List<Unit>();
-
-
-        /// <summary>
-        /// Возвращает лист Агро мобов
-        /// </summary>
-        /// <returns></returns>
         public List<Unit> GetAgroCreatures()
         {
             try
@@ -2419,6 +2286,7 @@ namespace WowAI
                 {
                     if (!i.IsAlive)
                         continue;
+                    if(AutoQuests.BestQuestId != 47576)
                     if (Me.Distance(i) > 40)
                         continue;
                     if (i.Id == 128604)
@@ -2620,6 +2488,8 @@ namespace WowAI
                                     {
                                         log("Не смог продать  " + item.Name + "[" + item.Id + "] Цена:" + (item.GetSellPrice() / 10000f).ToString("F2") + "  " + result + " " + " " + GetLastError(), LogLvl.Error);
                                         Thread.Sleep(5000);
+                                        if(GetLastError() == ELastError.CantFindNpc)
+                                        return;
                                     }
                                 }
                             }
@@ -2687,17 +2557,19 @@ namespace WowAI
                 MyCheckIsMovingIsCasting();
                 if (!(go as GameObject).Use())
                 {
-                    log("Не смог использовать " + go.Name + " " + GetLastError(), Host.LogLvl.Error);
+                    log("Не смог использовать " + go.Name + " " + GetLastError(), LogLvl.Error);
                     Thread.Sleep(5000);
                     return;
                 }
                 else
                 {
                     log("Использовал " + go.Name, LogLvl.Ok);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
                 
                 while (SpellManager.IsCasting)
+                    Thread.Sleep(100);
+                while (SpellManager.IsChanneling)
                     Thread.Sleep(100);
 
                 Thread.Sleep(500);
@@ -2705,7 +2577,7 @@ namespace WowAI
                 {
                     if (!PickupLoot())
                     {                      
-                        log("Не смог поднять дроп " + GetLastError(), Host.LogLvl.Error);
+                        log("Не смог поднять дроп " + GetLastError(), LogLvl.Error);
                     }
                 }
             }
@@ -2735,7 +2607,7 @@ namespace WowAI
             MyCheckIsMovingIsCasting();
             if (!go.Use())
             {
-                log("Не смог использовать " + go.Name + " " + GetLastError(), Host.LogLvl.Error);
+                log("Не смог использовать " + go.Name + " " + GetLastError(), LogLvl.Error);
                 Thread.Sleep(5000);
                 return;
             }
@@ -2748,7 +2620,7 @@ namespace WowAI
             if (!CanPickupLoot())
                 return;
             if (!PickupLoot())
-                log("Не смог поднять дроп " + GetLastError(), Host.LogLvl.Error);
+                log("Не смог поднять дроп " + GetLastError(), LogLvl.Error);
         }
 
 
@@ -2764,6 +2636,7 @@ namespace WowAI
                     && !cancelRequested
                     && FarmModule.BestMob == null
                     && GameState == EGameState.Ingame
+                    && CheckCanUseGameActions()
                     // && IsAlive(Me)
                     && FarmModule.readyToActions
                     && MyGetAura(269824) == null

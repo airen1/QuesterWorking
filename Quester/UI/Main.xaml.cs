@@ -16,13 +16,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using ComboBox = System.Windows.Controls.ComboBox;
 using TextBox = System.Windows.Controls.TextBox;
-using System.Runtime.InteropServices;
-using Application = System.Windows.Application;
-using Out.Internal.Core;
 using WoWBot.Core;
-using System.Windows.Markup;
-using System.Windows.Data;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using static WowAI.Host;
@@ -54,7 +48,7 @@ namespace WowAI.UI
         Script,
         [Description("Отбивание")]
         OnlyAttack,
-       
+
         /*  [Description("Пати фарм")]
           PartyFarm*/
 
@@ -127,7 +121,7 @@ namespace WowAI.UI
                 On = true;
                 NeedApplySettings = false;
                 SettingsNeedSave = false;
-                InitializeComponent();           
+                InitializeComponent();
                 DataContext = this;
                 CollectionActiveSkill.RemoveAll();
                 CollectionInvItems.RemoveAll();
@@ -528,7 +522,7 @@ namespace WowAI.UI
                 var list = Host.GetEntities();
                 foreach (var e in list.OrderBy(i => Host.Me.Distance(i)))
                 {
-                    MyEntity item = new MyEntity();
+                    var item = new MyEntity();
                     /*    if (e.Type == EBotTypes.Player)
                             continue;*/
                     if (CheckBoxCanAttack.IsChecked.Value)
@@ -544,7 +538,7 @@ namespace WowAI.UI
                     }
 
                     var gameObject = "";
-                    List<ushort> skilltype = new List<ushort>();
+                    var skilltype = new List<ushort>();
                     if (e.Type == EBotTypes.GameObject)
                     {
                         gameObject = (e as GameObject).GameObjectType.ToString();
@@ -680,31 +674,7 @@ namespace WowAI.UI
 
 
 
-        public void FlashWindow()
-        {
-            var helper = new FlashWindowHelper(Application.Current);
-            new Task(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
 
-                        Thread.Sleep(5000);
-                        // Flashes the window and taskbar 5 times and stays solid 
-                        // colored until user focuses the main window
-                        Dispatcher.Invoke(() => helper.FlashApplicationWindow());
-                        Thread.Sleep(5000);
-                        // Cancels the flash at any time
-                        Dispatcher.Invoke(() => helper.StopFlashing());
-                    }
-                    catch (Exception e)
-                    {
-                        Host.log(e.ToString());
-                    }
-                }
-            }).Start();
-        }
 
 
         public void CheckSkill()
@@ -715,7 +685,7 @@ namespace WowAI.UI
                 foreach (var s in CollectionActiveSkill)
                 {
 
-                    bool notUse = false;
+                    var notUse = false;
                     foreach (var spell in Host.SpellManager.GetSpells())
                     {
                         if (s.Id == 108853 && Host.Me.Level > 9 && Host.SpellManager.GetSpell(116) != null)
@@ -800,11 +770,11 @@ namespace WowAI.UI
                 // myGrid.Children.Add(myLine2);
 
 
-                Ellipse myEllipse = new Ellipse();
+                var myEllipse = new Ellipse();
 
                 // Create a SolidColorBrush with a red color to fill the 
                 // Ellipse with.
-                SolidColorBrush mySolidColorBrush = new SolidColorBrush();
+                var mySolidColorBrush = new SolidColorBrush();
 
                 // Describes the brush's color using RGB values. 
                 // Each value has a range of 0-255.
@@ -842,7 +812,7 @@ namespace WowAI.UI
                             continue;
                         foreach (var questPoiPoint in questPoi.Points)
                         {
-                            Vector3F point2 = new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0);
+                            var point2 = new Vector3F(questPoiPoint.X, questPoiPoint.Y, 0);
                             Point(point2);
                         }
                     }
@@ -861,7 +831,7 @@ namespace WowAI.UI
             Dispatcher.Invoke(() =>
             {
 
-                Point point = new Point(entity.X, entity.Y);
+                var point = new Point(entity.X, entity.Y);
 
                 /*  if (entity.Type == EBotTypes.Self)
                   {
@@ -875,7 +845,7 @@ namespace WowAI.UI
                 //  }
 
 
-                Ellipse elipse = new Ellipse();
+                var elipse = new Ellipse();
                 var name = "";
 
 
@@ -915,7 +885,7 @@ namespace WowAI.UI
             }
 
 
-            Ellipse elipse = new Ellipse();
+            var elipse = new Ellipse();
             var name = "";
 
 
@@ -1027,8 +997,8 @@ namespace WowAI.UI
                         }
                         if (Host.CharacterSettings.Mode == EMode.Script)
                         {
-                            QuestId.Content = "Скрипт " + Host.AutoQuests.scriptStopwatch.Elapsed.Minutes + " min, " +
-                                              Host.AutoQuests.scriptStopwatch.Elapsed.Seconds + " sec  Speed:" + Host.Me.RunSpeed + " " + Host.Me.MovementFlagExtra + " " + Host.Me.MovementFlags + " " + Host.Me.SwimBackSpeed +
+                            QuestId.Content = "Скрипт " + Host.AutoQuests.ScriptStopwatch.Elapsed.Minutes + " min, " +
+                                              Host.AutoQuests.ScriptStopwatch.Elapsed.Seconds + " sec  Speed:" + Host.Me.RunSpeed + " " + Host.Me.MovementFlagExtra + " " + Host.Me.MovementFlags + " " + Host.Me.SwimBackSpeed +
                                               " " + Host.Me.SwimSpeed;
                         }
 
@@ -1101,13 +1071,13 @@ namespace WowAI.UI
                         // LabelTimeNotWork.Content = "Время бездействия: " + Host.CheckCount;
 
                         double tempGold = Host.Me.Money;
-                        double gold = tempGold / 10000;
+                        var gold = tempGold / 10000;
 
-                        double startGold = Host.StartGold / 10000;
+                        var startGold = Host.StartGold / 10000;
 
 
                         invgold = invgold - Host.Startinvgold;
-                        double doubleGold = Convert.ToDouble(invgold) / 10000;
+                        var doubleGold = Convert.ToDouble(invgold) / 10000;
                         //   Host.log(gold + "  " + Host.StartGold + "  " + startGold);
                         LabelGold.Content = "Золото: " + Math.Round(gold, 2) + " г. [" +
                                             Math.Round(gold - startGold, 2) + " г. + " + Math.Round(doubleGold, 2) +
@@ -1167,29 +1137,14 @@ namespace WowAI.UI
                                                Host.ComboRoute.MobsWithDropCount() + "/" + Host.ComboRoute.MobsWithSkinCount() + "] "/* + Host.Me.HasInArc(Math.PI, Host.Me.Target) + Host.Me.GetAngle(Host.Me.Target)*/ +
                                                " " +
                                               " Цель: " +
-                                               Host.Me.Target?.Name + " " +
-                                               " [" + Host.Me.Target?.Id + "] MeDist:" +
+                                               Host.Me.Target.Name + " " +
+                                               " [" + Host.Me.Target.Id + "] MeDist:" +
                                                Math.Round(Host.Me.Distance(Host.Me.Target)) + " / Loc" + Host.Me.Target.Location;
-                            if (Host.Me.Target != null && Host.IsExists(Host.Me.Target))
-                            {
-                                var target = Host.Me.Target as Unit;
-                                if (target != null)
-                                {
-                                    target = Host.Me.Target as Unit;
-                                    ProgressBarTargetHp.Maximum = target.MaxHp;
-                                    ProgressBarTargetHp.Value = target.Hp;
-                                }
+                            ProgressBarTargetHp.Maximum = Host.Me.Target.MaxHp;
+                            ProgressBarTargetHp.Value = Host.Me.Target.Hp;                           
+                            formattedString = $"{ProgressBarTargetHp.Value}/{ProgressBarTargetHp.Maximum}";
+                            TextBlockTargetHp.Text = formattedString;
 
-                                if (Host.Me.Target.Type == EBotTypes.Player)
-                                {
-                                    target = Host.Me.Target as Player;
-                                    ProgressBarTargetHp.Maximum = target.MaxHp;
-                                    ProgressBarTargetHp.Value = target.Hp;
-                                }
-
-                                formattedString = $"{ProgressBarTargetHp.Value}/{ProgressBarTargetHp.Maximum}";
-                                TextBlockTargetHp.Text = formattedString;
-                            }
                         }
                         else
                             MeTarget.Content = "[" + Host.GetAgroCreatures().Count + "/" +
@@ -1203,7 +1158,7 @@ namespace WowAI.UI
                             TextboxMeCoord.Text = Host.Me.Location.ToString();
                         }
                         if (sw.ElapsedMilliseconds > 2)
-                            Host.log("SetMe " + sw.ElapsedMilliseconds + " mc", Host.LogLvl.Error);
+                            Host.log("SetMe " + sw.ElapsedMilliseconds + " mc", LogLvl.Error);
                     }
                     catch (Exception e)
                     {
@@ -1466,7 +1421,7 @@ namespace WowAI.UI
                 {
                     On = false;
                     Host.NeedRestart = true;
-                    Host.AutoQuests.scriptStopwatch.Stop();
+                    Host.AutoQuests.ScriptStopwatch.Stop();
                     Host.CancelMoveTo();
                     //  Host.log("Отменяю движение");
                     // Host.FarmModule.farmState = Modules.FarmState.Disabled;                  
@@ -1678,7 +1633,8 @@ namespace WowAI.UI
             {
                 var ctrl = sender as TextBox;
                 e.Handled = "0123456789".IndexOf(e.Text, StringComparison.Ordinal) < 0; //только цифры
-                if (ctrl != null) ctrl.MaxLength = 1; //длина текста в текстбоксе
+                if (ctrl != null)
+                    ctrl.MaxLength = 1; //длина текста в текстбоксе
             }
             catch (ThreadAbortException)
             {
@@ -1687,7 +1643,6 @@ namespace WowAI.UI
             {
                 Host.log(exception.ToString());
             }
-
         }
 
         /// <summary>
@@ -2074,7 +2029,7 @@ namespace WowAI.UI
                     //  Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   2    " + textBoxCheckAukStartTime.Text);
                     //   Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   2   " + textBoxCheckAukEndTime.Text);
 
-                    
+
 
                     Host.CharacterSettings.SendMailStartTime = TimeSpan.Parse(textBoxSendMailStartTime.Text);
                     Host.CharacterSettings.SendMailStopTime = TimeSpan.Parse(textBoxSendMailEndTime.Text);
@@ -2119,7 +2074,7 @@ namespace WowAI.UI
                         Slot = collectionScriptSchedule.Slot,
                         Level = collectionScriptSchedule.Level,
                         MaxPrice = collectionScriptSchedule.MaxPrice,
-                        Name= collectionScriptSchedule.Name,
+                        Name = collectionScriptSchedule.Name,
                         Stat1 = collectionScriptSchedule.Stat1,
                         Stat2 = collectionScriptSchedule.Stat2
                     };
@@ -2706,7 +2661,7 @@ namespace WowAI.UI
 
                     _collectionQuests = Host.GetQuests();
 
-                  
+
 
                     DataGridQuest.ItemsSource = _collectionQuests;
 
@@ -2762,22 +2717,22 @@ namespace WowAI.UI
                     CollectionAllBuff.RemoveAll();
                     foreach (var buff in Host.ItemManager.GetItems())
                     {
-                      /*  if (buff.Place == EItemPlace.Equipment)
-                            continue;*/
+                        /*  if (buff.Place == EItemPlace.Equipment)
+                              continue;*/
 
                         if (buff.SpellId == 0)
                             continue;
-                      /*  var isbuff = false;
-                        Host.log(buff.NameRu);
-                        foreach (var effect in buff.GetEffectsData())
-                        {
-                            Host.log(effect.Effect + " " + effect.ApplyAuraName);
-                            if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
-                                isbuff = true;
-                        }*/
+                        /*  var isbuff = false;
+                          Host.log(buff.NameRu);
+                          foreach (var effect in buff.GetEffectsData())
+                          {
+                              Host.log(effect.Effect + " " + effect.ApplyAuraName);
+                              if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
+                                  isbuff = true;
+                          }*/
 
-                       /* if (!isbuff)
-                            continue;*/
+                        /* if (!isbuff)
+                             continue;*/
                         var item = new BuffTable(buff.Name, buff.Id, buff.SpellId);
                         if (CollectionAllBuff.Any(collectionInvItem => buff.Id == collectionInvItem.ItemId))
                             continue;
@@ -2873,9 +2828,9 @@ namespace WowAI.UI
         {
             try
             {
-                var initDir = Host.AssemblyDirectory + "\\Plugins\\Quester\\Configs";
-                if (Host.isReleaseVersion)
-                    initDir = Host.AssemblyDirectory + "\\Configs";
+                var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
+                if (isReleaseVersion)
+                    initDir = AssemblyDirectory + "\\Configs";
 
                 var openFileDialog = new OpenFileDialog
                 {
@@ -2914,9 +2869,9 @@ namespace WowAI.UI
         {
             try
             {
-                var initDir = Host.AssemblyDirectory + "\\Plugins\\Quester\\Configs";
-                if (Host.isReleaseVersion)
-                    initDir = Host.AssemblyDirectory + "\\Configs";
+                var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
+                if (isReleaseVersion)
+                    initDir = AssemblyDirectory + "\\Configs";
 
                 var saveFileDialog = new SaveFileDialog
                 {
@@ -3228,7 +3183,7 @@ namespace WowAI.UI
                             // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
                             textBoxSendMailStartTime.Text = Host.CharacterSettings.SendMailStartTime.ToString("hh':'mm");
                             textBoxSendMailEndTime.Text = Host.CharacterSettings.SendMailStopTime.ToString("hh':'mm");
-                           
+
                             // Host.log(Host.CharacterSettings.StartAukTime.ToString() + "   ");
                             // Host.log(Host.CharacterSettings.EndAukTime.ToString() + "   ");
                         }
@@ -3323,7 +3278,7 @@ namespace WowAI.UI
                             ComboBoxSwitchMode.SelectedIndex = 3;
                         if (Host.CharacterSettings.Mode == EMode.OnlyAttack)
                             ComboBoxSwitchMode.SelectedIndex = 4;
-                       
+
 
 
 
@@ -3939,54 +3894,6 @@ namespace WowAI.UI
             }
         }
 
-        public void CheckPrivateFunction()
-        {
-            try
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    Host.log("Проверяю приватные функции. Пользователь " + Host.GetBotLogin());
-
-                    if (Host.GetBotLogin() == "alex" || Host.GetBotLogin() == "Zakkk" || (string.Compare(Host.GetBotLogin(), "outside", true) == 0) || Host.GetBotLogin() == "Daredevi1")
-                    {
-                        Host.log("Доступно:");
-                        Host.log("Фарм элиток");
-                        ComboBoxSwitchMode.Items.Add("Фарм элиток");
-
-                        Host.log("Данж.(п)");
-                        ComboBoxSwitchMode.Items.Add("Данж.(п)");
-                        TabItemDungeonP.Visibility = Visibility.Visible;
-                        Main1.Activate();
-                        //AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"
-                        if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
-                        {
-                            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\");
-                            // папка с файлами
-                            foreach (FileInfo file in dir.GetFiles())
-                            {
-                                comboBoxDungeonScript.Items.Add(file.Name);
-                            }
-                        }
-                    }
-                    if (Host.GetBotLogin() == "alex" || Host.GetBotLogin() == "Zakkk" || Host.GetBotLogin() == "Daredevi1")
-                    {
-                        Host.log("Доступно:");
-                        Host.log("Заслон");
-                        ComboBoxSwitchMode.Items.Add("Заслон");
-
-
-                        //AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"                     
-                    }
-
-
-
-                });
-            }
-            catch (Exception exception)
-            {
-                Host.log(exception.ToString());
-            }
-        }
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
@@ -4009,10 +3916,9 @@ namespace WowAI.UI
                 if (comboBoxDungeonSkill.SelectedIndex > 0)
                     skillId = GetSkillIdFromCombobox(comboBoxDungeonSkill.Text);
 
-                var tempLoc = new Vector3F();
                 /*   if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
                        ComboBoxDungeonAction.SelectedIndex == 6)*/
-                tempLoc = Host.Me.Location;
+                var tempLoc = Host.Me.Location;
 
 
 
@@ -4175,7 +4081,7 @@ namespace WowAI.UI
             var dungeon = ListViewDangeonFunction.SelectedItem as DungeonCoordSettings;
             if (dungeon != null)
             {
-                for (int i = 0; i < CollectionDungeonCoord.Count; i++)
+                for (var i = 0; i < CollectionDungeonCoord.Count; i++)
                 {
                     if (dungeon == CollectionDungeonCoord[i])
                     {
@@ -4437,8 +4343,8 @@ namespace WowAI.UI
             {
                 if (comboBoxEventType.SelectedIndex == -1 || comboBoxEventAction.SelectedIndex == -1)
                     return;
-                CharacterSettings.EventsAction Action = CharacterSettings.EventsAction.NotSellected;
-                CharacterSettings.EventsType Type = CharacterSettings.EventsType.NotSellected;
+                var Action = CharacterSettings.EventsAction.NotSellected;
+                var Type = CharacterSettings.EventsType.NotSellected;
 
                 if (comboBoxEventAction.SelectedIndex == 0)
                     Action = CharacterSettings.EventsAction.Log;
@@ -4690,7 +4596,7 @@ namespace WowAI.UI
             {
                 var openFileDialog = new OpenFileDialog
                 {
-                    InitialDirectory = Host.AssemblyDirectory + "\\Configs",
+                    InitialDirectory = AssemblyDirectory + "\\Configs",
                     Filter = @"wav files (*.wav)|*.wav|All files|*.*",
                     RestoreDirectory = true
                 };
@@ -4863,10 +4769,7 @@ namespace WowAI.UI
         {
             try
             {
-                var tempLoc = new Vector3F();
-
-                tempLoc = Host.Me.Location;
-
+                var tempLoc = Host.Me.Location;
 
 
                 CollectionMultiZone.Add(new MultiZone
@@ -4879,8 +4782,6 @@ namespace WowAI.UI
                     ChangeByDeathPlayer = CheckBoxChangeDeathByPlayer.IsChecked.Value,
                     CountDeathByPlayer = Convert.ToInt32(textBoxCountDeathByPlayer.Text)
                 });
-
-
             }
             catch (Exception exception)
             {
@@ -4911,7 +4812,7 @@ namespace WowAI.UI
             var multiZone = listViewMultiZone.SelectedItem as MultiZone;
             if (multiZone != null)
             {
-                for (int i = 0; i < CollectionMultiZone.Count; i++)
+                for (var i = 0; i < CollectionMultiZone.Count; i++)
                 {
                     if (multiZone == CollectionMultiZone[i])
                     {
@@ -5031,9 +4932,9 @@ namespace WowAI.UI
                 }
 
 
-                var initDir = Host.AssemblyDirectory + "\\Plugins\\Quester\\Configs";
-                if (Host.isReleaseVersion)
-                    initDir = Host.AssemblyDirectory + "\\Configs";
+                var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
+                if (isReleaseVersion)
+                    initDir = AssemblyDirectory + "\\Configs";
 
                 var openFileDialog = new OpenFileDialog
                 {
@@ -5114,7 +5015,7 @@ namespace WowAI.UI
                 {
                     var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\");
                     // папка с файлами
-                    foreach (FileInfo file in dir.GetFiles())
+                    foreach (var file in dir.GetFiles())
                     {
                         comboBoxDungeonScript.Items.Add(file.Name);
                         comboBoxDungeonScript_Copy.Items.Add(file.Name);
@@ -5624,7 +5525,7 @@ namespace WowAI.UI
                 {
                     var dir = new DirectoryInfo(Host.PathQuestSet);
                     // папка с файлами
-                    foreach (FileInfo file in dir.GetFiles())
+                    foreach (var file in dir.GetFiles())
                     {
                         comboBoxQuestSet.Items.Add(file.Name);
                     }
@@ -5887,11 +5788,11 @@ namespace WowAI.UI
 
 
 
-                 if (_collectionQuestTemplates.Count > 0)
-                      Host.log(_collectionQuestTemplates[0].LogTitle);
+                if (_collectionQuestTemplates.Count > 0)
+                    Host.log(_collectionQuestTemplates[0].LogTitle);
 
-                   if (DataGridQuest.Items.Count > 1)
-                       Host.log((DataGridQuest.Items[0] as QuestTemplate).LogTitle);
+                if (DataGridQuest.Items.Count > 1)
+                    Host.log((DataGridQuest.Items[0] as QuestTemplate).LogTitle);
 
                 //_collectionQuestTemplates.Clear();
 
@@ -6150,17 +6051,17 @@ namespace WowAI.UI
 
         private void buttonEquipAucDel_Click(object sender, RoutedEventArgs e)
         {
-            
-                try
-                {
-                    if (DataGridEquipAuction.SelectedIndex != -1)
-                        CollectionEquipAuc.RemoveAt(DataGridEquipAuction.SelectedIndex);
-                }
-                catch (Exception exception)
-                {
-                    Host.log(exception.ToString());
-                }
-            
+
+            try
+            {
+                if (DataGridEquipAuction.SelectedIndex != -1)
+                    CollectionEquipAuc.RemoveAt(DataGridEquipAuction.SelectedIndex);
+            }
+            catch (Exception exception)
+            {
+                Host.log(exception.ToString());
+            }
+
         }
 
         private void buttonAddEquipAuc_Click(object sender, RoutedEventArgs e)
@@ -6174,7 +6075,7 @@ namespace WowAI.UI
                 CollectionEquipAuc.Add(new EquipAuc()
                 {
                     Slot = (EEquipmentSlot)Enum.Parse(typeof(EEquipmentSlot), comboBoxBuyAuc.Text),
-                   
+
                 });
             }
             catch (Exception exception)
@@ -6200,157 +6101,6 @@ namespace WowAI.UI
         }
     }
 
-    public class FlashWindowHelper
-    {
-        private IntPtr mainWindowHWnd;
-        private Application theApp;
-
-        public FlashWindowHelper(Application app)
-        {
-            this.theApp = app;
-        }
-
-        public void FlashApplicationWindow()
-        {
-            InitializeHandle();
-            Flash(this.mainWindowHWnd, 5);
-        }
-
-        public void StopFlashing()
-        {
-            InitializeHandle();
-
-            if (Win2000OrLater)
-            {
-                FLASHWINFO fi = CreateFlashInfoStruct(this.mainWindowHWnd, FLASHW_STOP, uint.MaxValue, 0);
-                FlashWindowEx(ref fi);
-            }
-        }
-
-        private void InitializeHandle()
-        {
-            if (this.mainWindowHWnd == IntPtr.Zero)
-            {
-                // Delayed creation of Main Window IntPtr as Application.Current passed in to ctor does not have the MainWindow set at that time
-                var mainWindow = this.theApp.MainWindow;
-                this.mainWindowHWnd = new System.Windows.Interop.WindowInteropHelper(mainWindow).Handle;
-            }
-        }
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct FLASHWINFO
-        {
-            /// <summary>
-            /// The size of the structure in bytes.
-            /// </summary>
-            public uint cbSize;
-            /// <summary>
-            /// A Handle to the Window to be Flashed. The window can be either opened or minimized.
-            /// </summary>
-            public IntPtr hwnd;
-            /// <summary>
-            /// The Flash Status.
-            /// </summary>
-            public uint dwFlags;
-            /// <summary>
-            /// The number of times to Flash the window.
-            /// </summary>
-            public uint uCount;
-            /// <summary>
-            /// The rate at which the Window is to be flashed, in milliseconds. If Zero, the function uses the default cursor blink rate.
-            /// </summary>
-            public uint dwTimeout;
-        }
-
-        /// <summary>
-        /// Stop flashing. The system restores the window to its original stae.
-        /// </summary>
-        public const uint FLASHW_STOP = 0;
-
-        /// <summary>
-        /// Flash the window caption.
-        /// </summary>
-        public const uint FLASHW_CAPTION = 1;
-
-        /// <summary>
-        /// Flash the taskbar button.
-        /// </summary>
-        public const uint FLASHW_TRAY = 2;
-
-        /// <summary>
-        /// Flash both the window caption and taskbar button.
-        /// This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
-        /// </summary>
-        public const uint FLASHW_ALL = 3;
-
-        /// <summary>
-        /// Flash continuously, until the FLASHW_STOP flag is set.
-        /// </summary>
-        public const uint FLASHW_TIMER = 4;
-
-        /// <summary>
-        /// Flash continuously until the window comes to the foreground.
-        /// </summary>
-        public const uint FLASHW_TIMERNOFG = 12;
-
-        /// <summary>
-        /// Flash the spacified Window (Form) until it recieves focus.
-        /// </summary>
-        /// <param name="hwnd"></param>
-        /// <returns></returns>
-        public static bool Flash(IntPtr hwnd)
-        {
-            // Make sure we're running under Windows 2000 or later
-            if (Win2000OrLater)
-            {
-                FLASHWINFO fi = CreateFlashInfoStruct(hwnd, FLASHW_ALL | FLASHW_TIMERNOFG, uint.MaxValue, 0);
-
-                return FlashWindowEx(ref fi);
-            }
-            return false;
-        }
-
-        private static FLASHWINFO CreateFlashInfoStruct(IntPtr handle, uint flags, uint count, uint timeout)
-        {
-            FLASHWINFO fi = new FLASHWINFO();
-            fi.cbSize = Convert.ToUInt32(Marshal.SizeOf(fi));
-            fi.hwnd = handle;
-            fi.dwFlags = flags;
-            fi.uCount = count;
-            fi.dwTimeout = timeout;
-            return fi;
-        }
-
-        /// <summary>
-        /// Flash the specified Window (form) for the specified number of times
-        /// </summary>
-        /// <param name="hwnd">The handle of the Window to Flash.</param>
-        /// <param name="count">The number of times to Flash.</param>
-        /// <returns></returns>
-        public static bool Flash(IntPtr hwnd, uint count)
-        {
-            if (Win2000OrLater)
-            {
-                FLASHWINFO fi = CreateFlashInfoStruct(hwnd, FLASHW_ALL | FLASHW_TIMERNOFG, count, 0);
-
-                return FlashWindowEx(ref fi);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// A boolean value indicating whether the application is running on Windows 2000 or later.
-        /// </summary>
-        private static bool Win2000OrLater
-        {
-            get { return Environment.OSVersion.Version.Major >= 5; }
-        }
-    }
 
 
     #region Class

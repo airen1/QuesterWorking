@@ -1,14 +1,7 @@
 ﻿using WowAI.UI;
-using Newtonsoft.Json.Linq;
-using Out.Internal.Core;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Markup;
 using Out.Utility;
 using WoWBot.Core;
 

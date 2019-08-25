@@ -70,7 +70,7 @@ namespace WowAI.ComboRoutes
                     host.FarmModule.BestProp = host.FarmModule.GetNearestPropInZone(FarmPropIds[i], true);
 
 
-                    if (host.FarmModule.BestProp == null && host.CharacterSettings.Mode == UI.EMode.FarmResource)//"Сбор ресурсов")
+                    if (host.FarmModule.BestProp == null && host.CharacterSettings.Mode == EMode.FarmResource)//"Сбор ресурсов")
                     {
                         host.FarmModule.BestProp = host.FarmModule.GetNearestPropInZone(FarmPropIds[i], false);
                         if (host.FarmModule.BestProp == null)
@@ -82,19 +82,10 @@ namespace WowAI.ComboRoutes
                     if (host.FarmModule.BestProp == null)
                         continue;
 
-                    //Проверяем путь к этому пропу
-                    /*  var mobPreventDoodadFarm = host.FarmModule.CheckBestMob(BestProp);
-                      if (mobPreventDoodadFarm != null)
-                      {
-                          BestMob = mobPreventDoodadFarm;
-                          break;
-                      }*/
-
                     host.CommonModule.MoveTo(host.FarmModule.BestProp.Location, 3);
 
                     if (host.FarmModule.BestProp != null && host.FarmModule.BestMob == null)
                     {
-
                         host.FarmModule.InteractWithProp(host.FarmModule.BestProp);
                     }
 
@@ -117,7 +108,7 @@ namespace WowAI.ComboRoutes
 
                                         host.log("Использую спец итем " + item.Name + " " + item.Place + "  на " + host.FarmModule.BestProp.Guid);
                                         host.MyUseItemAndWait(item, host.FarmModule.BestProp);
-                                        host.FarmModule.SetBadProp(host.FarmModule.BestProp, 300000);
+                                        host.FarmModule.SetBadProp(host.FarmModule.BestProp, 60000);
                                         /*    var result = host.SpellManager.UseItem(item, host.FarmModule.bestProp);
                                             if (result != EInventoryResult.OK)
                                             {
@@ -200,7 +191,7 @@ namespace WowAI.ComboRoutes
                 GlobalCheckBestMob();
 
                 host.FarmModule.BestMob = GetHightPrioritiMob();
-                if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script && host.AutoQuests.EnableFarmProp)
+                if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == EMode.Script && host.AutoQuests.EnableFarmProp)
                 {
                     if (!host.AutoQuests.NeedActionNpcRepair && !host.AutoQuests.NeedActionNpcSell && !host.NeedAuk)
                     {
@@ -273,7 +264,7 @@ namespace WowAI.ComboRoutes
 
                 if (host.ComboRoute.SpecialItems != null)
                 {
-                    if (host.ComboRoute.SpecialItems?.Length == 0)
+                    if (host.ComboRoute.SpecialItems.Length == 0)
                         if (!host.CanAttack(unit, host.CanSpellAttack))
                             continue;
                 }
@@ -340,7 +331,7 @@ namespace WowAI.ComboRoutes
             if (host.FarmModule.BestMob != null && host.IsExists(host.FarmModule.BestMob) && host.IsAlive(host.FarmModule.BestMob))
                 host.CommonModule.SuspendMove();
 
-            if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == UI.EMode.Script && host.AutoQuests.EnableFarmProp)
+            if (host.CharacterSettings.GatherResouceScript && host.CharacterSettings.Mode == EMode.Script && host.AutoQuests.EnableFarmProp)
             {
                 host.FarmModule.BestProp = host.FarmModule.GetBestPropInZone(false);
 

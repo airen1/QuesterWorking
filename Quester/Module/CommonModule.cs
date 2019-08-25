@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using WowAI.Properties;
 using System.Globalization;
 using System.Linq;
 using System.Media;
 using System.Windows;
-using System.Windows.Documents;
 using Out.Internal.Core;
 using WoWBot.Core;
 using WowAI.UI;
@@ -18,6 +16,7 @@ namespace WowAI.Modules
 {
     internal class CommonModule : Module
     {
+        public GpsBase GpsBase = new GpsBase();
         public override void Stop()
         {
             try
@@ -27,6 +26,7 @@ namespace WowAI.Modules
                 Host.onMoveTick -= MyonMoveTick;
                 Host.onCastFailedMessage -= MyonCastFailedMessage;
                 Host.onSpellDamage -= MyonSpellDamage;
+                
                 base.Stop();
             }
             catch (Exception e)
@@ -34,7 +34,6 @@ namespace WowAI.Modules
                 Host.log(e.ToString());
             }
         }
-        public GpsBase GpsBase = new GpsBase();
         public override void Start(Host host)
         {
             try
@@ -59,7 +58,7 @@ namespace WowAI.Modules
             }
         }
 
-        void MyonSpellDamage(WowGuid casterGuid, WowGuid targetGuid, uint spellID, EAttackerStateFlags flags, int damage)
+        public void MyonSpellDamage(WowGuid casterGuid, WowGuid targetGuid, uint spellID, EAttackerStateFlags flags, int damage)
         {
             var target = Host.GetEntity(targetGuid);
             var caster = Host.GetEntity(casterGuid);
@@ -141,9 +140,11 @@ namespace WowAI.Modules
         {
             try
             {
-                if(!Host.IsOutdoors)
+                if (!Host.IsOutdoors)
                     return;
                 if (Host.MyGetAura(269564) != null)
+                    return;
+                if (Host.MyGetAura(267254) != null)
                     return;
                 if (Host.MyGetAura(263851) != null)
                     return;
@@ -217,7 +218,7 @@ namespace WowAI.Modules
 
                                     //106898 Тревожный рев
                                     //1850 Порыв
-                                    List<uint> listDash = new List<uint> { 1850, 106898 };
+                                    var listDash = new List<uint> { 1850, 106898 };
                                     var isNeedDash = true;
                                     foreach (var i in listDash)
                                     {
@@ -262,9 +263,6 @@ namespace WowAI.Modules
                                         break;
                                     }
                                 }
-
-
-                                //   Host.log("Нашел ауру");
                                 return;
                             }
 
@@ -352,29 +350,6 @@ namespace WowAI.Modules
 
                 while (Host.SpellManager.IsCasting)
                     Thread.Sleep(100);
-                /*   var myMount = new List<Mount>();
-                   if (host.Me.Mount != null || host.Me.GetMounts().Count <= 0)
-                       return;
-
-                   var randMount = host.RandGenerator.Next(0, host.Me.GetMounts().Count);
-                   foreach (var i in host.Me.GetMounts())
-                       if (i.Type == EBotTypes.Mount)
-                           myMount.Add(i);
-
-                   if (myMount[randMount].UseMount())
-                   {
-                       // host.log("Призываю маунта №" + randMount + " " + myMount[randMount].Db.LocalName);
-                       Thread.Sleep(2100);
-                       while (host.Me.IsCastingSkill)
-                       {
-                           Thread.Sleep(100);
-                       }
-                       _lastMountTime = DateTime.Now;
-                   }
-                   else
-                   {
-                       host.log("Не удалось призвать маунта: " + host.GetLastError(), Host.LogLvl.Error);
-                   }*/
             }
             catch (ThreadAbortException) { }
             catch (Exception e)
@@ -383,10 +358,7 @@ namespace WowAI.Modules
             }
         }
 
-        /// <summary>
-        /// Я в бою?
-        /// </summary>
-        /// <returns></returns>
+
         public bool InFight()
         {
             try
@@ -413,7 +385,6 @@ namespace WowAI.Modules
         public bool EventAttackPlayer;
 
 
-        // private Vector3F _obstaclePoint;
         private void NavMeshPreMove(Vector3F point)
         {
 
@@ -424,7 +395,7 @@ namespace WowAI.Modules
                 return;
             if (Host.MapID == 1904)
                 return;
-            //  _obstaclePoint = point;
+
 
             if (Host.CharacterSettings.Attack)
             {
@@ -432,8 +403,6 @@ namespace WowAI.Modules
                 {
                     if (Host.CharacterSettings.Mode == EMode.Questing)
                         break;
-                    /*if (Host.Me.Target != null && Host.Me.Target.HpPercents < 100)
-                        break;*/
                     if (Host.GetAgroCreatures().Count > 0)
                         break;
                     if (Host.Me.Level > 10 && entity.Level == 1)
@@ -516,12 +485,8 @@ namespace WowAI.Modules
                     return;
 
                 if (Host.CharacterSettings.NoAttackOnMount)
-                {
                     if (Host.Me.MountId != 0)
-                    {
                         return;
-                    }
-                }
 
                 foreach (var agromob in Host.GetAgroCreatures())
                 {
@@ -546,7 +511,7 @@ namespace WowAI.Modules
 
             }
 
-            if (Host.Me.Class == EClass.DeathKnight && !Host.Me.IsInCombat && Host.IsAlive() && Host.Me.MountId == 0)
+            if (Host.Me.Class == EClass.DeathKnight && !Host.Me.IsInCombat && Host.IsAlive() && Host.Me.MountId == 0 && !Host.Me.IsDeadGhost)
             {
 
                 var skill = Host.SpellManager.GetSpell(48265);
@@ -819,8 +784,12 @@ namespace WowAI.Modules
         {
             try
             {
+                if (!Host.Me.IsAlive)
+                    return;
+                if (Host.Me.IsDeadGhost)
+                    return;
                 var equipCells = new Dictionary<EEquipmentSlot, Item>();
-                // host.log("Тест  EquipBestArmorAndWeapon");
+                //  Host.log("Тест  EquipBestArmorAndWeapon");
 
                 foreach (EEquipmentSlot value in Enum.GetValues(typeof(EEquipmentSlot)))
                 {
@@ -957,7 +926,6 @@ namespace WowAI.Modules
                         {
                             if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
                                 continue;
-
                             if (item.RequiredLevel > Host.Me.Level)
                                 continue;
                             if (item.InventoryType != EInventoryType.Trinket)
@@ -983,12 +951,79 @@ namespace WowAI.Modules
                 }
 
 
-                //  Host.log("-----------------------------------------");
-                /* foreach (var equipCell in equipCells)
-                 {
+                if (equipCells[EEquipmentSlot.MainHand].InventoryType != EInventoryType.TwoHandedWeapon)
+                {
+                    foreach (var item in Host.ItemManager.GetItems())
+                    {
+                        if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
+                            item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
+                            item.Place == EItemPlace.InventoryItem || item.Place == EItemPlace.Equipment)
+                            if (item.ItemClass == EItemClass.Armor || item.ItemClass == EItemClass.Weapon)
+                            {
 
-                     Host.log(equipCell.Key + " " + equipCell.Value?.Name + "  " + equipCell.Value?.Place + "  " + "  ");
-                 }*/
+                                if (item.Id == 68743)//Прочный плащ пехотинца
+                                    continue;
+
+                                if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                                    continue;
+
+                                if (item.RequiredLevel > Host.Me.Level)
+                                    continue;
+
+                                var itemEquipType = GetItemEPlayerPartsType(item.InventoryType);
+
+                                if (item.ItemClass != EItemClass.Weapon)
+                                    continue;
+                                if (item.InventoryType == EInventoryType.TwoHandedWeapon)
+                                    continue;
+                                if (item.ItemClass == EItemClass.Weapon && !WeaponType.Contains((EItemSubclassWeapon)item.ItemSubClass))
+                                    continue;
+
+                                if (itemEquipType != EEquipmentSlot.MainHand)
+                                    continue;
+
+
+
+                                if (item.ItemClass == EItemClass.Weapon)
+                                {
+                                    if (Host.CharacterSettings.EquipItemStat != 0)
+                                    {
+                                        if (!item.ItemStatType.Contains((EItemModType)Host.CharacterSettings.EquipItemStat))
+                                            continue;
+                                    }
+                                }
+
+
+
+                                if (equipCells[EEquipmentSlot.MainHand] == item)
+                                    continue;
+                                if (equipCells[EEquipmentSlot.OffHand] == null)
+                                {
+                                    equipCells[EEquipmentSlot.OffHand] = item;
+                                }
+                                else
+                                {
+                                    double bestCoef = 0;
+                                    double curCoef = 0;
+
+                                    bestCoef = equipCells[EEquipmentSlot.OffHand].Level;
+
+                                    curCoef = item.Level;
+                                    if (bestCoef < curCoef)
+                                        equipCells[EEquipmentSlot.OffHand] = item;
+                                }
+
+
+                            }
+                    }
+                }
+
+                /*    Host.log("-----------------------------------------");
+                   foreach (var equipCell in equipCells)
+                   {
+
+                       Host.log(equipCell.Key + " " + equipCell.Value?.Name + "  " + equipCell.Value?.Place + "  " + "  ");
+                   }*/
 
                 foreach (var b in equipCells.Keys.ToList())
                 {
@@ -1114,7 +1149,35 @@ namespace WowAI.Modules
             new MyObstacle{Loc = new Vector3F(2751.12, 3330.07, 64.17), radius = 8, hight = 8},
             new MyObstacle{Loc = new Vector3F(1941.12, 1838.47, 21.27), radius = 3, hight = 3},
             new MyObstacle{Loc = new Vector3F(1942.03, 1837.25, 22.13), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(562.28, -262.14, -193.66), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(552.66, -255.10, -193.98), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(565.61, -262.10, -194.02), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(572.10, -263.93, -193.22), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(584.38, -265.50, -194.47), radius = 5, hight = 5},
+            new MyObstacle{Loc = new Vector3F(602.19, -255.42, -194.26), radius = 5, hight = 5},
+            new MyObstacle{Loc = new Vector3F(556.18, -255.87, -194.62), radius = 5, hight = 5},
+            new MyObstacle{Loc = new Vector3F(561.91, -257.68, -195.36), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1698.78, 85.40, -62.29), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1695.71, 78.76, -62.29), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1696.49, 82.19, -62.16), radius = 3, hight = 3},
 
+            new MyObstacle{Loc = new Vector3F(1725.81, 95.17, -61.95), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1729.45, 98.78, -61.95), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1731.94, 101.25, -61.94), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1735.93, 105.13, -61.94), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1738.70, 108.33, -61.87), radius = 3, hight = 3},
+
+            new MyObstacle{Loc = new Vector3F(1757.61, 129.05, -62.29), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1759.42, 133.02, -62.29), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1764.51, 141.31, -62.30), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1765.49, 148.31, -62.30), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1768.04, 153.55, -62.30), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1764.04, 145.33, -62.30), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1765.78, 136.52, -62.30), radius = 3, hight = 3},
+            new MyObstacle{Loc = new Vector3F(1642.75, 66.45, -61.62), radius = 5, hight = 5},
+
+            new MyObstacle{Loc = new Vector3F(1646.98, 72.97, -62.18), radius = 5, hight = 5},
+            new MyObstacle{Loc = new Vector3F(1648.42, 66.85, -62.18), radius = 5, hight = 5},
         };
 
         public List<uint> NoObstacle = new List<uint>
@@ -1137,7 +1200,8 @@ namespace WowAI.Modules
                     {
                         if (Host.GetVar(entity, "obstacle") != null)
                             continue;
-                        if (entity.Id == 131789 || entity.Id == 131753 || entity.Id == 135875)
+                        if (entity.Id == 131789 || entity.Id == 131753 || entity.Id == 135875 || entity.Id == 142484 || entity.Id == 142485 || entity.Id == 142478
+                            || entity.Id == 142360 || entity.Id == 135119 || entity.Id == 143875 || entity.Id == 141780 || entity.Id == 135388 || entity.Id == 143482)
                         {
                             if (Host.IsInsideNavMesh(new Vector3F(entity.Location.X, entity.Location.Y, entity.Location.Z)))
                             {
@@ -1340,6 +1404,8 @@ namespace WowAI.Modules
                                 return;
                             if (Host.MyGetAura(269564) != null)
                                 break;
+                            if (Host.MyGetAura(245831) != null)
+                                break;
                             if (Host.MapID == 1718)
                                 break;
                             Host.log("Ожидаю возврата движения " + Host.Me.MovementFlags);
@@ -1363,28 +1429,7 @@ namespace WowAI.Modules
                     _moveFailCount = 0;
 
 
-                if (_moveFailCount > 2)
-                {
-                    if (Host.MapID != 600)
-                    {
-                        if (Host.Me.Distance(-253.54, -5126.02, 29.17) > 50)
-                        {
-                            var obstacleRadius = 1;
-                            if (_moveFailCount > 7)
-                                obstacleRadius = 2;
-                            /*  if (Host.Me.Distance(_obstaclePoint) < 6)
-                              {
-                                  Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(_obstaclePoint));
-                                  Host.AddObstacle(_obstaclePoint, obstacleRadius, 10);
-                              }
-                              else
-                              {
-                                  Host.log("Ставлю обстакл " + obstacleRadius + "   " + Host.Me.Distance(_obstaclePoint));
-                                  Host.AddObstacle(Host.Me.Location, obstacleRadius, 10);
-                              }*/
-                        }
-                    }
-                }
+
                 if (_moveFailCount > 0)
                 {
                     // Host.log("Прыжок");
@@ -1467,8 +1512,10 @@ namespace WowAI.Modules
                     if (Host.Me.IsDeadGhost)
                         Host.ComboRoute.DeathTime = DateTime.Now;
                 }
-              //  if (Host.CharacterSettings.Mode != EMode.Questing)
-                    if (_moveFailCount > 20 || Host.Me.Distance(1477.98, 1591.57, 39.66) < 5)
+                //  if (Host.CharacterSettings.Mode != EMode.Questing)
+                if (_moveFailCount > 20 || Host.Me.Distance(1477.98, 1591.57, 39.66) < 5)
+                {
+                    if (Host.MapID != 1643)
                     {
                         Host.CanselForm();
                         Host.CancelMoveTo();
@@ -1476,6 +1523,7 @@ namespace WowAI.Modules
                         Thread.Sleep(2000);
                         foreach (var item in Host.ItemManager.GetItems())
                         {
+
                             if (item.Id == 6948)
                             {
                                 if (Host.SpellManager.GetItemCooldown(item) != 0)
@@ -1505,6 +1553,8 @@ namespace WowAI.Modules
                             }
                         }
                     }
+
+                }
 
                 /* if (_moveFailCount > 1)
                  {
@@ -1600,7 +1650,7 @@ namespace WowAI.Modules
                     return false;
 
                 IsMoveToNow = true;
-                double doneDist = Host.Me.RunSpeed / 5.0;
+                var doneDist = Host.Me.RunSpeed / 5.0;
                 //  Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
                 var result = Host.ForceComeTo(loc, dist, doneDist);
                 // Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
@@ -1623,7 +1673,7 @@ namespace WowAI.Modules
             }
         }
 
-        public bool ForceMoveTo2(Entity obj, double dist = 1, double doneDist = 0.5)
+        public bool ForceMoveTo2(Entity obj, double dist = 1)
         {
             try
             {
@@ -1635,9 +1685,9 @@ namespace WowAI.Modules
                     return false;
 
                 IsMoveToNow = true;
-                doneDist = Host.Me.RunSpeed / 5.0;
+
                 //  Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist);
-                var result = Host.ForceComeTo(obj, dist, doneDist);
+                var result = Host.ForceComeTo(obj, dist, Host.Me.RunSpeed / 5.0);
                 //  Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
                 // 
 
@@ -1659,7 +1709,7 @@ namespace WowAI.Modules
         }
 
 
-        public bool MoveTo(double x, double y, double z, double dist = 1, double doneDist = 0.5)
+        public bool MoveTo(double x, double y, double z, double dist = 1)
         {
             if (IsMovementSuspended)
                 return false;
@@ -1673,7 +1723,7 @@ namespace WowAI.Modules
 
 
                 IsMoveToNow = true;
-                doneDist = Host.Me.RunSpeed / 5.0;
+
 
                 if (Host.GetNavMeshHeight(new Vector3F(x, y, 0)) == 0 && Host.Me.Distance(x, y, z) > 300)
                 {
@@ -1711,7 +1761,7 @@ namespace WowAI.Modules
                          return false;
                      }*/
                     var path = Host.GetServerPath(Host.Me.Location, new Vector3F(x, y, z));
-                    for (int i = 0; i < path.Path.Count - 1; i++)
+                    for (var i = 0; i < path.Path.Count - 1; i++)
                     {
                         if (Host.Me.Distance(path.Path[i]) < 50)
                             continue;
@@ -1719,7 +1769,7 @@ namespace WowAI.Modules
                             return false;
                         if (!Host.MainForm.On)
                             return false;
-                        if (!Host.ComeTo(path.Path[i], dist, doneDist))
+                        if (!Host.ComeTo(path.Path[i], dist, Host.Me.RunSpeed / 5.0))
                         {
                             CheckMoveFailed(false);
                             return false;
@@ -1728,7 +1778,7 @@ namespace WowAI.Modules
                     }
                 }
 
-                var result = Host.ComeTo(x, y, z, dist, doneDist);
+                var result = Host.ComeTo(x, y, z, dist, Host.Me.RunSpeed / 5.0);
 
                 CheckMoveFailed(result);
                 /*   if (!result)
@@ -1929,7 +1979,7 @@ namespace WowAI.Modules
             return true;
         }
 
-        public bool MoveToConvoy(Entity obj, double dist = 1, double doneDist = 0.5, bool force = false)
+        public bool MoveToConvoy(Entity obj, double dist = 1, bool force = false)
         {
             try
             {
@@ -1938,22 +1988,19 @@ namespace WowAI.Modules
 
 
                 IsMoveToNow = true;
-                var result = false;
-                doneDist = Host.Me.RunSpeed / 5.0;
+
 
                 var req = new MoveParams()
                 {
                     Location = obj.Location,
                     Obj = null,
                     Dist = dist,
-                    DoneDist = doneDist,
+                    DoneDist = Host.Me.RunSpeed / 5.0,
                     UseNavCall = true,
                     NoWaitResult = true,
                     IgnoreStuckCheck = true
                 };
-                result = Host.MoveTo(req);
-
-
+                var result = Host.MoveTo(req);
 
                 // CheckMoveFailed(result);             
                 return result;
@@ -1996,12 +2043,29 @@ namespace WowAI.Modules
                 // if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
                 if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
                 {
+                     if (Host.AutoQuests.BestQuestId == 50751)
+                     {
+                         if (Host.Me.Distance(loc) > 1800)
+                         {
+                             Host.MyUseTaxi(8501, new Vector3F(2034.23, 4810.68, 71.18));
+
+                             return false;
+                         }
+                     }
+
+                    if (Host.AutoQuests.BestQuestId == 50703 && Host.GetQuest(50703) != null)
+                        if (Host.Area.Id == 8501) //волдун
+                        {
+                            Host.MyUseTaxi(8499, new Vector3F(-1035.45, 758.30, 435.33));
+                            return false;
+                        }
+
                     var path = Host.GetServerPath(Host.Me.Location, loc);
-                    if (path == null 
-                        || Host.Me.Distance(-976.23, 1200.57, 283.16) < 80 
-                                     || Host.Me.Distance(-972.04, 1121.50, 241.91) < 80 
-                                     || Host.Me.Distance(-1036.92, 1130.74, 189.23) < 80
-                        || path?.Path.Count < 10)
+                    if (path == null
+                        || Host.Me.Distance(-976.23, 1200.57, 283.16) < 80
+                        || Host.Me.Distance(-972.04, 1121.50, 241.91) < 80
+                        || Host.Me.Distance(-1036.92, 1130.74, 189.23) < 80
+                        || path.Path.Count < 10)
                     {
                         Host.log("Не нашел путь " + Host.Me.Distance(loc) + " " + loc);
 
@@ -2045,24 +2109,31 @@ namespace WowAI.Modules
                     Host.log("Бегу по серверным мешам " + Host.Me.Location + " в " + loc + "  всего точек " + path.Path.Count);
                     foreach (var vector3F in path.Path)
                     {
-                       //  Host.log(vector3F + " дистанция:" + Host.Me.Distance(vector3F));
+                        //  Host.log(vector3F + " дистанция:" + Host.Me.Distance(vector3F));
                     }
 
-                    for (int i = 0; i < path.Path.Count - 2; i++)
+                    for (var i = 0; i < path.Path.Count - 2; i++)
                     {
-                        
-                        if (Host.Me.Distance(path.Path[i]) < 150)
+                        if (!Host.IsInsideNavMesh(path.Path[i]))
                             continue;
-                       
+                        if (Host.Me.Distance(path.Path[i]) < 200)
+                            continue;
+                        if (Host.FarmModule.BestMob != null)
+                            return false;
                         if (!Host.Me.IsAlive)
                             return false;
                         if (!Host.MainForm.On)
                             return false;
+                         Host.log("Начал бег");
                         if (!Host.ComeTo(path.Path[i], dist, doneDist))
                         {
+                                Host.log("Закончил бег");
                             CheckMoveFailed(false);
                             return false;
                         }
+
+                       // return false;
+                        //   Host.log("Закончил бег");
                     }
 
                     return false;
@@ -2077,30 +2148,9 @@ namespace WowAI.Modules
                     Host.MoveTo(749.13, 3099.93, 133.11);
 
                 Host.log("Начал бег в " + loc + "  дист: " + Host.Me.Distance(loc) + "   dist: " + dist + "/" + doneDist + "  " + Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)));
+                var result = Host.ComeTo(loc, dist, doneDist);
+                Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
 
-                bool result;
-                /* if (Host.CharacterSettings.Mode == EMode.Questing)
-                 {
-                     Host.log("Бегу без учета застреваний");
-                     // MoveParams.LookTo = loc;
-                     MoveParams.Location = loc;
-                     MoveParams.Dist = dist;
-                     MoveParams.DoneDist = doneDist;
-                     MoveParams.IgnoreStuckCheck = true;
-                     MoveParams.ForceRandomJumps = false;
-                     MoveParams.UseNavCall = true;
-
-                     result = Host.MoveTo(MoveParams);
-                 }
-                 else
-                 {*/
-                result = Host.ComeTo(loc, dist, doneDist);
-                //   }
-
-                 Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
-                // 
-
-                //  
                 CheckMoveFailed(result);
                 /* if (!result)
                      host.log(host.GetLastError().ToString());*/
@@ -2151,22 +2201,9 @@ namespace WowAI.Modules
             }
 
             return true;
-            /* if (Host.Me.Distance(loc) > 300)
-             {
-                 var path = Host.GetServerPath(Host.Me.Location, loc);
-                 Host.log("Слишком далеко, использую GetServerPath из " + Host.Me.Location + " в " + loc + " Путь:" + path.Path.Count);
-
-
-                 foreach (var vector3F in path.Path)
-                 {
-                     Host.log(path.Path.Count + "  Путь " + Host.Me.Distance(vector3F));
-                     ForceMoveTo2(vector3F);
-                 }
-             }*/
-
         }
 
-        public bool MoveTo(Entity obj, double dist = 1, double doneDist = 0.5)
+        public bool MoveTo(Entity obj, double dist = 1)
         {
             if (IsMovementSuspended)
                 return false;
@@ -2179,8 +2216,8 @@ namespace WowAI.Modules
                 if (!MoveToBadLoc(obj.Location))
                     return false;
 
-                doneDist = Host.Me.RunSpeed / 5.0;
-                var result = Host.ComeTo(obj, dist, doneDist);
+
+                var result = Host.ComeTo(obj, dist, Host.Me.RunSpeed / 5.0);
 
                 CheckMoveFailed(result);
                 /*  if (!result)
@@ -2193,38 +2230,22 @@ namespace WowAI.Modules
             }
         }
 
-        public bool ForceMoveTo(double x, double y, double z, double dist = 1, double doneDist = 0.5)
+        public bool ForceMoveTo(double x, double y, double z, double dist = 1)
         {
-            doneDist = Host.Me.RunSpeed / 5.0;
-            var result = Host.ComeTo(x, y, z, dist, doneDist);
+
+            var result = Host.ComeTo(x, y, z, dist, Host.Me.RunSpeed / 5.0);
 
             CheckMoveFailed(result);
             return result;
         }
 
-        public bool ForceMoveTo(Vector3F loc, double dist = 1, double doneDist = 0.5)
+        public bool ForceMoveTo(Vector3F loc, double dist = 1)
         {
             MySitMount(loc);
-            doneDist = Host.Me.RunSpeed / 5.0;
-            Host.log("Начал бег");
-            bool result;
-            /*  if (Host.CharacterSettings.Mode == EMode.Script)
-              {
-                  Host.log("Бегу без учета застреваний");
-                  MoveParams.Location = loc;
-                  MoveParams.Obj = null;
-                  MoveParams.Dist = dist;
-                  MoveParams.DoneDist = doneDist;
-                  MoveParams.IgnoreStuckCheck = true;
-                  MoveParams.ForceRandomJumps = false;
-                  MoveParams.UseNavCall = true;
-                  result = Host.MoveTo(MoveParams);
-              }
-              else
-              {*/
-            result = Host.ComeTo(loc, dist, doneDist);
-            //  }
 
+            Host.log("Начал бег");
+
+            var result = Host.ComeTo(loc, dist, Host.Me.RunSpeed / 5.0);
 
             Host.log("Закончил бег");
             CheckMoveFailed(result);
@@ -2268,6 +2289,7 @@ namespace WowAI.Modules
                 MoveParams.UseNavCall = true;
 
                 result = Host.MoveTo(MoveParams);
+                Host.log("Добежал");
             }
             else
             {
@@ -2284,6 +2306,7 @@ namespace WowAI.Modules
         public List<EItemSubclassWeapon> WeaponType = new List<EItemSubclassWeapon>();
         public List<EItemSubclassArmor> ArmorType = new List<EItemSubclassArmor>();
         public bool WeaponAndShield;
+
 
         public override void Run(CancellationToken ct)
         {
@@ -2322,6 +2345,7 @@ namespace WowAI.Modules
                         break;
                     case EClass.Shaman:
                         {
+                            //  WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.STAFF, EItemSubclassWeapon.POLEARM, EItemSubclassWeapon.MACE2 };
                             WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE, EItemSubclassWeapon.DAGGER, EItemSubclassWeapon.MACE };
                             ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.MAIL, EItemSubclassArmor.SHIELD, EItemSubclassArmor.CLOTH, EItemSubclassArmor.MISCELLANEOUS };
                             WeaponAndShield = true;
@@ -2338,6 +2362,12 @@ namespace WowAI.Modules
                     case EClass.Monk:
                         {
                             WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.STAFF, EItemSubclassWeapon.POLEARM };
+
+                            if (Host.Me.TalentSpecId == 269)
+                            {
+                                WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE, EItemSubclassWeapon.SWORD, EItemSubclassWeapon.FIST_WEAPON };
+                            }
+
                             ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER, EItemSubclassArmor.MISCELLANEOUS };
                         }
                         break;

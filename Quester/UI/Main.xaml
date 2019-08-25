@@ -2114,6 +2114,7 @@
                                                                         <ComboBoxItem Content="Удалить"/>
                                                                         <ComboBoxItem Content="Не продавать"/>
                                                                         <ComboBoxItem Content="Использовать"/>
+                                                                        <ComboBoxItem Content="Отправить почтой"/>
                                                                     </ComboBox>
                                                                 </DataTemplate>
                                                             </GridViewColumn.CellTemplate>
@@ -2134,6 +2135,7 @@
                                                         <ComboBoxItem Content="Удалить"/>
                                                         <ComboBoxItem Content="Не продавать"/>
                                                         <ComboBoxItem Content="Использовать"/>
+                                                        <ComboBoxItem Content="Отправить почтой"/>
                                                     </ComboBox>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -2403,7 +2405,7 @@
                                                             <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0" SelectionChanged="ComboBoxDungeonAction_SelectionChanged">
                                                                 <ComboBoxItem Content="Не выбрано"/>
                                                                 <ComboBoxItem Content="Вход в данж" IsEnabled="False"/>
-                                                                <ComboBoxItem Content="Выход из данжа" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Выход из данжа" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Бежать на точку"/>
                                                                 <ComboBoxItem Content="Фарм мобов" IsEnabled="False"/>
                                                                 <ComboBoxItem Content="Отбиться от мобов"/>

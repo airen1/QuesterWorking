@@ -151,9 +151,10 @@ namespace WowAI.ComboRoutes
                         }
 
 
-                    if (host.MapID == 1760 || host.MapID == 1904)
+                    if (host.MapID == 1760 || host.MapID == 1904 )
                     {
                         Thread.Sleep(30000);
+                        host.FarmModule.farmState = FarmState.AttackOnlyAgro;
                         return;
                     }
 
@@ -170,9 +171,9 @@ namespace WowAI.ComboRoutes
                         return;
 
 
-                    DateTime begin = DateTime.Now;
-                    DateTime end = DeathTime;
-                    TimeSpan rez = begin - end;
+                    var begin = DateTime.Now;
+                    var end = DeathTime;
+                    var rez = begin - end;
                     Thread.Sleep(5000);
                     host.log("Последняя смерть " + rez.TotalMinutes);
                     if (rez.TotalMinutes < 5 && host.CharacterSettings.Mode != EMode.Questing)
@@ -535,6 +536,38 @@ namespace WowAI.ComboRoutes
             }
         }
         DateTime NextUsePottion = DateTime.MinValue;
+
+        private void UseRegenSpell(Spell regenSpel)
+        {
+            if (regenSpel != null)
+            {
+                host.CommonModule.SuspendMove();
+                if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
+                    return;
+                try
+                {
+
+                    host.MyCheckIsMovingIsCasting();
+                    host.CanselForm();
+                    host.CommonModule.MyUnmount();
+                    host.MyCheckIsMovingIsCasting();
+                    var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
+                    if (result != ESpellCastError.SUCCESS)
+                    {
+                        host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
+                        Thread.Sleep(2000);
+
+                    }
+                    while (host.SpellManager.IsCasting)
+                        Thread.Sleep(200);
+                }
+                finally
+                {
+                    host.CommonModule.ResumeMove();
+                }
+            }
+        }
+
         public virtual void UseRegenItems()
         {
             if (host.MyGetAura(269824) != null)//стан
@@ -618,68 +651,12 @@ namespace WowAI.ComboRoutes
                         host.CommonModule.ResumeMove();
                     }
                 }
-
-                var regenSpel = host.SpellManager.GetSpell(8004);
-                if (regenSpel != null)
-                {
-                    host.CommonModule.SuspendMove();
-                    if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
-                        return;
-                    try
-                    {
-
-                        host.MyCheckIsMovingIsCasting();
-                        host.CanselForm();
-                        host.CommonModule.MyUnmount();
-                        host.MyCheckIsMovingIsCasting();
-                        var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
-                        if (result != ESpellCastError.SUCCESS)
-                        {
-                            host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
-                            Thread.Sleep(2000);
-
-                        }
-                        while (host.SpellManager.IsCasting)
-                            Thread.Sleep(200);
-                    }
-                    finally
-                    {
-                        host.CommonModule.ResumeMove();
-                    }
-                }
+                
+                UseRegenSpell(host.SpellManager.GetSpell(8004));              
             }
 
             if (host.Me.GetThreats().Count == 0 && host.Me.HpPercents < 50)
-            {
-                var regenSpel = host.SpellManager.GetSpell(18562);
-                if (regenSpel != null)
-                {
-                    host.CommonModule.SuspendMove();
-                    if (host.SpellManager.CheckCanCast(regenSpel.Id, host.Me) != ESpellCastError.SUCCESS)
-                        return;
-                    try
-                    {
-
-                        host.MyCheckIsMovingIsCasting();
-                        host.CanselForm();
-                        host.CommonModule.MyUnmount();
-                        host.MyCheckIsMovingIsCasting();
-                        var result = host.SpellManager.CastSpell(regenSpel.Id, host.Me);
-                        if (result != ESpellCastError.SUCCESS)
-                        {
-                            host.log("Не смог использовать скилл регена " + result + " " + host.GetLastError(), Host.LogLvl.Error);
-                            Thread.Sleep(2000);
-
-                        }
-                        while (host.SpellManager.IsCasting)
-                            Thread.Sleep(200);
-                    }
-                    finally
-                    {
-                        host.CommonModule.ResumeMove();
-                    }
-                }
-            }
+                UseRegenSpell(host.SpellManager.GetSpell(18562));
 
             if (host.Me.GetThreats().Count == 0 && host.Me.HpPercents < 80)
             {
@@ -717,7 +694,6 @@ namespace WowAI.ComboRoutes
                 }
 
             }
-
         }
 
         private int _failMoveUseSpecialSkill;
@@ -727,6 +703,9 @@ namespace WowAI.ComboRoutes
             try
             {
                 if (FarmState == FarmState.FarmProps)
+                    return;
+
+                if (host.AutoQuests.BestQuestId == 48576)
                     return;
                 if (host.AutoQuests.BestQuestId == 13523)//:  Власть над приливами[13523
                     return;
@@ -749,6 +728,23 @@ namespace WowAI.ComboRoutes
                         if (host.Me.Distance(entity) > 10)
                             continue;
                         if (entity.Id == 126610 || entity.Id == 126627)
+                        {
+                            use = true;
+                        }
+
+                    }
+                    if (!use)
+                        return;
+                }
+
+                if (host.AutoQuests.BestQuestId == 47622)
+                {
+                    var use = false;
+                    foreach (var entity in host.GetEntities())
+                    {
+                        if (host.Me.Distance(entity) > 10)
+                            continue;
+                        if (entity.Id == 123121 || entity.Id == 123116)
                         {
                             use = true;
                         }
@@ -818,7 +814,7 @@ namespace WowAI.ComboRoutes
                             }
 
                         host.TurnDirectly(host.Me.Target);
-                        Item spItem = host.MyGetItem(Convert.ToUInt32(SpecialItems[i]));
+                        var spItem = host.MyGetItem(Convert.ToUInt32(SpecialItems[i]));
 
                         if (spItem != null)
                         {
@@ -853,6 +849,12 @@ namespace WowAI.ComboRoutes
                                             result = host.SpellManager.UseItem(spItem, host.Me.Target);
                                         }
                                         break;
+
+                                    case 152610:
+                                    {
+                                        result = host.SpellManager.UseItem(spItem, host.Me.Target);
+                                    }
+                                        break;
                                     default:
                                         {
                                             result = host.SpellManager.UseItem(spItem);
@@ -869,7 +871,7 @@ namespace WowAI.ComboRoutes
                                 }
                                 else
                                 {
-                                    host.log("Не получилось использовать " + spItem.Name + "[" + SpecialItems[i] + "]  " + result + "  " + host.GetLastError() + "  " + host.FarmModule.BestMob.Guid, Host.LogLvl.Error);
+                                    host.log("Не получилось использовать 2 " + spItem.Name + "[" + SpecialItems[i] + "]  " + result + "  " + host.GetLastError() + "  " + host.FarmModule.BestMob.Guid, Host.LogLvl.Error);
                                     host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 60000);
                                     host.FarmModule.BestMob = null;
                                 }
@@ -1127,6 +1129,17 @@ namespace WowAI.ComboRoutes
                 var mobsWithDropLoot = new List<Unit>();
                 if (host.GetAgroCreatures().Count == 0 && host.IsAlive())
                 {
+                    if (host.MapID == 2207)
+                    {
+                        foreach (var entity in host.GetEntities())
+                        {
+                            if (entity.Id == 21273 && host.Me.Distance(entity) < 20)
+                            {
+                                host.CommonModule.ForceMoveTo(entity, 0);
+                            }
+                        }
+                    }
+
                     foreach (var m in host.GetEntities<Unit>())
                     {
                         if (!host.IsExists(m))
