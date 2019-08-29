@@ -115,6 +115,7 @@ namespace WowAI
         // private Thread FormThread { get; set; }
         public bool FormInitialized { get; set; }
         public MyNpcLocs MyNpcLocss { get; set; } = new MyNpcLocs();
+        public MyGameObjectLocs MyGameObjectLocss { get; set; } = new MyGameObjectLocs();
 
         public bool NeedWaitAfterCombat;
 
@@ -174,6 +175,7 @@ namespace WowAI
         }
 
         public string PathNpCjson = "";
+        public string PathGameObjectLocs = "";
         public string PathNpCjsonCopy = "";
         public string PathDropjson = "";
         public string PathQuestSet = "";
@@ -229,6 +231,25 @@ namespace WowAI
                 if (GetBotLogin() == "Daredevi1")
                     AdvancedLog = true;
 
+                /* var pathItem = "C:\\AllQuestItem" + ClientType + ".txt";
+                 var pathQuest = "C:\\AllQuest" + ClientType + ".txt";
+                 if (File.Exists(pathItem))
+                     File.Delete(pathItem);
+                 if (File.Exists(pathQuest))
+                     File.Delete(pathQuest);
+                 foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
+                 {
+                     if (gameDbQuestTemplate.Value.QuestObjectives != null)
+                         foreach (var valueQuestObjective in gameDbQuestTemplate.Value.QuestObjectives)
+                         {
+                             if (valueQuestObjective.Type == EQuestRequirementType.Item)
+                             {
+                                 File.AppendAllText(pathItem, valueQuestObjective.ObjectID + Environment.NewLine);
+                             }
+                         }
+                     File.AppendAllText(pathQuest, gameDbQuestTemplate.Value.Id + Environment.NewLine);
+                 }*/
+
                 ClearLogs(GetCurrentAccount().Name);
                 RandGenerator = new Random((int)DateTime.Now.Ticks);
                 while (GameState != EGameState.Ingame)
@@ -239,9 +260,9 @@ namespace WowAI
                 var sw = new Stopwatch();
                 if (AdvancedLog)
                     sw.Start();
-                
+
                 FormInitialized = false;
-               
+
                 if (!Directory.Exists(AssemblyDirectory + "\\Configs"))
                     Directory.CreateDirectory(AssemblyDirectory + "\\Configs");
 
@@ -251,8 +272,8 @@ namespace WowAI
                 if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
                     Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\");
 
-                if (!Directory.Exists(AssemblyDirectory + "\\Log"))
-                    Directory.CreateDirectory(AssemblyDirectory + "\\Log");
+                if (!Directory.Exists(AssemblyDirectory + "\\Log\\"))
+                    Directory.CreateDirectory(AssemblyDirectory + "\\Log\\");
 
 
                 if (isReleaseVersion)
@@ -268,7 +289,7 @@ namespace WowAI
                 if (!Directory.Exists(PathQuestSet))
                     Directory.CreateDirectory(PathQuestSet);
 
-               
+
 
                 if (isReleaseVersion)
                     PathQuestState = AssemblyDirectory + "\\QuestState\\";
@@ -296,20 +317,39 @@ namespace WowAI
                 }
 
                 var PathQuestjson = "";
-                if (isReleaseVersion)
-                    PathQuestjson = AssemblyDirectory + "\\MyQuestBase.json";
-                else
-                    PathQuestjson = AssemblyDirectory + "\\Plugins\\Quester\\MyQuestBase.json";
+
+                if (ClientType == EWoWClient.Retail)
+                {
+                    if (isReleaseVersion)
+                        PathQuestjson = AssemblyDirectory + "\\MyQuestBase.json";
+                    else
+                        PathQuestjson = AssemblyDirectory + "\\Plugins\\Quester\\MyQuestBase.json";
+                }
+
+                if (ClientType == EWoWClient.Classic)
+                {
+                    if (isReleaseVersion)
+                        PathQuestjson = AssemblyDirectory + "\\MyQuestBaseClassic.json";
+                    else
+                        PathQuestjson = AssemblyDirectory + "\\Plugins\\Quester\\MyQuestBaseClassic.json";
+                }
 
 
+                if (ClientType == EWoWClient.Retail)
+                {
+                    if (isReleaseVersion)
+                        PathNpCjson = AssemblyDirectory + "\\npc.json";
+                    else
+                        PathNpCjson = AssemblyDirectory + "\\Plugins\\Quester\\npc.json";
+                }
 
-
-
-
-                if (isReleaseVersion)
-                    PathNpCjson = AssemblyDirectory + "\\npc.json";
-                else
-                    PathNpCjson = AssemblyDirectory + "\\Plugins\\Quester\\npc.json";
+                if (ClientType == EWoWClient.Classic)
+                {
+                    if (isReleaseVersion)
+                        PathNpCjson = AssemblyDirectory + "\\npcClassic.json";
+                    else
+                        PathNpCjson = AssemblyDirectory + "\\Plugins\\Quester\\npcClassic.json";
+                }
 
                 if (isReleaseVersion)
                     PathNpCjsonCopy = AssemblyDirectory + "\\npcCopy.json";
@@ -321,15 +361,47 @@ namespace WowAI
                 else
                     PathMonsterGroup = AssemblyDirectory + "\\Plugins\\Quester\\monstergroup.json";
 
-                if (isReleaseVersion)
-                    PathDropjson = AssemblyDirectory + "\\drop.json";
+
+                if (ClientType == EWoWClient.Retail)
+                {
+                    if (isReleaseVersion)
+                        PathDropjson = AssemblyDirectory + "\\drop.json";
+                    else
+                        PathDropjson = AssemblyDirectory + "\\Plugins\\Quester\\drop.json";
+                }
+                if (ClientType == EWoWClient.Classic)
+                {
+                    if (isReleaseVersion)
+                        PathDropjson = AssemblyDirectory + "\\MyDropBasesClassic.json";
+                    else
+                        PathDropjson = AssemblyDirectory + "\\Plugins\\Quester\\MyDropBasesClassic.json";
+                }
+
+                if (ClientType == EWoWClient.Classic)
+                {
+                    if (isReleaseVersion)
+                        PathGameObjectLocs = AssemblyDirectory + "\\GameObjectClassic.json";
+                    else
+                        PathGameObjectLocs = AssemblyDirectory + "\\Plugins\\Quester\\GameObjectClassic.json";
+                }
+
+                if (ClientType == EWoWClient.Retail)
+                {
+                    if (isReleaseVersion)
+                        PathGameObjectLocs = AssemblyDirectory + "\\GameObject.json";
+                    else
+                        PathGameObjectLocs = AssemblyDirectory + "\\Plugins\\Quester\\GameObject.json";
+                }
+
+                if (File.Exists(PathGameObjectLocs))
+                    MyGameObjectLocss = (MyGameObjectLocs)ConfigLoader.LoadConfig(PathGameObjectLocs, typeof(MyGameObjectLocs), MyGameObjectLocss);
                 else
-                    PathDropjson = AssemblyDirectory + "\\Plugins\\Quester\\drop.json";
+                    log("Не найден файл PathNpCjson " + PathNpCjson + "  " + ClientType, LogLvl.Error);
 
                 if (File.Exists(PathNpCjson))
-                    MyNpcLocss = (MyNpcLocs) ConfigLoader.LoadConfig(PathNpCjson, typeof(MyNpcLocs), MyNpcLocss);
+                    MyNpcLocss = (MyNpcLocs)ConfigLoader.LoadConfig(PathNpCjson, typeof(MyNpcLocs), MyNpcLocss);
                 else
-                    log("Не найден файл " + PathNpCjson, LogLvl.Error);
+                    log("Не найден файл PathNpCjson " + PathNpCjson + "  " + ClientType, LogLvl.Error);
 
                 if (AdvancedLog)
                 {
@@ -338,9 +410,9 @@ namespace WowAI
                 }
 
                 if (File.Exists(PathDropjson))
-                    DropBases = (DropBases) ConfigLoader.LoadConfig(PathDropjson, typeof(DropBases), DropBases);
+                    DropBases = (DropBases)ConfigLoader.LoadConfig(PathDropjson, typeof(DropBases), DropBases);
                 else
-                    log("Не найден файл " + PathDropjson, LogLvl.Error);
+                    log("Не найден файл PathDropjson " + PathDropjson, LogLvl.Error);
 
                 if (AdvancedLog)
                 {
@@ -350,9 +422,9 @@ namespace WowAI
 
                 if (File.Exists(PathMonsterGroup))
                     MonsterGroup =
-                        (MonsterGroup2) ConfigLoader.LoadConfig(PathMonsterGroup, typeof(MonsterGroup2), MonsterGroup);
+                        (MonsterGroup2)ConfigLoader.LoadConfig(PathMonsterGroup, typeof(MonsterGroup2), MonsterGroup);
                 else
-                    log("Не найден файл " + PathMonsterGroup, LogLvl.Error);
+                    log("Не найден файл PathMonsterGroup " + PathMonsterGroup, LogLvl.Error);
 
                 if (AdvancedLog)
                 {
@@ -362,9 +434,9 @@ namespace WowAI
 
                 if (File.Exists(PathQuestjson))
                     MyQuestBases =
-                        (MyQuestBase) ConfigLoader.LoadConfig(PathQuestjson, typeof(MyQuestBase), MyQuestBases);
+                        (MyQuestBase)ConfigLoader.LoadConfig(PathQuestjson, typeof(MyQuestBase), MyQuestBases);
                 else
-                    log("Не найден файл " + PathQuestjson, LogLvl.Error);
+                    log("Не найден файл PathQuestjson " + PathQuestjson + ClientType, LogLvl.Error);
 
                 if (AdvancedLog)
                 {
@@ -380,7 +452,7 @@ namespace WowAI
                     ConfigLoader.SaveConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", QuestStates);
                 }
                 else
-                    QuestStates = (QuestStates) ConfigLoader.LoadConfig(
+                    QuestStates = (QuestStates)ConfigLoader.LoadConfig(
                         PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", typeof(QuestStates),
                         QuestStates);
 
@@ -487,25 +559,42 @@ namespace WowAI
 
 
                 ApplySettings();
+                if (AdvancedLog)
+                {
+                    log("ApplySettings                               " + sw.ElapsedMilliseconds + " мс");
+                    sw.Restart();
+                }
+
                 LoadScript();
+                if (AdvancedLog)
+                {
+                    log("LoadScript                              " + sw.ElapsedMilliseconds + " мс");
+                    sw.Restart();
+                }
+
                 LoadQuest();
-                MainForm.NeedApplyDungeonSettings = true;
-                MainForm.NeedApplyQuestSettings = true;
-                
+                if (AdvancedLog)
+                {
+                    log("LoadQuest                              " + sw.ElapsedMilliseconds + " мс");
+                    sw.Restart();
+                }
+                /*   MainForm.NeedApplyDungeonSettings = true;
+                   MainForm.NeedApplyQuestSettings = true;*/
+
                 MainForm.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         try
                         {
                             MainForm.Main1.Title = Me?.Name + " " + GetCurrentAccount().ServerName + " " + Version + " " + isReleaseVersion;
-                            if (!CharacterSettings.HideQuesterUi)
+                            // if (!CharacterSettings.HideQuesterUi)
+                            //  {
+                            MainForm.Main1.WindowState = WindowState.Normal;
+                            if (CharacterSettings.QuesterLeft > -1)
                             {
-                                MainForm.Main1.WindowState = WindowState.Normal;
-                                if (CharacterSettings.QuesterLeft > -1)
-                                {
-                                    MainForm.Main1.Left = CharacterSettings.QuesterLeft;
-                                    MainForm.Main1.Top = CharacterSettings.QuesterTop;
-                                }
+                                MainForm.Main1.Left = CharacterSettings.QuesterLeft;
+                                MainForm.Main1.Top = CharacterSettings.QuesterTop;
                             }
+                            //  }
                         }
                         catch (Exception err)
                         {
@@ -517,7 +606,6 @@ namespace WowAI
                 {
                     log("Форма 2                               " + sw.ElapsedMilliseconds + " мс");
                     sw.Restart();
-
                 }
 
 
@@ -528,438 +616,15 @@ namespace WowAI
                 FarmModule.Start(this);
                 AutoQuests = new AutoQuests();
                 AutoQuests.Start(this);
-             
-                
-                #region TestLog
+
+
+
                 if (AdvancedLog)
                 {
                     log("Запуск потоков                               " + sw.ElapsedMilliseconds + " мс");
                     sw.Stop();
-                
-                    log("Level: " + Me.Level + " HP: " + Me.Hp + "/" + Me.MaxHp +/* " MP: " + Me.Mp + "/" + Me.MaxMp +*/ " Class: " + Me.Class + "  " + Me.Exp + "  " + Me.NextLevelExp + "  ObjectSize" + Me.ObjectSize + " GetRealmId:" + Me.Guid.GetRealmId() + " GetServerId:" + Me.Guid.GetServerId() + "  ");
-
-                    log(GetTimerInfo(EMirrorTimerType.Breath).InitialValue + "  " + GetTimerInfo(EMirrorTimerType.Breath).MaxValue + " " + GetTimerInfo(EMirrorTimerType.Breath).IsActivated);
-                    log("-------------------------------GetQuests------------------------------------------------------");
-
-                    //  Me.PrintDebug();
-
-                   
-
-
-                    log("----------------------------------------GetSkills-------------------------------------" + SpellManager.GetSpells().Count);
-                    foreach (var skill in SpellManager.GetSpells())
-                    {
-                        /*  if (NoShowSkill.Contains(skill.Id))
-                              continue;*/
-                        try
-                        {
-                            /* if (skill.DescriptionRu == "")
-                                 continue;*/
-                            /*  if (skill.IsPassive())
-                                  continue;*/
-
-                            /*    if (skill.SkillLines.Contains(ESkillType.SKILL_MINING))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_HERBALISM))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_FISHING))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_MOUNTS))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_GLYPHS))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_SPECIALIZATIONS))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_COMPANIONS))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_GENERIC_DND))
-                                    continue;
-                                if (skill.SkillLines.Contains(ESkillType.SKILL_FIRST_AID))
-                                    continue;*/
-
-
-                            //  if (skill.Id == 6795)//(skill.DescriptionRu.Contains("Можно использовать"))// (skill.DescriptionRu.Contains("ед. урона ") || skill.DescriptionRu.Contains("физический урон") || skill.DescriptionRu.Contains("физического урона"))
-                            //   {
-                            // log(skill.Id + " " + "  " + skill.Name + " IsPassive =  " + skill.IsPassive());
-                            /*   foreach (var i in skill.SkillLines)
-                                   log(i + "  ");*/
-
-                            /*   foreach(var i in skill.GetEffectsData())
-                               {
-                                   log(i.Effect + "  " + i.Mechanic + "  " + i.ApplyAuraName);
-                               }*/
-                            /*   log("DescriptionRu: " + skill.DescriptionRu, LogLvl.Important);
-                               log("AuraDescriptionRu: " + skill.AuraDescriptionRu + " \n");*/
-                            //     }
-
-                        }
-                        catch
-                        {
-                            // log(skill.Id + " " + "  " + skill.Name + "  IsPassive = null" + "  " );
-                        }
-
-
-                    }
-                    //   int percent = 220000 / 220000 / 100;
-                    //   log(percent + " ghjd");
-                    // SpellManager.CastSpell(5487);
-                    log("GetAuras " + Me.GetAuras().Count);
-                    foreach (var i in Me.GetAuras())
-                    {
-                        // log(i.SpellId + "   " + i.SpellName + "  " + i.AuraDescriptionRu);  //106829   Облик медведя  5487 аура 5487 
-                    }
-
-
-
-                    /*   foreach (var item in ItemManager.GetItems())
-                       {
-                           if (item.Id == 44925)
-
-                           {
-                               var target = GetNpcById(194133); 
-
-
-
-                               var result = SpellManager.UseItem(item, target);
-                               log(result + " ");
-                           }
-                       }*/
-
-                    foreach (var entity in GetEntities<Unit>())
-                    {
-                        /* if (entity.Id == 43949)
-                         {
-                             if(OpenShop(entity))
-                                 log("Открыл шоп ");
-                             else
-                             {
-                                 log("не смог открыть шоп " + GetLastError());
-                             }
-                         }*/
-                        /*  if (!entity.IsQuestGiver)
-                              continue;*/
-
-
-
-                        //  log(entity.Name + "  " + entity.Id + " IsQuestGiver:" + entity.IsQuestGiver + " QuestGiverStatus:" + entity.QuestGiverStatus + " " + entity.TaxiStatus);
-                        /*  if (entity.QuestGiverStatus == EQuestGiverStatus.Reward)
-                              if (!OpenDialog(entity))
-                                  log("Не смог открыть диалог с НПС " + entity.Name + "  " + GetLastError(), LogLvl.Error);*/
-                    }
-
-                    log("--------------------------------------- GetNpcDialogs " + GetNpcDialogs().Count);
-
-                    foreach (var gossipOptionsData in GetNpcDialogs())
-                    {
-                        log(gossipOptionsData.Text + " " + " " + gossipOptionsData.Confirm + " " + gossipOptionsData.OptionNPC + "  " + gossipOptionsData.ClientOption);
-                    }
-
-                    log("--------------------------------------- GetNpcQuestDialogs " + GetNpcQuestDialogs().Count);
-                    foreach (var gossipQuestTextData in GetNpcQuestDialogs())
-                    {
-                        log(" " + gossipQuestTextData.QuestID + " " + gossipQuestTextData.QuestType + " " + gossipQuestTextData.QuestTitle);
-                    }
-
-                    log("---------------------------------------");
-                    const bool questlog = true;
-                    if (questlog)
-                        foreach (var quest in GetQuests())
-                        {
-                            if (quest.Id == 42421)
-                                continue;
-                            if (quest.Id == 48641)
-                                continue;
-                            if (quest.Id == 42170)
-                                continue;
-                            if (quest.Id == 42233)
-                                continue;
-                            if (quest.Id == 42422)
-                                continue;
-                            if (quest.Id == 49930)
-                                continue;
-
-                            if (quest.Template == null)
-                            {
-                                log(quest.Id + " ");
-                                continue;
-                            }
-                            log(quest.Id + " State:" + quest.State + " LogTitle:" + quest.Template.LogTitle + " QuestType:" + quest.Template.QuestType + " Flags:" + quest.Template.Flags + " FlagsEx" + quest.Template.FlagsEx + " " + quest.Counts.Length, LogLvl.Ok);
-                            for (var index = 0; index < quest.Counts.Length; index++)
-                            {
-                                var questCount = quest.Counts[index];
-                                if (questCount == 0)
-                                    continue;
-                                log("questCount: " + index + ") " + questCount);
-                            }
-
-                            if (quest.Template.QuestObjectives != null)
-                                foreach (var templateQuestObjective in quest.Template.QuestObjectives)
-                                {
-                                    log(templateQuestObjective.StorageIndex + ")" + templateQuestObjective.Type + " " + templateQuestObjective.Amount + " " + templateQuestObjective.Description + " ", LogLvl.Important);
-                                }
-
-                            if (quest.CompletionNpcIds != null)
-                                foreach (var questCompletionNpcId in quest.CompletionNpcIds)
-                                {
-                                    log("questCompletionNpcId " + questCompletionNpcId);
-
-                                }
-
-                            log("---------------------------------------" + quest.GetQuestPOI().Count);
-
-                            foreach (var questPoi in quest.GetQuestPOI())
-                            {
-
-                                log("questPoi Flags:" + questPoi.Flags
-                                    + "   Floor:" //+ questPoi.
-                                    + "   MapId:" + questPoi.MapId
-                                    + "   ObjectiveIndex:" + questPoi.ObjectiveIndex
-                                    + "   WorldMapAreaId:" + questPoi.WorldMapAreaId
-                                    + "   BlobIndex:" + questPoi.BlobIndex
-                                    + "   PlayerConditionId:" + questPoi.PlayerConditionId
-                                    + "   Priority:" + questPoi.Priority
-                                    + "   QuestObjectId:" + questPoi.QuestObjectId
-                                    + "   WorldEffectId:" + questPoi.WorldEffectId
-                                    + "   QuestObjectiveId:" + questPoi.QuestObjectiveId
-
-                                    );
-                                foreach (var questPoiPoint in questPoi.Points)
-                                {
-                                    //  log("questPoiPoint " + questPoiPoint.X + " " + questPoiPoint.Y);
-                                }
-                            }
-                        }
-
-
-                    log(CurrentInteractionGuid + " CurrentInteractionGuid");
-
-                    //CreateNewEditorGpsPoint(Me.Location);
-                    //  log(QuestManager.FindQuestSlot(29078) + "  " + QuestManager.GetQuestSlotQuestId(0) + "  " + QuestManager.(29078));
-
-
-                    /*   log("-----------------------------------------------------------------------------" + GameDB.GameObjectsEntries.Count);
-                       foreach (var i in GameDB.GameObjectsEntries)
-                       {
-                           if (i.Value.ID == 2175320)
-                               log(i.Value.ID + "  " + i.Value.Name);
-
-                           if (i.Key == 179965)
-                               log(i.Value.ID + "  " + i.Value.Name);
-                       }*/
-                    log("-----------------------------------------------------------------------------");
-                    log("-----------------------------------------------------------------------------");
-
-                    log("----------------------------------------GetItems-------------------------------------");
-                    foreach (var item in ItemManager.GetItems())
-                    {
-                       
-                       /* if(item.ItemClass == EItemClass.Armor)
-
-                        foreach (var eItemModType in item.ItemStatType)
-                        {
-                            
-                            if ((int) eItemModType == -1)
-                                continue;
-                            log(eItemModType + "");
-                        }*/
-                        /*  if (item.Id == 141410)
-                          {
-                             var res = item.Sell();
-                              log("результат " + res + " " + GetLastError());
-                          }*/
-                        /*  if (item.Id == 46789)//Грибы
-                          {
-                              log("Использую " + item.Name + " " + item.Place);
-                              var result = SpellManager.UseItem(item);
-                              if (result != EInventoryResult.OK)
-                              {
-                                  log("Не смог использовать итем " + item.Name + "  " + result,
-                                      LogLvl.Error);
-                              }
-                          }*/
-
-                        /* if (item.Id == 10327)//Ичияки
-                         {
-                             log("Использую " + item.Name + item.Place);
-                             var result = SpellManager.UseItem(item);
-                             if (result != EInventoryResult.OK)
-                             {
-                                 log("Не смог использовать итем " + item.Name + "  " + result,
-                                     LogLvl.Error);
-                             }
-                         }*/
-
-                        /* if (item.ItemClass == EItemClass.Armor || item.ItemClass == EItemClass.Weapon)
-                         {
-                             log(item.Id + "   " + item.Name + "  " + item.ItemClass + "  " + item.ItemQuality + "  " + item.Place + " Level:" + item.Level + " RequiredLevel:" + item.RequiredLevel + " " + " " + item.Modifiers + " " + " " + (EEquipmentSlot)item.Cell + " " + item.Cell + " " + item.InventoryType + " " + item.CanEquipItem() + " ");
-
-                         }*/
-                        /*  if (item.Place == EItemPlace.Equipment)
-                              continue;
-
-                          if (item.SpellId == 0)
-                              continue;
-                          var isbuff = false;
-
-                          foreach (var effect in item.GetEffectsData())
-                          {
-                              if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
-                                  isbuff = true;
-                          }
-
-                          if (!isbuff)
-                              continue;*/
-
-
-                        /*  foreach (var i in item.SkillLines)
-                             log(i.ToString());
-
-                         foreach (var i in item.GetEffectsData())
-                             log(i.Effect + "  " + i.Mechanic + "  " + i.ApplyAuraName);*/
-
-                    }
-
-                    /*  if (QuestManager.AcceptQuest(2))
-                      {
-                          Log("Взял квест " + GetLastError());
-                      }
-                      else
-                      {
-                          Log("Не смог взять квест " + GetLastError());
-                      }      */
-
-
-
-                    //   log(BindPoint.ZoneID + "  " + BindPoint.MapID + "  " + BindPoint.Location);
-
-
-                    //  ForceMoveTo(1572.03, -4396.03, 15.98);
-                    /*   log(Me.Target.GetAuras().Count + "   sdgsg ");
-                       foreach (var aura in Me.Target.GetAuras())
-                       {
-                           log(aura.SpellName + " " + aura.SpellId);
-                       }*/
-
-
-                    // log(Me.GetPet().Name);
-                    /*   foreach (var item in ItemManager.GetItems())
-                       {
-                           if (item.ItemClass == EItemClass.Weapon)
-                           {
-                               Log(item.Name + " " + item.Id + " " + item.IsSoulBound + " " + item.ItemClass + " " + item.Place);
-                               foreach (var i in item.ItemStatType)
-                               {
-                                   Log("ItemStatType " + i);                              
-                               }
-                           }
-                       }*/
-
                 }
 
-
-                /*foreach (var dungeonSettingsDungeonCoordSetting in DungeonSettings.DungeonCoordSettings)
-                {
-                    CreateNewEditorGpsPoint(dungeonSettingsDungeonCoordSetting.Loc);
-                }*/
-
-                // log(LFGStatus.Joined + "" + Scenario.GetCriterias().Count);
-
-                // SetMoveStateForClient(true);
-                /*  TurnDirectly(new Vector3F(-8507.96, 672.98, 93.39));
-                  TurnDirectly(new Vector3F(-8507.96, 672.98, 93.39));
-                  TurnDirectly(new Vector3F(-8507.96, 672.98, 93.39));*/
-                /*  Wait(1000);
-
-                  MoveForward(true);
-                  Thread.Sleep(1000);
-                  MoveForward(false);
-                  SetMoveStateForClient(false);*/
-
-
-
-                /*  AddNonUnloadableMesh(600, 31, 31);
-                  AddNonUnloadableMesh(600, 31, 32);
-                  AddNonUnloadableMesh(600, 31, 33);
-                  AddNonUnloadableMesh(600, 32, 31);
-                  AddNonUnloadableMesh(600, 32, 32);
-                  AddNonUnloadableMesh(600, 32, 33);
-                  AddNonUnloadableMesh(600, 33, 31);
-                  AddNonUnloadableMesh(600, 33, 32);
-                  AddNonUnloadableMesh(600, 33, 33);
-                  AddNonUnloadableMesh(600, 34, 31);
-                  AddNonUnloadableMesh(600, 34, 32);
-                  AddNonUnloadableMesh(600, 34, 33);
-                  AddNonUnloadableMesh(600, 32, 34);
-                  AddNonUnloadableMesh(600, 33, 34);
-                  AddNonUnloadableMesh(600, 34, 34);
-
-                  AddNonUnloadableMesh(571, 34, 22);
-                  AddNonUnloadableMesh(571, 34, 23);
-                  AddNonUnloadableMesh(571, 34, 24);
-                  AddNonUnloadableMesh(571, 35, 22);
-                  AddNonUnloadableMesh(571, 35, 23);
-                  AddNonUnloadableMesh(571, 35, 24);
-                  AddNonUnloadableMesh(571, 36, 22);
-                  AddNonUnloadableMesh(571, 36, 23);
-                  AddNonUnloadableMesh(571, 36, 24);
-                  AddNonUnloadableMesh(571, 34, 21);
-                  AddNonUnloadableMesh(571, 35, 21);
-                  AddNonUnloadableMesh(571, 36, 21);
-
-
-                  AddNonUnloadableMesh(1, 36, 16);
-                  AddNonUnloadableMesh(1, 36, 17);
-                  AddNonUnloadableMesh(1, 36, 18);
-                  AddNonUnloadableMesh(1, 37, 16);
-                  AddNonUnloadableMesh(1, 37, 17);
-                  AddNonUnloadableMesh(1, 37, 18);
-                  AddNonUnloadableMesh(1, 38, 16);
-                  AddNonUnloadableMesh(1, 38, 17);
-                  AddNonUnloadableMesh(1, 38, 18);
-                  //Перед 12 данжем
-                  AddNonUnloadableMesh(1, 35, 32);
-                  AddNonUnloadableMesh(1, 35, 33);
-                  AddNonUnloadableMesh(1, 35, 34);
-                  AddNonUnloadableMesh(1, 36, 32);
-                  AddNonUnloadableMesh(1, 36, 33);
-                  AddNonUnloadableMesh(1, 36, 34);
-                  AddNonUnloadableMesh(1, 37, 32);
-                  AddNonUnloadableMesh(1, 37, 33);
-                  AddNonUnloadableMesh(1, 37, 34);
-                  //12 данж
-                  AddNonUnloadableMesh(43, 30, 31);
-                  AddNonUnloadableMesh(43, 30, 32);
-                  AddNonUnloadableMesh(43, 30, 33);
-                  AddNonUnloadableMesh(43, 31, 31);
-                  AddNonUnloadableMesh(43, 31, 32);
-                  AddNonUnloadableMesh(43, 31, 33);
-                  AddNonUnloadableMesh(43, 32, 31);
-                  AddNonUnloadableMesh(43, 32, 32);
-                  AddNonUnloadableMesh(43, 32, 33);
-
-                  //перед 85 данж 
-                  AddNonUnloadableMesh(646, 29, 29);
-                  AddNonUnloadableMesh(646, 29, 30);
-                  AddNonUnloadableMesh(646, 29, 31);
-                  AddNonUnloadableMesh(646, 30, 29);
-                  AddNonUnloadableMesh(646, 30, 30);
-                  AddNonUnloadableMesh(646, 30, 31);
-                  AddNonUnloadableMesh(646, 31, 29);
-                  AddNonUnloadableMesh(646, 31, 30);
-                  AddNonUnloadableMesh(646, 31, 31);
-
-                  //в 85 данж 
-                  AddNonUnloadableMesh(725, 29, 29);
-                  AddNonUnloadableMesh(725, 29, 30);
-                  AddNonUnloadableMesh(725, 29, 31);
-                  AddNonUnloadableMesh(725, 30, 29);
-                  AddNonUnloadableMesh(725, 30, 30);
-                  AddNonUnloadableMesh(725, 30, 31);
-                  AddNonUnloadableMesh(725, 31, 29);
-                  AddNonUnloadableMesh(725, 31, 30);
-                  AddNonUnloadableMesh(725, 31, 31);*/
-               
-                #endregion
 
                 var timer = 0;
                 var timer2 = 0;
@@ -976,23 +641,6 @@ namespace WowAI
                     lastZ = Me.Location.Z;
                 }
 
-
-                /* foreach (var skill in SkillManager.GetSkills())
-                 {
-                     Log(skill.Id + " " + skill.Db.mName);
-                 }*/
-
-                /*
-                                foreach (var entity in GetEntities())
-                                {
-                                    if (entity.Type == EBotTypes.Player)
-                                        continue;
-                                    log(Distance(Me.Location.X, Me.Location.Y, Me.Location.Z, entity.Location.X, entity.Location.Y, entity.Location.Z).ToString());
-                                    log(entity.Guid + " " + entity.Type);
-                                }
-
-                                */
-                //  log(Me.Money + "");
                 if (Me != null)
                 {
                     StartGold = Me.Money;
@@ -1032,9 +680,21 @@ namespace WowAI
                 }
 
                 // CommonModule.MoveTo(1636.14, -4445.57, 17.04);
-                GetUpdateInventory();
-                if(CharacterSettings.Mode == EMode.Questing)
+                //  GetUpdateInventory();
+                if (CharacterSettings.Mode == EMode.Questing)
                     SetCTMMovement(true);
+
+                if (ClientType == EWoWClient.Classic)
+                {
+                    if (Me.Class == EClass.Hunter && Me.GetPet() != null)
+                        SetCTMMovement(true);
+                }
+
+
+
+
+
+
 
                 //Jump();
                 while (!cancelRequested)
@@ -1069,14 +729,14 @@ namespace WowAI
                     {
                         if (timer2 > 100)
                         {
-                            GetUpdateInventory();
-                            CompInv();
+                            //GetUpdateInventory();
+                            //CompInv();
                             timer2 = 0;
                         }
-
+                        MainForm?.SetMe();
                         //  MainForm.Draw();
                         MyCheckNPC();
-                        MainForm?.SetMe();
+
                         timer = 0;
                     }
 
@@ -1311,8 +971,6 @@ namespace WowAI
                         ComboRoute = new DefaultComboRoute(this);
                         break;
 
-
-
                     default:
                         ComboRoute = new DefaultComboRoute(this);
                         break;
@@ -1362,7 +1020,6 @@ namespace WowAI
         {
 
             ScriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\" + CharacterSettings.Script;
-            // ScriptName = AssemblyDirectory + "\\Script\\" + CharacterSettings.Script;
 
             var doc = new XmlDocument();
             try
@@ -1402,6 +1059,38 @@ namespace WowAI
                 }
                 else
                 {
+                    var path = AssemblyDirectory + "\\Configs\\Default\\";
+                    if (!isReleaseVersion)
+                    {
+                        path = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\Default\\";
+                    }
+                    if (Directory.Exists(path))
+                    {
+                        var dir = new DirectoryInfo(path);
+                        // папка с файлами
+                        foreach (var file in dir.GetFiles())
+                        {
+                            if (file.Name.Contains(Me.Class.ToString()))
+                            {
+                                if (isReleaseVersion)
+                                {
+                                    CfgName = AssemblyDirectory + "\\Configs\\Default\\" + file.Name;
+                                }
+                                else
+                                {
+                                    CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\Default\\" + file.Name;
+                                }
+
+                                CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
+                                _cfgLoaded = true;
+                                log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
+                                FileName = file.Name;
+                                return true;
+                            }
+                        }
+                    }
+
+
                     log("Не получилось загрузить настройки: " + CfgName + " Загружаю стандартные", LogLvl.Important);
 
 
@@ -1409,11 +1098,11 @@ namespace WowAI
                     {
                         CfgName = AssemblyDirectory + "\\Configs\\Default\\Default.json";
                     }
-
                     else
                     {
                         CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\Default\\Default.json";
                     }
+
                     CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
                     _cfgLoaded = true;
                     log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
@@ -1520,18 +1209,7 @@ namespace WowAI
 
                 MainForm.InitFromSettings();
                 MainForm.NeedApplySettings = false;
-                MainForm.Dispatcher.BeginInvoke(new Action(() =>
-                {
 
-                    //  MainForm.GridSettings.DataContext = CharacterSettings;
-                    //    MainForm.ComboBoxSwitchMode.DataContext = CharacterSettings;
-                    /*   MainForm.StackPanelGlobal.DataContext = CharacterSettings;
-                       MainForm.listViewProp.DataContext = CharacterSettings;
-                       MainForm.GridResource.DataContext = CharacterSettings;
-                       MainForm.groupBoxFilterMob.DataContext = CharacterSettings;*/
-
-
-                }));
             }
             catch (ThreadAbortException) { }
             catch (Exception err)

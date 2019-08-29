@@ -139,7 +139,13 @@ namespace WowAI.ComboRoutes
                 && MobsWithSkinCount() == 0
                 )
                 host.CommonModule.ResumeMove();
-            if ((host.FarmModule.BestMob == null || !host.IsAlive(host.FarmModule.BestMob)) && ((/*host.Me.MpPercents > 40 &&*/ host.Me.HpPercents > 75) || (host.GetAgroCreatures().Count > 0)))
+
+            decimal power = host.Me.GetPower(host.Me.PowerType);
+            decimal maxPower = host.Me.GetMaxPower(host.Me.PowerType);
+            var percent = power * 100 / maxPower;
+            if (host.Me.Class == EClass.Warrior)
+                percent = 100;
+            if ((host.FarmModule.BestMob == null || !host.IsAlive(host.FarmModule.BestMob)) && ((percent > host.CharacterSettings.MpRegen && host.Me.HpPercents > host.CharacterSettings.HpRegen) || (host.GetAgroCreatures().Count > 0)))
             {
                 if (!host.NeedWaitAfterCombat)
                 {

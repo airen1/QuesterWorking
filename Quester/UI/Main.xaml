@@ -259,8 +259,7 @@
                                             <CheckBox x:Name="CheckBoxAutoEquip" Content="Авто подбор экипировки " HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding AutoEquip}"/>
                                             <TextBox x:Name="textBoxEquipStateWeapon" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="50" Text="0"/>
                                         </StackPanel>
-                                        <CheckBox x:Name="CheckBoxHideQuesterUI" Content="Сворачивать окно квестера после запуска" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding HideQuesterUi}"/>
-                                        <CheckBox x:Name="CheckBoxNoAttackOnMount" Content="Не отбиваться на маунте" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding NoAttackOnMount}"/>
+                                        <CheckBox x:Name="CheckBoxNoAttackOnMount" Content="Не отбиваться на маунте" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding NoAttackOnMount}"/>
                                         <CheckBox x:Name="CheckBoxUseDash" Content="Использовать ускорение" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding UseDash}"/>
                                         <StackPanel Margin="0" Orientation="Horizontal">
                                             <Label x:Name="labelFarmLoc_Copy1" Content="Курс" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
@@ -270,13 +269,13 @@
                                             <Label x:Name="labelFarmLoc_Copy2" Content="Валюта" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                             <TextBox x:Name="textBoxValuta" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,0,0"/>
                                         </StackPanel>
-                                        <CheckBox x:Name="CheckBoxPickUpLoot" Content="Подбирать лут" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
+                                        <CheckBox x:Name="CheckBoxPickUpLoot" Content="Подбирать лут" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
                                         <StackPanel Margin="0" Orientation="Horizontal">
                                             <Label x:Name="labelFarmLoc_Copy4" Content="Игнорировать моба через" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                             <TextBox x:Name="textBoxIgnoreMob" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,0,0" Text="20000"/>
                                             <Label x:Name="labelFarmLoc_Copy5" Content="мс" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                         </StackPanel>
-                                        <CheckBox x:Name="CheckBoxUnmountMoveFail" Content="Слезать с маунта при застревании" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
+                                        <CheckBox x:Name="CheckBoxUnmountMoveFail" Content="Слезать с маунта при застревании" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="True"/>
                                         <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
                                             <CheckBox x:Name="CheckBoxSummonBattlePet" Content="Призывать боевого питомца" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="0,5,0,0"/>
                                             <ComboBox x:Name="ComboBoxSummonBattlePetNumber" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Width="147" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
@@ -288,6 +287,12 @@
                                             </ComboBox>
                                         </StackPanel>
                                         <CheckBox x:Name="CheckBoxAttackForSitMount" Content="Отбиваться если нужно сесть на маунта" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" IsChecked="{Binding NoAttackOnMount}"/>
+                                        <StackPanel Margin="5,3,0,0" Orientation="Horizontal">
+                                            <CheckBox x:Name="CheckBoxUseRegen" Content="Реген когда ХП &lt;" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" IsChecked="True"/>
+                                            <TextBox x:Name="TextBoxHpRegen" TextWrapping="Wrap" Text="85" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
+                                            <Label x:Name="LabelMultiZoneRadius2Copy" Content="МП &lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Margin="0"/>
+                                            <TextBox x:Name="TextBoxMpRegen" TextWrapping="Wrap" Text="85" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="0"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox x:Name="groupBox_Pets" Header="Настройки питомцев" Margin="0" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1">
@@ -2404,12 +2409,12 @@
                                                             <Label x:Name="labelDungeonMob1" Content="Действие: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                                             <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0" SelectionChanged="ComboBoxDungeonAction_SelectionChanged">
                                                                 <ComboBoxItem Content="Не выбрано"/>
-                                                                <ComboBoxItem Content="Вход в данж" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Вход в данж" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Выход из данжа" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Бежать на точку"/>
                                                                 <ComboBoxItem Content="Фарм мобов" IsEnabled="False"/>
                                                                 <ComboBoxItem Content="Отбиться от мобов"/>
-                                                                <ComboBoxItem Content="Фарм пропов" IsEnabled="False"/>
+                                                                <ComboBoxItem Content="Фарм пропов" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Пауза"/>
                                                                 <ComboBoxItem Content="Пауза 2"/>
                                                                 <ComboBoxItem Content="Сбросить все данжи"/>
@@ -2434,7 +2439,7 @@
                                                                 <ComboBoxItem Content="Эквип на ауке" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Использовать портал" IsEnabled="True"/>
                                                                 <ComboBoxItem Content="Положить нитки на склад" IsEnabled="True"/>
-                                                                
+
                                                             </ComboBox>
                                                             <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="5,4,0,0" IsChecked="True"/>
                                                             <Button x:Name="ButtonUpDungeon" Content="&gt;" RenderTransformOrigin="0.5,0.5" FontWeight="Bold" controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E" Foreground="White" BorderBrush="#FF4A4F55" Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
@@ -2557,114 +2562,6 @@
                         </TabControl>
                     </Grid>
                 </TabItem>
-                <TabItem x:Name="Debug" Header="Debug" >
-                    <Grid Margin="0">
-                        <TabControl HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <TabItem Header="TabItem">
-                                <Grid Background="#FFE5E5E5">
-                                    <GroupBox x:Name="groupBox3" Header="Debug" Margin="0">
-                                        <Grid Margin="0,0,0,-3">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="611*"/>
-                                                <ColumnDefinition Width="466*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="407*"/>
-                                                <RowDefinition Height="270*"/>
-                                            </Grid.RowDefinitions>
-                                            <ListView x:Name="ListViewDebugEntity" ItemsSource="{Binding CollectionMyQuests}" Grid.ColumnSpan="2" PreviewMouseDoubleClick="ListViewDangeonFunction1_PreviewMouseDoubleClick">
-                                                <ListView.View>
-                                                    <GridView>
-
-
-
-
-                                                        <!--<GridViewColumn Header="Guid" DisplayMemberBinding="{Binding Guid}" Width="Auto"/>-->
-                                                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding GetEntry}" Width="Auto"/>
-                                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="Auto"/>
-                                                        <!--<GridViewColumn Header="MovementFlag" DisplayMemberBinding="{Binding MovementFlag}" Width="Auto"/>-->
-                                                        <GridViewColumn Header="Location" DisplayMemberBinding="{Binding Location}" Width="Auto"/>
-                                                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="Auto"/>
-
-                                                        <GridViewColumn Header="GetHighGuidType" DisplayMemberBinding="{Binding GetHighGuidType}" Width="Auto"/>
-                                                        <GridViewColumn Header="GetObjectType" DisplayMemberBinding="{Binding GetObjectType}" Width="Auto"/>
-                                                        <GridViewColumn Header="MeDist" DisplayMemberBinding="{Binding MeDist}" Width="Auto"/>
-                                                        <GridViewColumn Header="SkillType" DisplayMemberBinding="{Binding SkillTyoe}" Width="Auto"/>
-
-                                                        <GridViewColumn Header="CanAttack" DisplayMemberBinding="{Binding CanAttack}" Width="Auto"/>
-                                                        <GridViewColumn Header="GameObject" DisplayMemberBinding="{Binding GameObject}" Width="Auto"/>
-                                                        <GridViewColumn Header="SkillId" DisplayMemberBinding="{Binding SkillId}" Width="Auto"/>
-                                                        <GridViewColumn Header="SkillName" DisplayMemberBinding="{Binding SkillName}" Width="Auto"/>
-                                                        <GridViewColumn Header="IsTrader" DisplayMemberBinding="{Binding IsTrader}" Width="Auto"/>
-                                                        <GridViewColumn Header="Angle" DisplayMemberBinding="{Binding Angle}" Width="Auto"/>
-
-                                                    </GridView>
-                                                </ListView.View>
-                                            </ListView>
-                                            <StackPanel Margin="10,10,0,0" Orientation="Vertical" Grid.Row="1">
-                                                <Button x:Name="buttonUpdateEntity" Content="Обновить" Click="buttonUpdateEntity_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                                <CheckBox x:Name="CheckBoxCanAttack" Content="Только те кого можно атаковать" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="0"/>
-                                                <CheckBox x:Name="CheckBoxCanSbor" Content="Только те кого можно собрать" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="0"/>
-                                                <CheckBox x:Name="CheckBoxAutoUpdate" Content="Авто обновление" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55" Style="{DynamicResource CheckBoxStyle1}" Margin="0"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </GroupBox>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="LFG">
-                                <StackPanel Orientation="Vertical">
-                                    <DataGrid x:Name="DataGridLfg" Margin="0"/>
-                                    <DataGrid x:Name="DataGridLfg_Copy" Margin="0,300,0,0"/>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="Сценарий">
-                                <StackPanel Orientation="Vertical">
-                                    <DataGrid x:Name="DataGridScenario" Margin="0"/>
-                                    <DataGrid x:Name="DataGridScenarioCriteria" Margin="0,200,0,0"/>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="Entity">
-                                <Grid Background="#FFE5E5E5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="22*"/>
-                                        <ColumnDefinition Width="331*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <DataGrid x:Name="DataGridEntity" Margin="0" Grid.ColumnSpan="2"/>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Quest">
-                                <Grid>
-                                    <StackPanel Margin="0" Orientation="Vertical">
-
-
-                                        <DataGrid x:Name="DataGridQuest" ItemsSource="{Binding _collectionQuests}" SelectionChanged="DataGridQuest_SelectionChanged" SelectedCellsChanged="DataGridQuest_SelectedCellsChanged"   Margin="0" />
-                                        <DataGrid x:Name="DataGridQuestTemplate" ItemsSource="{Binding _collectionQuestTemplate}" Margin="0" AutoGenerateColumns="True" Height="300"/>
-                                    </StackPanel>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Item">
-                                <Grid Background="#FFE5E5E5">
-                                    <DataGrid x:Name="DataGridItem" Margin="0"/>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Buff">
-                                <Grid Background="#FFE5E5E5">
-                                    <DataGrid x:Name="DataGridBuff" Margin="0"/>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="BuffTarget">
-                                <Grid Background="#FFE5E5E5">
-                                    <DataGrid x:Name="DataGridBuffTarget" Margin="0"/>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Skill">
-                                <Grid Background="#FFE5E5E5">
-                                    <DataGrid x:Name="DataGridSkill" Margin="0"/>
-                                </Grid>
-                            </TabItem>
-                        </TabControl>
-                    </Grid>
-                </TabItem>
                 <TabItem x:Name="NPC" Header="NPC">
                     <Grid Margin="0">
                         <GroupBox x:Name="groupBox2" Header="NPC" Margin="0">
@@ -2677,7 +2574,7 @@
                                     <RowDefinition Height="407*"/>
                                     <RowDefinition Height="270*"/>
                                 </Grid.RowDefinitions>
-                                <ListView x:Name="ListViewNpcForAction" ItemsSource="{Binding CollectionNpcForActions}" Grid.ColumnSpan="2" PreviewMouseDoubleClick="ListViewNpcForAction_PreviewMouseDoubleClick">
+                                <ListView x:Name="ListViewNpcForAction" ItemsSource="{Binding CollectionNpcForActions}" Grid.ColumnSpan="2">
                                     <ListView.View>
                                         <GridView>
 
@@ -2824,8 +2721,8 @@
                                     Foreground="#FFD81313" BorderBrush="#FF4A4F55" Background="#FF4A4F55" />
                 <TextBlock x:Name="TextBlockTargetHp" HorizontalAlignment="Center" Margin="0,-15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Text="{Binding Value, ElementName=ProgressBarTargetHp}" RenderTransformOrigin="0.769,6.188" Foreground="White"/>
 
-                <Label x:Name="BestMob" Content="BestMob: null" Margin="1,-5,1,0" Foreground="White"/>
-                <Label x:Name="BestProp" Content="Bestprop:"  Margin="1,-5,1,0" Foreground="White"/>
+                <Label x:Name="BestMob" Content="BestMob: " Margin="1,-5,1,0" Foreground="White"/>
+                <Label x:Name="BestProp" Content="BestProp:"  Margin="1,-5,1,0" Foreground="White"/>
                 <Label x:Name="FarmState" Content="FarmState: null"  Margin="1,-5,1,0" Foreground="White" />
                 <Label x:Name="QuestId" Content="QuestId: null" Margin="1,-5,1,0" Foreground="White" />
                 <Label x:Name="QuestState" Content="QuestState: null" Margin="1,-5,1,0" Foreground="White" />
@@ -2854,7 +2751,7 @@
                 <Label x:Name="LabelInvUpdate" Content="Инвентарь:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" />
 
             </StackPanel>
-            <Grid x:Name="myGrid" Margin="0,361,0,50" Opacity="0.5" Background="Black" PreviewMouseWheel="myGrid_PreviewMouseWheel"/>
+            <Grid x:Name="myGrid" Margin="0,361,0,50" Opacity="0.5" Background="Black"/>
             <Button x:Name="ButtonContinue" Content="Продолжить" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Click="ButtonContinue_Click" RenderTransformOrigin="-2.107,2.12" Foreground="White" Background="#FF36393E" BorderBrush="#FF4A4F55" Style="{DynamicResource ButtonStyle1}" Panel.ZIndex="1" IsEnabled="False"/>
         </Grid>
         <ComboBox x:Name="ComboBoxSwitchMode"  HorizontalAlignment="Right" Margin="138,0,0,0" VerticalAlignment="Top" Width="154" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged"  
@@ -2868,7 +2765,8 @@
             <ComboBoxItem Content="Фарм ресурсов" Background="#FF36393E" Foreground="White"/>
             <ComboBoxItem Content="Скрипт" Background="#FF36393E" Foreground="White"/>
             <ComboBoxItem Content="Отбивание" Background="#FF36393E" Foreground="White"/>
-           
+            <ComboBoxItem Content="Квестинг Классик" Background="#FF36393E" Foreground="White"/>
+
 
 
         </ComboBox>

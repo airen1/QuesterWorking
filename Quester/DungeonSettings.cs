@@ -20,7 +20,7 @@ namespace WowAI
         public int MapId { get; set; }
         public uint AreaId { get; set; }
         public int MobId { get; set; }
-        public int PropId { get; set; }
+        public uint PropId { get; set; }
         public bool Attack { get; set; }
         public int Pause { get; set; }
         public int ItemId { get; set; }

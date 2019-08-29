@@ -618,7 +618,7 @@ namespace WowAI.ComboRoutes
             }
             if (!host.Me.IsInCombat && host.Me.HpPercents < 80)
             {
-                if (host.Me.Class == EClass.Mage)
+                if (host.Me.Class == EClass.Mage && host.SpellManager.GetSpell(190336) != null)
                 {
                     host.CommonModule.SuspendMove();
                     try
@@ -1047,6 +1047,7 @@ namespace WowAI.ComboRoutes
                         }
                         if (host.GetAgroCreatures().Count != 0)
                             return;
+                        Thread.Sleep(500);
                         var result = host.SpellManager.CastSpell(skillSkinning.Id, m);
                         Thread.Sleep(500);
 
@@ -1064,12 +1065,22 @@ namespace WowAI.ComboRoutes
                             Thread.Sleep(100);
 
 
-                        Thread.Sleep(400);
+                        Thread.Sleep(1000);
                         host.SetVar(m, "skinFailed", true);
-
+                        
                         if (host.GetAgroCreatures().Count != 0)
                             return;
 
+                        var waitTill = DateTime.UtcNow.AddSeconds(3);
+                        while (waitTill > DateTime.UtcNow)
+                        {
+                            Thread.Sleep(100);
+                            if (!host.MainForm.On)
+                                return;
+                            if(m.IsLootable)
+                                break;
+
+                        }
                         if (!m.IsLootable)
                             continue;
 
@@ -1265,15 +1276,28 @@ namespace WowAI.ComboRoutes
                         }
                         else
                         {
-                            // host.log("Окно лута не открыто 1 " + host.Me.Distance(m) + "  " + m.Name + "   " + host.GetLastError(), Host.LogLvl.Error);
+                            host.log("Окно лута не открыто 1 " + host.Me.Distance(m) + "  " + m.Name + "   " + host.GetLastError(), Host.LogLvl.Error);
                             host.SetVar(m, "pickFailed", true);
+                            host.SendKeyPress(0x1B);
                         }
 
                         if (host.GetAgroCreatures().Count != 0)
                             break;
                     }
 
+                    if (host.CharacterSettings.Skinning)
+                    {
+                        var waitTill = DateTime.UtcNow.AddSeconds(2);
+                        while (waitTill > DateTime.UtcNow)
+                        {
+                            Thread.Sleep(100);
+                            if (!host.MainForm.On)
+                                return;
+                            if (MobsWithSkinCount() > 0)
+                                break;
 
+                        }
+                    }
 
 
                     /**/
@@ -1305,7 +1329,16 @@ namespace WowAI.ComboRoutes
                      {
                          host.CanselForm();
                      }*/
-                    Thread.Sleep(300);
+                    var waitTill = DateTime.UtcNow.AddSeconds(2);
+                    while (waitTill > DateTime.UtcNow)
+                    {
+                        Thread.Sleep(100);
+                        if (!host.MainForm.On)
+                            return;
+                        if (MobsWithDropCount() > 0)
+                            break;
+
+                    }
                     host.NeedWaitAfterCombat = false;
                 }
                 UseRegenItems();

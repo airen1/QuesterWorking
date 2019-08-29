@@ -26,7 +26,7 @@ namespace WowAI.Modules
                 Host.onMoveTick -= MyonMoveTick;
                 Host.onCastFailedMessage -= MyonCastFailedMessage;
                 Host.onSpellDamage -= MyonSpellDamage;
-                
+                //Host.onChatMessage -= MyOnChatMessage;
                 base.Stop();
             }
             catch (Exception e)
@@ -51,6 +51,7 @@ namespace WowAI.Modules
                 Host.onMoveTick += MyonMoveTick;
                 Host.onCastFailedMessage += MyonCastFailedMessage;
                 Host.onSpellDamage += MyonSpellDamage;
+                //Host.onChatMessage += MyOnChatMessage;
             }
             catch (Exception e)
             {
@@ -58,6 +59,11 @@ namespace WowAI.Modules
             }
         }
 
+       /* public void MyOnChatMessage(EChatMessageType type, string text, string receiver)
+        {
+            if(Host.GetBotLogin() == "Daredevi1")
+                Host.log(text + " " + receiver + " " + type);
+        }*/
         public void MyonSpellDamage(WowGuid casterGuid, WowGuid targetGuid, uint spellID, EAttackerStateFlags flags, int damage)
         {
             var target = Host.GetEntity(targetGuid);
@@ -712,72 +718,80 @@ namespace WowAI.Modules
 
         public EEquipmentSlot GetItemEPlayerPartsType(EInventoryType type)
         {
-            switch (type)
+            try
             {
-                /*  case EInventoryType.NonEquip:
+                switch (type)
+                {
+                    /*  case EInventoryType.NonEquip:
                       break;*/
-                case EInventoryType.Head:
-                    return EEquipmentSlot.Head;
-                case EInventoryType.Neck:
-                    return EEquipmentSlot.Neck;
-                case EInventoryType.Shoulders:
-                    return EEquipmentSlot.Shoulders;
+                    case EInventoryType.Head:
+                        return EEquipmentSlot.Head;
+                    case EInventoryType.Neck:
+                        return EEquipmentSlot.Neck;
+                    case EInventoryType.Shoulders:
+                        return EEquipmentSlot.Shoulders;
 
-                case EInventoryType.Body:
-                    return EEquipmentSlot.Body;
-                case EInventoryType.Chest:
-                    return EEquipmentSlot.Chest;
+                    case EInventoryType.Body:
+                        return EEquipmentSlot.Body;
+                    case EInventoryType.Chest:
+                        return EEquipmentSlot.Chest;
 
-                case EInventoryType.Waist:
-                    return EEquipmentSlot.Waist;
-                case EInventoryType.Legs:
-                    return EEquipmentSlot.Legs;
-                case EInventoryType.Feet:
-                    return EEquipmentSlot.Feet;
-                case EInventoryType.Wrists:
-                    return EEquipmentSlot.Wrists;
-                case EInventoryType.Hands:
-                    return EEquipmentSlot.Hands;
-                case EInventoryType.Finger:
-                    return EEquipmentSlot.Finger1;
-                case EInventoryType.Trinket:
-                    return EEquipmentSlot.Trinket1;
-                case EInventoryType.Weapon:
-                    return EEquipmentSlot.MainHand;
-                case EInventoryType.Shield:
-                    return EEquipmentSlot.OffHand;
+                    case EInventoryType.Waist:
+                        return EEquipmentSlot.Waist;
+                    case EInventoryType.Legs:
+                        return EEquipmentSlot.Legs;
+                    case EInventoryType.Feet:
+                        return EEquipmentSlot.Feet;
+                    case EInventoryType.Wrists:
+                        return EEquipmentSlot.Wrists;
+                    case EInventoryType.Hands:
+                        return EEquipmentSlot.Hands;
+                    case EInventoryType.Finger:
+                        return EEquipmentSlot.Finger1;
+                    case EInventoryType.Trinket:
+                        return EEquipmentSlot.Trinket1;
+                    case EInventoryType.Weapon:
+                        return EEquipmentSlot.MainHand;
+                    case EInventoryType.Shield:
+                        return EEquipmentSlot.OffHand;
 
-                case EInventoryType.Ranged:
-                    return EEquipmentSlot.MainHand;
-                case EInventoryType.Cloak:
-                    return EEquipmentSlot.Cloak;
-                case EInventoryType.TwoHandedWeapon:
-                    return EEquipmentSlot.MainHand;
-                case EInventoryType.Bag:
-                    break;
-                case EInventoryType.Tabard:
-                    return EEquipmentSlot.Tabard;
-                case EInventoryType.Robe:
-                    return EEquipmentSlot.Chest;
-                case EInventoryType.MainHandWeapon:
-                    return EEquipmentSlot.MainHand;
-                case EInventoryType.OffHandWeapon:
-                    return EEquipmentSlot.OffHand;
-                case EInventoryType.Holdable:
-                    return EEquipmentSlot.OffHand;
-                /*  case EInventoryType.Ammo:
+                    case EInventoryType.Ranged:
+                        return EEquipmentSlot.MainHand;
+                    case EInventoryType.Cloak:
+                        return EEquipmentSlot.Cloak;
+                    case EInventoryType.TwoHandedWeapon:
+                        return EEquipmentSlot.MainHand;
+                    case EInventoryType.Bag:                       
+                        break;
+                    case EInventoryType.Tabard:
+                        return EEquipmentSlot.Tabard;
+                    case EInventoryType.Robe:
+                        return EEquipmentSlot.Chest;
+                    case EInventoryType.MainHandWeapon:
+                        return EEquipmentSlot.MainHand;
+                    case EInventoryType.OffHandWeapon:
+                        return EEquipmentSlot.OffHand;
+                    case EInventoryType.Holdable:
+                        return EEquipmentSlot.OffHand;
+                    /*  case EInventoryType.Ammo:
                       break;*/
-                /*  case EInventoryType.Thrown:
+                    /*  case EInventoryType.Thrown:
                       break;*/
-                case EInventoryType.RangedRight:
-                    return EEquipmentSlot.MainHand;
-                    /*  case EInventoryType.Quiver:
-                          break;*/
-                    /*  case EInventoryType.Relic:
-                          break;   */
+                    case EInventoryType.RangedRight:
+                        return EEquipmentSlot.MainHand;
+                        /*  case EInventoryType.Quiver:
+                              break;*/
+                        /*  case EInventoryType.Relic:
+                              break;   */
 
+                }
+                return EEquipmentSlot.Ranged;
             }
-            return EEquipmentSlot.Ranged;
+            catch (Exception e)
+            {
+                Host.log(e + "");
+                return EEquipmentSlot.Ranged;
+            }
         }
 
         private void EquipBestArmorAndWeapon()
@@ -789,7 +803,7 @@ namespace WowAI.Modules
                 if (Host.Me.IsDeadGhost)
                     return;
                 var equipCells = new Dictionary<EEquipmentSlot, Item>();
-                //  Host.log("Тест  EquipBestArmorAndWeapon");
+                // Host.log("Тест  EquipBestArmorAndWeapon");
 
                 foreach (EEquipmentSlot value in Enum.GetValues(typeof(EEquipmentSlot)))
                 {
@@ -798,7 +812,7 @@ namespace WowAI.Modules
                     equipCells.Add(value, null);
                     // Host.log(value.ToString());
                 }
-
+                //  Host.log("Тест  EquipBestArmorAndWeapon 2");
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
@@ -881,7 +895,7 @@ namespace WowAI.Modules
                         }
                 }
 
-
+                //   Host.log("Тест  EquipBestArmorAndWeapon 3");
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
@@ -916,7 +930,7 @@ namespace WowAI.Modules
                             }
                         }
                 }
-
+                //  Host.log("Тест  EquipBestArmorAndWeapon 4");
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
@@ -950,8 +964,8 @@ namespace WowAI.Modules
                         }
                 }
 
-
-                if (equipCells[EEquipmentSlot.MainHand].InventoryType != EInventoryType.TwoHandedWeapon)
+                //    Host.log("Тест  EquipBestArmorAndWeapon 5");
+                if (equipCells[EEquipmentSlot.MainHand]?.InventoryType != EInventoryType.TwoHandedWeapon)
                 {
                     foreach (var item in Host.ItemManager.GetItems())
                     {
@@ -1024,7 +1038,7 @@ namespace WowAI.Modules
 
                        Host.log(equipCell.Key + " " + equipCell.Value?.Name + "  " + equipCell.Value?.Place + "  " + "  ");
                    }*/
-
+                //  Host.log("Тест  EquipBestArmorAndWeapon 6");
                 foreach (var b in equipCells.Keys.ToList())
                 {
                     if (equipCells[b] != null && equipCells[b].Place != EItemPlace.Equipment)
@@ -1328,7 +1342,7 @@ namespace WowAI.Modules
             set
             {
                 _isMovementSuspended = value;
-                // host.MainForm.SetIsMovementSuspendedText(_isMovementSuspended.ToString());
+                // Host.MainForm.SetIsMovementSuspendedText("IsMoveToNow: " + _isMoveToNow + "   Susp: " + _isMovementSuspended);
             }
         }
 
@@ -1338,7 +1352,7 @@ namespace WowAI.Modules
             set
             {
                 _isMoveToNow = value;
-                // host.MainForm.SetIsMoveToNowText(_isMoveToNow.ToString());
+                // Host.MainForm.SetIsMovementSuspendedText("IsMoveToNow: " + _isMoveToNow + "   Susp: " + _isMovementSuspended);
             }
         }
 
@@ -1361,7 +1375,7 @@ namespace WowAI.Modules
 
         public int _moveFailCount;
 
-        private void CheckMoveFailed(bool result)
+        private void CheckMoveFailed(bool result, Vector3F loc)
         {
             try
             {
@@ -1391,7 +1405,7 @@ namespace WowAI.Modules
                     {
                         _moveFailCount++;
                         Host.log("Застрял: " + Host.GetLastError() + "(" + _moveFailCount + ")" + " " + Host.Me.MovementFlagExtra + " " + Host.Me.MovementFlags + " " + Host.Me.SwimBackSpeed +
-                            " " + Host.Me.SwimSpeed, Host.LogLvl.Error);
+                            " " + Host.Me.SwimSpeed + " loc: " + loc + " " + Host.Me.Distance(loc), Host.LogLvl.Error);
                         if (Host.Me.MovementFlags == EMovementFlag.Pending_root)
                         {
                             _moveFailCount = 0;
@@ -1405,6 +1419,8 @@ namespace WowAI.Modules
                             if (Host.MyGetAura(269564) != null)
                                 break;
                             if (Host.MyGetAura(245831) != null)
+                                break;
+                            if (Host.AutoQuests.BestQuestId == 52472)
                                 break;
                             if (Host.MapID == 1718)
                                 break;
@@ -1657,7 +1673,7 @@ namespace WowAI.Modules
                 // 
 
                 //  
-                CheckMoveFailed(result);
+                CheckMoveFailed(result, loc);
                 /* if (!result)
                      host.log(host.GetLastError().ToString());*/
                 return result;
@@ -1692,7 +1708,7 @@ namespace WowAI.Modules
                 // 
 
                 //  
-                CheckMoveFailed(result);
+                CheckMoveFailed(result, obj.Location);
                 /* if (!result)
                      host.log(host.GetLastError().ToString());*/
                 return result;
@@ -1771,7 +1787,7 @@ namespace WowAI.Modules
                             return false;
                         if (!Host.ComeTo(path.Path[i], dist, Host.Me.RunSpeed / 5.0))
                         {
-                            CheckMoveFailed(false);
+                            CheckMoveFailed(false, path.Path[i]);
                             return false;
                         }
 
@@ -1780,7 +1796,7 @@ namespace WowAI.Modules
 
                 var result = Host.ComeTo(x, y, z, dist, Host.Me.RunSpeed / 5.0);
 
-                CheckMoveFailed(result);
+                CheckMoveFailed(result, new Vector3F(x, y, z));
                 /*   if (!result)
                        host.log(host.GetLastError().ToString());*/
                 return result;
@@ -2036,22 +2052,30 @@ namespace WowAI.Modules
 
                 if (!MoveToBadLoc(loc))
                 {
-                    CheckMoveFailed(false);
+                    CheckMoveFailed(false, loc);
                     return false;
+                }
+
+                if (Host.AutoQuests.BestQuestId == 50934)
+                {
+                    if (Host.Me.Distance(loc) > 1000)
+                    {
+                        Host.MyUseTaxi(8500, new Vector3F(2007.54, -79.64, 1.91));
+                        return false;
+                    }
                 }
 
                 // if (Host.CharacterSettings.Mode == EMode.Questing || Host.AutoQuests.HerbQuest)
                 if (Host.GetNavMeshHeight(new Vector3F(loc.X, loc.Y, 0)) == 0 && Host.Me.Distance(loc) > 300)
                 {
-                     if (Host.AutoQuests.BestQuestId == 50751)
-                     {
-                         if (Host.Me.Distance(loc) > 1800)
-                         {
-                             Host.MyUseTaxi(8501, new Vector3F(2034.23, 4810.68, 71.18));
-
-                             return false;
-                         }
-                     }
+                    if (Host.AutoQuests.BestQuestId == 50751)
+                    {
+                        if (Host.Me.Distance(loc) > 1800)
+                        {
+                            Host.MyUseTaxi(8501, new Vector3F(2034.23, 4810.68, 71.18));
+                            return false;
+                        }
+                    }
 
                     if (Host.AutoQuests.BestQuestId == 50703 && Host.GetQuest(50703) != null)
                         if (Host.Area.Id == 8501) //волдун
@@ -2095,13 +2119,13 @@ namespace WowAI.Modules
                         if (z > 0)
                         {
                             Host.log("Точка в мешах. Дист:" + Host.Me.Distance(resX, resY, z));
-                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 50, 50));
+                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 50, 50), new Vector3F(resX, resY, z));
                             return false;
                         }
                         else
                         {
                             Host.log("Точка вне мешей " + Host.Me.Distance(resX, resY, z) + " " + expectedDistance);
-                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 250, 250));
+                            CheckMoveFailed(Host.ComeTo(resX, resY, z, 250, 250), new Vector3F(resX, resY, z));
                             return false;
                         }
                         // loc.Z = 116;
@@ -2124,15 +2148,15 @@ namespace WowAI.Modules
                             return false;
                         if (!Host.MainForm.On)
                             return false;
-                         Host.log("Начал бег");
+                        Host.log("Начал бег");
                         if (!Host.ComeTo(path.Path[i], dist, doneDist))
                         {
-                                Host.log("Закончил бег");
-                            CheckMoveFailed(false);
+                            Host.log("Закончил бег");
+                            CheckMoveFailed(false, path.Path[i]);
                             return false;
                         }
 
-                       // return false;
+                        // return false;
                         //   Host.log("Закончил бег");
                     }
 
@@ -2151,7 +2175,7 @@ namespace WowAI.Modules
                 var result = Host.ComeTo(loc, dist, doneDist);
                 Host.log("Закончил бег в " + loc + "  дист: " + Host.Me.Distance(loc));
 
-                CheckMoveFailed(result);
+                CheckMoveFailed(result, loc);
                 /* if (!result)
                      host.log(host.GetLastError().ToString());*/
                 return result;
@@ -2219,7 +2243,7 @@ namespace WowAI.Modules
 
                 var result = Host.ComeTo(obj, dist, Host.Me.RunSpeed / 5.0);
 
-                CheckMoveFailed(result);
+                CheckMoveFailed(result, obj.Location);
                 /*  if (!result)
                       host.log(host.GetLastError().ToString());*/
                 return result;
@@ -2235,7 +2259,7 @@ namespace WowAI.Modules
 
             var result = Host.ComeTo(x, y, z, dist, Host.Me.RunSpeed / 5.0);
 
-            CheckMoveFailed(result);
+            CheckMoveFailed(result, new Vector3F(x, y, z));
             return result;
         }
 
@@ -2248,7 +2272,7 @@ namespace WowAI.Modules
             var result = Host.ComeTo(loc, dist, Host.Me.RunSpeed / 5.0);
 
             Host.log("Закончил бег");
-            CheckMoveFailed(result);
+            CheckMoveFailed(result, loc);
             return result;
         }
 
@@ -2295,7 +2319,7 @@ namespace WowAI.Modules
             {
                 result = Host.ComeTo(obj, dist, doneDist);
             }
-            CheckMoveFailed(result);
+            CheckMoveFailed(result, obj.Location);
             return result;
         }
 
@@ -2319,14 +2343,30 @@ namespace WowAI.Modules
                     case EClass.Warrior:
                         {
                             WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE2, EItemSubclassWeapon.SWORD2, EItemSubclassWeapon.MACE2 };
+                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.PLATE, EItemSubclassArmor.MISCELLANEOUS };
                         }
                         break;
                     case EClass.Paladin:
+                        {
+                            if (Host.ClientType == EWoWClient.Classic)
+                            {
+                                WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.MACE2};
+                                ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS };
+                            }
+                        }
                         break;
                     case EClass.Hunter:
                         {
                             WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.BOW, EItemSubclassWeapon.GUN };
-                            ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS };
+                            if (Host.ClientType == EWoWClient.Classic)
+                            {
+                                ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER, EItemSubclassArmor.MISCELLANEOUS };
+                            }
+                            else
+                            {
+                                ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.CLOTH, EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS };
+                            }
+
                         }
                         break;
                     case EClass.Rogue:
