@@ -9,20 +9,22 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WowAI</RootNamespace>
     <AssemblyName>WowAI</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseX64|AnyCPU'">
-    <OutputPath>D:\Games\Bless\BlessBot_debug\Plugins\Quester\</OutputPath>
+    <OutputPath>.\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <Optimize>true</Optimize>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -46,7 +48,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseX64|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\ReleaseX64\</OutputPath>
+    <OutputPath>.\</OutputPath>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -67,10 +69,10 @@
     <Reference Include="Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=41c6cb2c63b6d20e, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Core.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -88,33 +90,81 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharacterSettings\AdvancedEquipArmor.cs" />
+    <Compile Include="CharacterSettings\AdvancedEquipStat.cs" />
+    <Compile Include="CharacterSettings\AdvancedEquipWeapon.cs" />
+    <Compile Include="CharacterSettings\AukSettings.cs" />
+    <Compile Include="CharacterSettings\EquipAuc.cs" />
+    <Compile Include="CharacterSettings\EventSettings.cs" />
+    <Compile Include="CharacterSettings\GameObjectIgnore.cs" />
+    <Compile Include="CharacterSettings\IgnoreQuest.cs" />
+    <Compile Include="CharacterSettings\ItemGlobal.cs" />
+    <Compile Include="CharacterSettings\ItemSettings.cs" />
+    <Compile Include="CharacterSettings\LearnTalent.cs" />
+    <Compile Include="CharacterSettings\LearnSkill.cs" />
+    <Compile Include="CharacterSettings\MobsSettings.cs" />
+    <Compile Include="CharacterSettings\MultiZone.cs" />
+    <Compile Include="CharacterSettings\NpcForAction.cs" />
+    <Compile Include="CharacterSettings\PetSettings.cs" />
+    <Compile Include="CharacterSettings\PropSettings.cs" />
+    <Compile Include="CharacterSettings\RegenItems.cs" />
+    <Compile Include="CharacterSettings\ScriptSchedule.cs" />
+    <Compile Include="ConfigLoader.cs" />
+    <Compile Include="Enums\Mode.cs" />
+    <Compile Include="Enums\EMyUnitType.cs" />
+    <Compile Include="Enums\LogLvl.cs" />
+    <Compile Include="Enums\EItemUse.cs" />
+    <Compile Include="Enums\EMountType.cs" />
+    <Compile Include="Enums\EPriority.cs" />
+    <Compile Include="Enums\EQuestReg.cs" />
+    <Compile Include="Enums\EventsAction.cs" />
+    <Compile Include="Enums\EventsType.cs" />
+    <Compile Include="Enums\ExecuteType.cs" />
+    <Compile Include="Enums\FarmState.cs" />
+    <Compile Include="Enums\QuestAction.cs" />
+    <Compile Include="Host.MyDialog.cs" />
+    <Compile Include="Host.MyDistance.cs" />
+    <Compile Include="Host.MyExp.cs" />
+    <Compile Include="Host.MyGetFreeSlot.cs" />
+    <Compile Include="Host.MyIsNeedBuy.cs" />
+    <Compile Include="Host.MyIsNeedRepair.cs" />
+    <Compile Include="Host.MyIsNeedSell.cs" />
+    <Compile Include="Host.MyMail.cs" />
+    <Compile Include="Module\AutoQuests.Mode.cs" />
+    <Compile Include="Module\AutoQuests.OldQuest.cs" />
+    <Compile Include="Module\AutoQuests.QuestClassic.cs" />
+    <Compile Include="Module\CommonModule.Equip.cs" />
+    <Compile Include="Module\CommonModule.MoveTo.cs" />
+    <Compile Include="Module\FarmModule.CheckWeDie.cs" />
+    <Compile Include="Module\FarmModule.DropSkin.cs" />
+    <Compile Include="Module\FarmModule.UseSkillAndWait.cs" />
     <Compile Include="MonsterGroup.cs" />
     <Compile Include="Drop.cs" />
-    <Compile Include="MyQuestHelp.cs" />
+    <Compile Include="MyQuestBaseItem.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelp.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpApply.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpApplyCustom.cs" />
+    <Compile Include="MyQuestHelp\MyQuestInfoCompleteCustom.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpRunCustom.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpLua.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpRouteAlliance.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpRouteHorde.cs" />
+    <Compile Include="MyQuestHelp\MyQuestHelpRun.cs" />
+    <Compile Include="MyQuestHelp\MyQuestInfoComplete.cs" />
     <Compile Include="QuestState.cs" />
     <Compile Include="QuestSetting.cs" />
     <Compile Include="DungeonSettings.cs" />
-    <Compile Include="CharacterSettings.cs" />
-    <Compile Include="ComboRoutes\ComboRoute.cs" />
-    <Compile Include="ComboRoutes\DefaultComboRoute.cs" />
+    <Compile Include="CharacterSettings\CharacterSettings.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="HostGameFunctions.cs" />
     <Compile Include="JTask.cs" />
@@ -129,6 +179,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="CharacterSettings\SkillSettings.cs" />
+    <Compile Include="UI\Helper.cs" />
     <Compile Include="UI\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
@@ -143,7 +195,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Quester.pfx" />
-    <None Include="Resources\helpGps.db3" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -167,7 +218,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "G:\GoogleDrive\WOW\Plugins\Quester"

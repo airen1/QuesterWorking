@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Out.Utility;
+using System;
 using System.Collections.Generic;
-using Out.Utility;
 
 
 namespace WowAI

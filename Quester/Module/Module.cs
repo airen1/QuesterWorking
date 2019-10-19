@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading;
-using AlbionAI;
 
-namespace WowAI.Modules
+namespace WowAI.Module
 {
     internal class Module
     {
@@ -14,7 +13,7 @@ namespace WowAI.Modules
             Host = host;
             try
             {
-                Task = new JTask(() => Run(Task.token));
+                Task = new JTask(() => Run(Task.Token));
                 Task.Start();
             }
             catch (Exception error)

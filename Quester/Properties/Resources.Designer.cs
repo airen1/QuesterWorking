@@ -59,15 +59,5 @@ namespace WowAI.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
-        /// </summary>
-        internal static byte[] helpGps {
-            get {
-                object obj = ResourceManager.GetObject("helpGps", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

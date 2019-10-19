@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Out.Utility;
+using System;
 using System.Collections.Generic;
-using Out.Utility;
 
 
 namespace WowAI
@@ -8,7 +8,7 @@ namespace WowAI
 
     [Serializable]
     public class DungeonSetting
-    {      
+    {
         public List<DungeonCoordSettings> DungeonCoordSettings = new List<DungeonCoordSettings>();
     }
 
@@ -27,5 +27,7 @@ namespace WowAI
         public uint SkillId { get; set; }
         public string Com { get; set; }
         public string PluginPath { get; set; }
-    }   
+        public uint QuestId { get; set; }
+        public QuestAction QuestAction { get; set; }
+    }
 }

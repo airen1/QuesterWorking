@@ -1,82 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System;
-using System.Threading.Tasks;
-using Out.Internal.Core;
+﻿using Out.Internal.Core;
 using Out.Utility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using WoWBot.Core;
-using WowAI.UI;
 
-namespace WowAI.Modules
+namespace WowAI.Module
 {
-    internal enum FarmState
+    internal partial class FarmModule : Module
     {
-        Disabled,
-        FarmMobs,
-        FarmProps,
-        AttackOnlyAgro,
-    }
-
-    internal class FarmModule : Module
-    {
-        public override void Start(Host host)
-        {
-            base.Start(host);
-
-            farmState = FarmState.Disabled;
-            if (host.CharacterSettings.Mode == EMode.Questing)
-                farmState = FarmState.AttackOnlyAgro;
-            if (host.CharacterSettings.Mode == EMode.QuestingClassic)
-                farmState = FarmState.AttackOnlyAgro;
-        }
-
-        public override void Stop()
-        {
-            base.Stop();
-        }
-
-
-
-        public bool StopFarmModule;
-
-        public override void Run(CancellationToken ct)
-        {
-            try
-            {
-                StopFarmModule = false;
-                while (!Host.cancelRequested && !ct.IsCancellationRequested)
-                {
-                    base.Run(ct);
-                    Thread.Sleep(100);
-                    // continue;
-                    if (Host.Me == null)
-                        continue;
-                    if ((Host.MainForm.On) && (Host.GameState == EGameState.Ingame))
-                    {
-                        // if (farmState == FarmState.FarmMobs || farmState == FarmState.FarmProps || bestMob != null)
-                        /* if (host.Me.Mount != null)
-                             host.Me.Unmount();*/
-                        Host.ComboRoute.PrepareForFight();
-                        Host.ComboRoute.Fight();
-                    }
-                }
-                StopFarmModule = true;
-            }
-            catch (ThreadAbortException)
-            {
-            }
-            catch (Exception error)
-            {
-                Host.log(error.ToString());
-            }
-            finally
-            {
-                Host.log("FarmModule Stop");
-            }
-        }
-
-
-        internal bool readyToActions
+        public bool EventDeath;
+        public bool EventDeathPlayer;
+        public bool IsWing1 = true;
+        public long TickTime;
+        private List<SkillSettings> _deckSkills;
+        public int IsNeedFight;
+        DateTime _nextUsePottion = DateTime.MinValue;
+        private int _attackMoveFailCount;
+        DateTime _useQuestSpell = DateTime.MinValue;
+        internal bool ReadyToActions
         {
             get
             {
@@ -86,19 +29,19 @@ namespace WowAI.Modules
                 {
                     return true;
                 }
-
                 return false;
             }
         }
+        public bool RandDirLeft;
+        public DateTime NextRandomMovesDirChange = DateTime.UtcNow;
+        internal int[] SpecialItems;
+        internal float SpecialDist;
+        internal int[] SpecialSkills;
 
-        internal int[] specialItems;
-        internal float specialDist;
-        internal int[] specialSkills;
-
-        internal Zone farmZone = new RoundZone(0, 0, 0);
-        internal List<uint> farmMobsIds = new List<uint>();
-        internal List<uint> factionIds = new List<uint>();
-
+        internal Zone FarmZone = new RoundZone(0, 0, 0);
+        internal List<uint> FarmMobsIds = new List<uint>();
+        internal List<uint> FactionIds = new List<uint>();
+        private int _gatherCount;
         private Unit _bestMob;
         internal Unit BestMob
         {
@@ -116,8 +59,6 @@ namespace WowAI.Modules
                     {
                         if (value != null && Host.IsExists(value))
                         {
-                            AutoAttackStart = false;
-
                             Host.MainForm.SetBestMobText(value.Name + "[" + value.Id + "]");
                             _bestMob = value;
                         }
@@ -127,7 +68,6 @@ namespace WowAI.Modules
                             Host.MainForm.SetBestMobText("");
                         }
                     }
-
                 }
                 catch
                 {
@@ -136,7 +76,7 @@ namespace WowAI.Modules
             }
         }
 
-        internal List<uint> farmPropIds = new List<uint>();
+        internal List<uint> FarmPropIds = new List<uint>();
         private GameObject _bestProp;
 
         internal GameObject BestProp
@@ -172,30 +112,1046 @@ namespace WowAI.Modules
                 }
             }
         }
-
+        private int _failMoveUseSpecialSkill;
         private FarmState _farmState;
-        internal FarmState farmState
+        internal FarmState FarmState
         {
-            get
-            {
-                return _farmState;
-            }
+            get => _farmState;
             set
             {
                 _farmState = value;
                 Host.MainForm.SetFarmModuleText(_farmState.ToString());
+                var s = "";
+                foreach (var farmMobsId in FarmMobsIds)
+                {
+                    s += farmMobsId + Environment.NewLine;
+                }
+                foreach (var farmMobsId in FarmPropIds)
+                {
+                    s += farmMobsId + Environment.NewLine;
+                }
+                Host.MainForm.SetFarmModuleToolTipt(s);
             }
         }
 
+
+        public override void Start(Host host)
+        {
+            base.Start(host);
+            FarmState = FarmState.Disabled;
+            if (host.CharacterSettings.Mode == Mode.Questing)
+                FarmState = FarmState.AttackOnlyAgro;
+            if (host.ClientType == EWoWClient.Classic)
+                FarmState = FarmState.AttackOnlyAgro;
+            LoadSkill();
+        }
+
+        public void LoadSkill()
+        {
+            _deckSkills = new List<SkillSettings>();
+            var copySkillSettings = new List<SkillSettings>(Host.CharacterSettings.SkillSettings);
+            copySkillSettings.Sort(delegate (SkillSettings ss1, SkillSettings ss2)
+                { return ss1.Priority.CompareTo(ss2.Priority); });
+            copySkillSettings.Reverse();
+            foreach (var i in copySkillSettings)
+                _deckSkills.Add(i);
+        }
+
+        public override void Stop()
+        {
+            Host.CancelMoveTo();
+            base.Stop();
+        }
+
+        public override void Run(CancellationToken ct)
+        {
+            try
+            {
+                while (!Host.CancelRequested && !ct.IsCancellationRequested)
+                {
+                    base.Run(ct);
+                    Thread.Sleep(100);
+                    if (Host.MainForm.On && Host.GameState == EGameState.Ingame)
+                    {
+                        PrepareForFight();
+                        if (ReadyToActions)
+                            Fight();
+                    }
+                }
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception error) { Host.log(error.ToString()); }
+            finally { Host.log("FarmModule Stop"); }
+        }
+
+
+        private void Fight()
+        {
+            try
+            {
+                TickTime = Host.GetUnixTime();
+                if (!Host.IsExists(Host.FarmModule.BestMob))
+                    Host.FarmModule.BestMob = null;
+
+                switch (FarmState)
+                {
+                    case FarmState.Disabled:
+                        FightFarmDisabledTick();
+                        break;
+
+                    case FarmState.FarmMobs:
+                        FightFarmMobsTick();
+                        break;
+
+                    case FarmState.FarmProps:
+                        FightFarmPropsTick();
+                        break;
+
+                    case FarmState.AttackOnlyAgro:
+                        FightAttackOnlyAgroTick();
+                        break;
+                }
+            }
+            catch (ThreadAbortException)
+            { }
+            catch (Exception e)
+            {
+                Host.log(e.ToString());
+            }
+        }
+
+        private void FightFarmPropsTick()
+        {
+            GlobalCheckBestMob();
+            if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && ((Host.Me.HpPercents > 75) || (Host.GetAgroCreatures().Count > 0)))
+                Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+
+            if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0 && MobsWithSkinCount() == 0)
+                Host.CommonModule.ResumeMove();
+
+            if (Host.FarmModule.BestMob == null)
+            {
+                for (var i = 0; i < FarmPropIds.Count; i++)
+                {
+                    if (Host.MyIsNeedRegen())
+                        break;
+
+                    if (Host.FarmModule.BestMob != null || Host.CommonModule.IsMoveSuspended())
+                        break;
+
+                    Host.FarmModule.BestProp = Host.FarmModule.GetNearestPropInZone(FarmPropIds[i], true);
+
+
+                    if (Host.FarmModule.BestProp == null && Host.CharacterSettings.Mode == Mode.FarmResource)//"Сбор ресурсов")
+                    {
+                        Host.FarmModule.BestProp = Host.FarmModule.GetNearestPropInZone(FarmPropIds[i], false);
+                        if (Host.FarmModule.BestProp == null)
+                            Host.log("bestprop = null");
+                        else
+                            Host.log(Host.FarmModule.BestProp.Id + "");
+                    }
+
+                    if (Host.FarmModule.BestProp == null)
+                        continue;
+
+                    Host.CommonModule.MoveTo(Host.FarmModule.BestProp.Location, 3);
+
+                    if (Host.FarmModule.BestProp != null && Host.FarmModule.BestMob == null)
+                    {
+                        var needWait = false;
+                        if (Host.FarmModule.BestProp.Id == 128308 || Host.FarmModule.BestProp.Id == 128403)
+                        {
+                            needWait = true;
+                        }
+                        Host.FarmModule.InteractWithProp(Host.FarmModule.BestProp);
+                        if (needWait)
+                            Thread.Sleep(3000);
+                    }
+
+                    Thread.Sleep(100);
+
+
+                    if (SpecialItems != null && Host.GetAgroCreatures().Count == 0)
+                    {
+
+                        for (var j = 0; j < SpecialItems.Length; j++)
+                        {
+                            // host.log("teldjf + " + SpecialItems.Length);
+                            foreach (var item in Host.ItemManager.GetItems())
+                            {
+                                if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
+                                    item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
+                                    item.Place == EItemPlace.InventoryItem)
+                                    if (item.Id == SpecialItems[j])
+                                    {
+
+                                        Host.log("Использую спец итем " + item.Name + " " + item.Place + "  на " + Host.FarmModule.BestProp.Guid);
+                                        Host.MyUseItemAndWait(item, Host.FarmModule.BestProp);
+                                        Host.FarmModule.SetBadProp(Host.FarmModule.BestProp, 60000);
+                                        /*    var result = host.SpellManager.UseItem(item, host.FarmModule.bestProp);
+                                            if (result != EInventoryResult.OK)
+                                            {
+                                                host.log("Не смог использовать спец итем " + item.Name + "  " + result, Host.LogLvl.Error);
+                                                Thread.Sleep(5000);
+                                            }*/
+
+                                    }
+                            }
+                            //todo
+                        }
+                    }
+                }
+            }
+            FarmRoute();
+        }
+
+        private void FightFarmMobsTick()
+        {
+            GlobalCheckBestMob();
+            //  host.log(host.FarmModule.bestMob?.Name);
+            if (Host.CommonModule.IsMoveSuspended()
+                && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob))
+                && !Host.CommonModule.InFight()
+                && Host.FarmModule.GetBestAgroMob() == null
+                && MobsWithDropCount() == 0
+                && MobsWithSkinCount() == 0)
+                Host.CommonModule.ResumeMove();
+
+
+            if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob))
+                && (!Host.MyIsNeedRegen() || Host.GetAgroCreatures().Count > 0)
+                && (MobsWithDropCount() + MobsWithSkinCount()) == 0 || Host.GetAgroCreatures().Count > 0)
+            {
+                if (!Host.NeedWaitAfterCombat)
+                {
+                    Host.FarmModule.BestMob = Host.FarmModule.GetBestMob(true);
+                    if (Host.FarmModule.BestMob == null)
+                        Host.FarmModule.BestMob = Host.FarmModule.GetBestMob();
+                    /*  if (host.FarmModule.bestMob == null)
+                          host.log("null");*/
+                }
+
+            }
+            FarmRoute();
+        }
+
+        private void FightFarmDisabledTick()
+        {
+            Host.CallPet();
+            if (Host.CharacterSettings.Mode == Mode.Questing)
+                return;
+            if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
+                return;
+            if (Host.CharacterSettings.DebuffDeath)
+            {
+                var debuf = Host.MyGetAura(15007);
+                if (debuf != null)
+                {
+                    Thread.Sleep(5000);
+                    // host.log("Ожидаю " + debuf.SpellName + " " + debuf.Remaining);
+                    return;
+                }
+            }
+
+
+            if (Host.IsAlive() && !Host.Me.IsDeadGhost)
+            {
+                if (Host.CharacterSettings.FightIfHPLess)
+                    if (Host.Me.HpPercents < Host.CharacterSettings.FightIfHPLessCount)
+                    {
+                        Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
+                        if (Host.GetAgroCreatures().Count > 0)
+                        {
+                            if (Host.Me.MountId != 0)
+                                Host.CommonModule.MyUnmount();
+                        }
+                    }
+
+
+                GlobalCheckBestMob();
+
+                if (Host.CharacterSettings.GatherResouceScript && Host.CharacterSettings.Mode == Mode.Script && Host.AutoQuests.EnableFarmProp)
+                {
+                    if (!Host.AutoQuests.NeedActionNpcRepair && !Host.AutoQuests.NeedActionNpcSell && !Host.NeedAuk)
+                    {
+                        Host.FarmModule.BestProp = Host.FarmModule.GetBestPropInZone(false);
+                        if (Host.FarmModule.BestProp != null && Host.IsExists(Host.FarmModule.BestProp))
+                            Host.CommonModule.SuspendMove();
+                        if (Host.FarmModule.BestMob == null && Host.FarmModule.BestProp != null)
+                        {
+                            Host.log("Нашел ресурс " + Host.FarmModule.BestProp.Name + "  дист " + Host.Me.Distance(Host.FarmModule.BestProp));
+                            if (Host.CharacterSettings.FindBestPoint)
+                                Host.AutoQuests.NeedFindBestPoint = true;
+                            Host.CancelMoveTo();
+                            Thread.Sleep(100);
+                            Host.CommonModule.ForceMoveTo(Host.FarmModule.BestProp, 3);
+                            /*  if ((host.FarmModule.bestMob == null || !host.IsAlive(host.FarmModule.bestMob)) && ((host.Me.HpPercents > 20) || (host.GetAgroCreatures().Count > 0)))
+                                  host.FarmModule.bestMob = host.FarmModule.GetBestAgroMob();*/
+
+                            Host.FarmModule.InteractWithProp(Host.FarmModule.BestProp);
+                        }
+                    }
+
+                    if (Host.CommonModule.IsMoveSuspended() /*&& (host.FarmModule.bestMob == null || !host.IsAlive(host.FarmModule.bestMob)) */&& Host.FarmModule.BestProp == null /*&& !host.CommonModule.InFight() && host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0*/)
+                        Host.CommonModule.ResumeMove();
+
+
+                }
+
+
+                if (Host.FarmModule.BestMob != null && Host.CharacterSettings.Mode == Mode.Script)
+                {
+                    if (Host.CheckPikPocket())
+                    {
+                        // host.ObstaclePic();
+                        Host.log("Бегу к мобу");
+                        Host.CommonModule.SuspendMove();
+                        Host.SetTarget(Host.FarmModule.BestMob);
+
+                        var safePoint = new List<Vector3F>();
+                        var xc = Host.FarmModule.BestMob.Location.X;
+                        var yc = Host.FarmModule.BestMob.Location.Y;
+
+                        var radius = 3;
+                        var bestPoint = new Vector3F(Vector3F.Zero);
+                        double bestDist = 99999;
+                        const double a = Math.PI / 16;
+                        double u = 0;
+                        for (var i = 0; i < 32; i++)
+                        {
+                            var x1 = xc + radius * Math.Cos(u);
+                            var y1 = yc + radius * Math.Sin(u);
+                            // log(" " + i + " x:" + x + " y:" + y);
+                            u += a;
+
+                            var z1 = Host.FarmModule.BestMob.Location.Z;
+                            var next = false;
+                            foreach (var entity in Host.GetEntities<Unit>())
+                            {
+                                if (entity == Host.FarmModule.BestMob)
+                                    continue;
+                                if (entity == Host.Me)
+                                    continue;
+
+                                if (entity.Distance(x1, y1, z1) < 3)
+                                    next = true;
+                            }
+
+                            if (next)
+                                continue;
+                            if (Host.IsInsideNavMesh(new Vector3F(x1, y1, z1)))
+                            {
+                                var vector = new Vector3F(x1, y1, z1);
+                                if (Host.CommonModule.GetPath(Host.Me.Location, vector) < bestDist)
+                                {
+                                    bestDist = Host.CommonModule.GetPath(Host.Me.Location, vector);
+                                    bestPoint = vector;
+                                    safePoint.Add(new Vector3F(x1, y1, z1));
+                                }
+                            }
+                        }
+
+                        Host.log("Пытаюсь обойти препядствие " + safePoint.Count);
+                        if (safePoint.Count > 0)
+                        {
+                            // var bestPoint = safePoint[host.RandGenerator.Next(safePoint.Count)];
+                            Host.log("Бегу в " + bestPoint + " " + Host.IsInsideNavMesh(bestPoint));
+                            if (!Host.CommonModule.ForceMoveTo(bestPoint))
+                                return;
+                        }
+                        else
+                        {
+                            if (!Host.CommonModule.ForceMoveTo(Host.FarmModule.BestMob, 4.5))
+                                return;
+                        }
+
+
+                        Host.MyCheckIsMovingIsCasting();
+                        var res = Host.SpellManager.CastSpell(921, Host.FarmModule.BestMob);
+                        Host.KillMobsCount++;
+                        if (res != ESpellCastError.SUCCESS)
+                        {
+                            Host.log("Не удалось обокрасть " + res + " " + Host.GetLastError(), LogLvl.Error);
+                            if (res == ESpellCastError.OUT_OF_RANGE)
+                            {
+                                if (!Host.CommonModule.ForceMoveTo(Host.FarmModule.BestMob, 4.2))
+                                    return;
+                                Host.MyCheckIsMovingIsCasting();
+                                res = Host.SpellManager.CastSpell(921, Host.FarmModule.BestMob);
+                                if (res != ESpellCastError.SUCCESS)
+                                    Host.log("Не удалось обокрасть 2 " + res + " " + Host.GetLastError(), LogLvl.Error);
+                            }
+                        }
+                        var waitTill = DateTime.UtcNow.AddSeconds(1);
+                        while (waitTill > DateTime.UtcNow)
+                        {
+                            Thread.Sleep(100);
+                            if (!Host.MainForm.On)
+                                return;
+                            if (Host.CanPickupLoot())
+                                break;
+                        }
+                        if (Host.CanPickupLoot())
+                            Host.PickupLoot();
+                        // host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 360000);
+                        if (Host.ListGuidPic.ContainsKey(Host.FarmModule.BestMob.Guid))
+                        {
+                            Host.ListGuidPic[Host.FarmModule.BestMob.Guid] = DateTime.Now.AddMinutes(6);
+                        }
+                        else
+                        {
+                            Host.ListGuidPic.Add(Host.FarmModule.BestMob.Guid, DateTime.Now.AddMinutes(6));
+                        }
+                        Host.FarmModule.BestMob = null;
+                        Host.CommonModule.ResumeMove();
+                    }
+
+
+                }
+                //if ((host.FarmModule.bestMob == null || !host.IsAlive(host.FarmModule.bestMob)) && ((/*host.Me.MpPercents > 40 &&*/ host.Me.HpPercents > 75) || (host.GetAgroCreatures().Count > 0)))
+                //{
+
+                //    if (!host.NeedWaitAfterCombat)
+                //    {
+                //        host.FarmModule.bestMob = host.FarmModule.GetBestMob(true);
+                //        /*  if (host.FarmModule.bestMob == null)
+                //              host.log("null");*/
+                //        if (host.FarmModule.bestMob == null)
+                //            host.FarmModule.bestMob = host.FarmModule.GetBestMob(false);
+                //    }
+                //}
+            }
+
+            if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && Host.FarmModule.BestProp == null /*&& !host.CommonModule.InFight() && host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0*/)
+                Host.CommonModule.ResumeMove();
+            if (Host.ClientType == EWoWClient.Retail)
+                FarmRoute();
+        }
+
+        private void FightAttackOnlyAgroTick()
+        {
+            GlobalCheckBestMob();
+
+
+            if (Host.CharacterSettings.NoAttackOnMount)
+            {
+                if (Host.Me.MountId == 0)
+                {
+                    if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
+                        Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+                }
+                else
+                {
+                    if (Host.GetAgroCreatures().Count > 0)
+                    {
+                        if (Host.Me.IsMoving)
+                            IsNeedFight = 0;
+                        else
+                            IsNeedFight++;
+
+                        if (IsNeedFight > 50)
+                        {
+                            Host.log("Нет движения, отзываю маунта");
+                            Host.CancelMoveTo();
+                            Host.CommonModule.MyUnmount();
+                            IsNeedFight = 0;
+                        }
+                    }
+
+
+                }
+            }
+            else
+            {
+                if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
+                    Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+            }
+
+
+
+            if (Host.FarmModule.BestMob != null && Host.IsExists(Host.FarmModule.BestMob) && Host.IsAlive(Host.FarmModule.BestMob))
+                Host.CommonModule.SuspendMove();
+
+            if (Host.CharacterSettings.GatherResouceScript && Host.CharacterSettings.Mode == Mode.Script && Host.AutoQuests.EnableFarmProp)
+            {
+                Host.FarmModule.BestProp = Host.FarmModule.GetBestPropInZone(false);
+
+                if (Host.FarmModule.BestProp != null && Host.IsExists(Host.FarmModule.BestProp))
+                    Host.CommonModule.SuspendMove();
+
+                if (Host.FarmModule.BestMob == null && Host.FarmModule.BestProp != null)
+                {
+                    Host.log("Нашел ресурс " + Host.FarmModule.BestProp.Name + "  дист " + Host.Me.Distance(Host.FarmModule.BestProp));
+                    if (Host.CharacterSettings.FindBestPoint)
+                        Host.AutoQuests.NeedFindBestPoint = true;
+                    Host.CancelMoveTo();
+                    Thread.Sleep(100);
+                    Host.CommonModule.ForceMoveTo(Host.FarmModule.BestProp, 3);
+                    if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
+                        Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+
+                    Host.FarmModule.InteractWithProp(Host.FarmModule.BestProp);
+                }
+
+                if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null
+                                                            || !Host.IsAlive(Host.FarmModule.BestMob)) && Host.FarmModule.BestProp == null && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0)
+                    Host.CommonModule.ResumeMove();
+
+            }
+
+            if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0 && MobsWithSkinCount() == 0)
+                Host.CommonModule.ResumeMove();
+            FarmRoute();
+        }
+
+        private void FarmRoute()
+        {
+            try
+            {
+                if (Host.CharacterSettings.RunRun || Host.CharacterSettings.Mode == Mode.QuestingClassic)
+                {
+                    if (Host.GetChanceDeath() > Host.CharacterSettings.RunRunPercent)
+                    {
+                        double bestDist = 99999999;
+                        Vector3F bestPoint = Vector3F.Zero;
+                        foreach (var myNpcLoc in Host.MyNpcLocss.NpcLocs)
+                        {
+                            if (!myNpcLoc.IsTaxy && !myNpcLoc.IsArmorer)
+                                continue;
+                            foreach (var vector3F in myNpcLoc.ListLoc)
+                            {
+                                if (Host.Me.Distance(vector3F) < bestDist)
+                                {
+                                    bestDist = Host.Me.Distance(bestPoint);
+                                    bestPoint = vector3F;
+                                }
+                            }
+                        }
+
+                        if (bestPoint != Vector3F.Zero)
+                        {
+                            Host.log("Сваливаю " + Host.Me.Distance(bestPoint));
+                            Host.FarmModule.BestMob = null;
+                            Host.FarmModule.FarmState = FarmState.Disabled;
+                            Host.RunRun = true;
+                            Host.CommonModule.ForceMoveTo(bestPoint);
+                            Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
+                            return;
+                        }
+                    }
+                }
+
+                if (Host.NeedWaitAfterCombat && Host.FarmModule.BestMob == null)
+                {
+
+                    var waitTill = DateTime.UtcNow.AddSeconds(2);
+                    while (waitTill > DateTime.UtcNow)
+                    {
+                        Thread.Sleep(100);
+                        Host.log("Ожидаю после боя " + MobsWithDropCount() + " " + Host.GetAgroCreatures().Count, LogLvl.Important);
+                        if (!Host.MainForm.On)
+                            return;
+                        if (MobsWithDropCount() > 0)
+                            break;
+                        if (Host.GetAgroCreatures().Count > 0)
+                            break;
+                    }
+                    Host.NeedWaitAfterCombat = false;
+                }
+
+                Host.CallPet();
+                Host.FoodPet();
+                PickupDropRoute();
+                PickupSkinRoute();
+                MyUsePossion();
+                UseBuffItems();
+
+
+
+                // host.log("ХП "+_badBestMobHp + " время " + _timeAttack + " время2 " + TickTime);
+                UseSkills();
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception error)
+            {
+                Host.log(error.ToString());
+            }
+        }
+
+        private Item MyGetPossionItem()
+        {
+            foreach (var item in Host.ItemManager.GetItems())
+            {
+                if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 || item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 || item.Place == EItemPlace.InventoryItem)
+                {
+                    if (item.Id == 6947 || item.Id == 6949 || item.Id == 6950 || item.Id == 8926 || item.Id == 8927 || item.Id == 8928)
+                        return item;
+                }
+
+            }
+            return null;
+            // return Host.ItemManager.GetItems().FirstOrDefault(item => item.Id == 6947 && item.Place >= EItemPlace.InventoryItem && item.Place <= EItemPlace.Bag4);
+        }
+
+        public void MyUsePossion()
+        {
+
+            if (Host.Me.IsInCombat)
+                return;
+            if (Host.Me.Class != EClass.Rogue)
+                return;
+            var weaponMainHand = Host.ItemManager.GetItems().FirstOrDefault(item => item.Place == EItemPlace.Equipment && item.Cell == (byte)EEquipmentSlot.MainHand);
+            var weaponOffHand = Host.ItemManager.GetItems().FirstOrDefault(item => item.Place == EItemPlace.Equipment && item.Cell == (byte)EEquipmentSlot.OffHand);
+            if (weaponMainHand != null)
+            {
+                var enchId = weaponMainHand.GetEnchantmentId(EEnchantmentSlot.Temp);
+                var enchCharges = weaponMainHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
+                if (enchId != 0)
+                    return;
+
+                var itemToCast = MyGetPossionItem();
+                if (itemToCast != null)
+                {
+                    Host.CommonModule.SuspendMove();
+                    Host.MyCheckIsMovingIsCasting();
+                    var res = Host.SpellManager.UseItem(itemToCast, weaponMainHand);
+                    while (Host.Me.IsCasting)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    if (res != EInventoryResult.OK)
+                    {
+                        Host.log("Не удалось использовать яд " + itemToCast.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
+                    }
+                    Host.CommonModule.ResumeMove();
+                }
+            }
+
+            if (weaponOffHand != null)
+            {
+                var enchId = weaponOffHand.GetEnchantmentId(EEnchantmentSlot.Temp);
+                var enchCharges = weaponOffHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
+                if (enchId != 0)
+                    return;
+
+                var itemToCast = MyGetPossionItem();
+                if (itemToCast != null)
+                {
+                    Host.CommonModule.SuspendMove();
+                    Host.MyCheckIsMovingIsCasting();
+                    var res = Host.SpellManager.UseItem(itemToCast, weaponOffHand);
+                    while (Host.Me.IsCasting)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    if (res != EInventoryResult.OK)
+                    {
+                        Host.log("Не удалось использовать яд " + itemToCast.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
+                    }
+                    Host.CommonModule.ResumeMove();
+                }
+            }
+
+
+
+        }
+
+        private void GlobalCheckBestMob()
+        {
+            try
+            {
+                if (!Host.IsExists(Host.FarmModule.BestMob))
+                    Host.FarmModule.BestMob = null;
+                if (Host.FarmModule.BestMob != null && !Host.IsAlive(Host.FarmModule.BestMob))
+                    Host.FarmModule.BestMob = null;
+                if (Host.FarmModule.BestMob != null && !Host.CanAttack(Host.FarmModule.BestMob, Host.CanSpellAttack))
+                    Host.FarmModule.BestMob = null;
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception e)
+            {
+                Host.log(e.ToString());
+            }
+        }
+
+        private void UseRegenSpell(Spell regenSpel)
+        {
+            if (regenSpel != null)
+            {
+                Host.CommonModule.SuspendMove();
+                if (Host.SpellManager.CheckCanCast(regenSpel.Id, Host.Me) != ESpellCastError.SUCCESS)
+                    return;
+                try
+                {
+
+                    Host.MyCheckIsMovingIsCasting();
+                    Host.CanselForm();
+                    Host.CommonModule.MyUnmount();
+                    Host.MyCheckIsMovingIsCasting();
+                    var result = Host.SpellManager.CastSpell(regenSpel.Id, Host.Me);
+                    if (result != ESpellCastError.SUCCESS)
+                    {
+                        Host.log("Не смог использовать скилл регена " + result + " " + Host.GetLastError(), LogLvl.Error);
+                        Thread.Sleep(2000);
+
+                    }
+                    while (Host.SpellManager.IsCasting)
+                        Thread.Sleep(200);
+                }
+                finally
+                {
+                    Host.CommonModule.ResumeMove();
+                }
+            }
+        }
+
+        private void UseBuffItems()
+        {
+            try
+            {
+                if (!Host.Me.IsAlive)
+                    return;
+                if (Host.Me.IsDeadGhost)
+                    return;
+                if (Host.CheckUnderWather())
+                    return;
+                if (Host.MyGetAura(269824) != null)//стан
+                    return;
+
+                foreach (var regenItemse in Host.CharacterSettings.RegenItemses)
+                {
+                    if (Host.Me.IsInCombat && !regenItemse.InFight)
+                        continue;
+
+                    if (Host.MeMpPercent() <= regenItemse.MeMinMp || Host.MeMpPercent() > regenItemse.MeMaxMp)
+                    {
+                        //  Host.log("MP персонажа не соответсвует условиям [" + characterSettingsRegenSkillSettingse.ItemId + "] " + characterSettingsRegenSkillSettingse.Name);
+                        continue;
+                    }
+
+                    if (Host.Me.HpPercents < regenItemse.MeMinHp || Host.Me.HpPercents > regenItemse.MeMaxHp)
+                    {
+                        // host.log("HP персонажа не соответсвует условиям [" + characterSettingsRegenSkillSettingse.ItemId + "] " + characterSettingsRegenSkillSettingse.Name);
+                        continue;
+                    }
+
+                    var findEffect = false;
+                    if (regenItemse.NotMeEffect != 0)
+                    {
+                        foreach (var abnormalStatuse in Host.Me.GetAuras())
+                            if (abnormalStatuse.SpellId == regenItemse.NotMeEffect)
+                                findEffect = true;
+
+                        if (findEffect)
+                        {
+                            // host.log("Нашел эффект на персонаже " + characterSettingsRegenSkillSettingse.NotMeEffect);
+                            continue;
+                        }
+
+                    }
+
+                    if (regenItemse.IsMeEffect != 0)
+                    {
+                        foreach (var abnormalStatuse in Host.Me.GetAuras())
+                            if (abnormalStatuse.SpellId == regenItemse.IsMeEffect)
+                            {
+                                findEffect = true;
+                                //  Host.log("нашел ", Host.LogLvl.Ok);
+                            }
+
+                        if (!findEffect)
+                        {
+                            //  host.log("Не нашел эффект на персонаже " + characterSettingsRegenSkillSettingse.IsMeEffect);
+                            continue;
+                        }
+
+                    }
+
+                    var aura = Host.MyGetAura(regenItemse.SpellId);
+                    if (aura != null && aura.Remaining >= 60000)
+                        continue;
+
+                    var buffItem = Host.MyGetItem(regenItemse.ItemId);
+
+                    if (buffItem == null)
+                        continue;
+                    if (Host.SpellManager.GetItemCooldown(buffItem.Id) > 0)
+                        continue;
+                    Host.CommonModule.SuspendMove();
+                    Host.MyUseItemAndWait(buffItem, Host.Me);
+                    aura = Host.MyGetAura(regenItemse.SpellId);
+                    if (aura != null && aura.Remaining < 30000)
+                    {
+                        while (true)
+                        {
+                            Thread.Sleep(1000);
+                            if (!Host.MainForm.On)
+                                break;
+                            aura = Host.MyGetAura(regenItemse.SpellId);
+                            if (aura == null)
+                                break;
+                        }
+                    }
+
+                    if (Host.Me.StandState == EStandState.Sit)
+                    {
+                        Host.ChangeStandState(EStandState.Stand);
+                        // Host.MoveTo(Host.Me.Location.X + 1, Host.Me.Location.Y, Host.Me.Location.Z);
+                    }
+
+                    Host.CommonModule.ResumeMove();
+                    Thread.Sleep(1000);
+                }
+
+                if (Host.CommonModule.InFight() && Host.Me.HpPercents < 50 && !Host.Me.IsMounted)
+                {
+
+                    if (_nextUsePottion > DateTime.UtcNow)
+                    {
+
+                    }
+                    else
+                    {
+                        _nextUsePottion = DateTime.UtcNow.AddSeconds(Host.RandGenerator.Next(5, 15));
+                        Item buffItem = null;
+                        foreach (var item in Host.ItemManager.GetItems())
+                        {
+                            if (item.Id == 152494)
+                            {
+                                buffItem = item;
+                                break;
+                            }
+                        }
+                        if (buffItem != null && Host.SpellManager.GetItemCooldown(buffItem) == 0)
+                        {
+                            Host.CommonModule.SuspendMove();
+
+                            var isNeedUnmount = true;
+
+                            if (buffItem.Id == 152813)
+                                isNeedUnmount = false;
+
+                            if (isNeedUnmount)
+                                Host.CommonModule.MyUnmount();
+
+                            var result = Host.SpellManager.UseItem(buffItem);
+                            if (result != EInventoryResult.OK)
+                            {
+                                Host.log("Не смог использовать итем для регена " + buffItem.Name + "  " + result, LogLvl.Error);
+                            }
+                            while (Host.SpellManager.IsCasting)
+                                Thread.Sleep(100);
+                            Host.CommonModule.ResumeMove();
+                        }
+                    }
+
+                }
+
+                if (!Host.Me.IsInCombat)
+                {
+                    if (Host.Me.Class == EClass.Mage && Host.CharacterSettings.CraftConjured)
+                    {
+                        var listFood = new Dictionary<uint, uint>
+                        {
+                            {190336, 113509},
+                            {6129, 1487},
+                            {990, 1114},
+                            {597, 1113},
+                            {587, 5349},
+
+                        };
+                        var listWater = new Dictionary<uint, uint>
+                        {
+                            {10138, 8077},
+                            {6127, 3772},
+                            {5506, 2136},
+                            {5505, 2288},
+                            {5504, 5350},
+
+                        };
+
+                        if (Host.MeMpPercent() < Host.CharacterSettings.CraftConjuredMp)
+                        {
+                            foreach (var u in listWater)
+                            {
+                                if (Host.SpellManager.GetSpell(u.Key) == null)
+                                    continue;
+                                Host.CommonModule.SuspendMove();
+                                try
+                                {
+                                    if (Host.MeGetItemsCount(u.Value) < 2)
+                                    {
+                                        Host.FarmModule.UseSkillAndWait(u.Key);
+                                        Thread.Sleep(500);
+                                    }
+                                    var item = Host.MyGetItem(u.Value);
+                                    if (item != null)
+                                    {
+                                        Host.MyUseItemAndWait(item);
+                                        while (Host.MeMpPercent() < 90)
+                                        {
+                                            Thread.Sleep(100);
+                                            if (!Host.MainForm.On)
+                                                return;
+                                            if (Host.Me.IsInCombat)
+                                                return;
+                                        }
+                                        if (Host.Me.StandState == EStandState.Sit)
+                                        {
+                                            Host.ChangeStandState(EStandState.Stand);
+                                            //  Host.MoveTo(Host.Me.Location.X + 1, Host.Me.Location.Y, Host.Me.Location.Z);
+                                        }
+                                        break;
+                                    }
+                                }
+                                finally
+                                {
+                                    Host.CommonModule.ResumeMove();
+                                }
+                            }
+                        }
+
+                        if (Host.Me.HpPercents < Host.CharacterSettings.CraftConjuredHp)
+                        {
+                            foreach (var u in listFood)
+                            {
+                                if (Host.SpellManager.GetSpell(u.Key) == null)
+                                    continue;
+                                Host.CommonModule.SuspendMove();
+                                try
+                                {
+                                    if (Host.MeGetItemsCount(u.Value) < 2)
+                                    {
+                                        Host.FarmModule.UseSkillAndWait(u.Key);
+                                        Thread.Sleep(500);
+                                    }
+
+                                    var item = Host.MyGetItem(u.Value);
+                                    if (item != null)
+                                    {
+                                        Host.MyUseItemAndWait(item);
+                                        while (Host.Me.HpPercents < 90)
+                                        {
+                                            Thread.Sleep(100);
+                                            if (!Host.MainForm.On)
+                                                return;
+                                            if (Host.Me.IsInCombat)
+                                                return;
+                                        }
+                                        if (Host.Me.StandState == EStandState.Sit)
+                                        {
+                                            Host.ChangeStandState(EStandState.Stand);
+                                            //  Host.MoveTo(Host.Me.Location.X + 1, Host.Me.Location.Y, Host.Me.Location.Z);
+                                        }
+                                    }
+                                    break;
+                                }
+                                finally
+                                {
+                                    Host.CommonModule.ResumeMove();
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                if (Host.ClientType == EWoWClient.Classic)
+                    return;
+
+                if (!Host.Me.IsInCombat && Host.Me.HpPercents < 80)
+                    UseRegenSpell(Host.SpellManager.GetSpell(8004));
+
+                if (Host.Me.GetThreats().Count == 0 && Host.Me.HpPercents < 50)
+                    UseRegenSpell(Host.SpellManager.GetSpell(18562));
+
+                if (Host.Me.GetThreats().Count == 0 && Host.Me.HpPercents < 80)
+                {
+                    var regenSpel = Host.SpellManager.GetSpell(8936);
+                    if (regenSpel != null)
+                    {
+                        if (Host.SpellManager.CheckCanCast(regenSpel.Id, Host.Me) != ESpellCastError.SUCCESS)
+                            return;
+                        Host.CommonModule.SuspendMove();
+                        try
+                        {
+                            var needChangeForm = true;
+                            foreach (var i in Host.Me.GetAuras())
+                            {
+                                if (i.SpellId == 24858)//Облик лунного совуха    
+                                    needChangeForm = false;
+                            }
+                            if (needChangeForm)
+                                Host.CanselForm();
+                            Host.MyCheckIsMovingIsCasting();
+                            var result = Host.SpellManager.CastSpell(regenSpel.Id, Host.Me);
+                            if (result != ESpellCastError.SUCCESS)
+                            {
+                                Host.log("Не смог использовать скилл регена " + result + " " + Host.GetLastError(), LogLvl.Error);
+                                Thread.Sleep(2000);
+
+                            }
+                            while (Host.SpellManager.IsCasting)
+                                Thread.Sleep(200);
+                        }
+                        finally
+                        {
+                            Host.CommonModule.ResumeMove();
+                        }
+                    }
+                }
+                /* if (host.Me.GetThreats().Count == 0)//Морозная аура, нахера?
+                 {
+                     var auraSkill = host.MyGetAura(3714);
+                     if (auraSkill == null)
+                     {
+                         Spell buffItem = null;
+                         foreach (var item in host.SpellManager.GetSpells())
+                         {
+                             if (item.Id == 3714)
+                             {
+                                 buffItem = item;
+                                 break;
+                             }
+                         }
+                         if (buffItem != null)
+                         {
+                             host.CommonModule.SuspendMove();
+                             // host.CommonModule.MyUnmount();
+                             host.MyCheckIsMovingIsCasting();
+                             var result = host.SpellManager.CastSpell(buffItem.Id);
+                             if (result != ESpellCastError.SUCCESS)
+                             {
+                                 host.log("Не смог использовать скилл для бафа " + buffItem.Name + "  " + result, Host.LogLvl.Error);
+                             }
+                             while (host.SpellManager.IsCasting)
+                                 Thread.Sleep(100);
+                             host.CommonModule.ResumeMove();
+                         }
+                     }
+                 }*/
+
+            }
+            catch (ThreadAbortException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Host.log(e.ToString());
+            }
+        }
 
         public void StopFarm()
         {
             try
             {
                 BestMob = null;
-                specialSkills = null;
-                specialItems = null;
-                farmState = FarmState.AttackOnlyAgro;
+                BestProp = null;
+                SpecialSkills = null;
+                SpecialItems = null;
+                if (Host.FarmModule.FarmState != FarmState.Disabled)
+                    FarmState = FarmState.AttackOnlyAgro;
             }
             catch (Exception e)
             {
@@ -203,52 +1159,30 @@ namespace WowAI.Modules
             }
         }
 
-        public void SetFarmMobs(Zone zone, List<uint> ids, int[] UseSpecialItem)
-        {
-            try
-            {
-                if (!Host.IsAlive())
-                    return;
-                specialSkills = null;
-                specialItems = null;
-                BestMob = null;
-                lock (farmMobsIds)
-                    farmMobsIds = new List<uint>(ids);
-                lock (farmZone)
-                    farmZone = zone;
-                Host.DrawZones(new List<Zone> { zone });
-                specialItems = UseSpecialItem;
-                farmState = FarmState.FarmMobs;
-            }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-            }
-        }
 
-        public void SetFarmMobs(Zone zone, List<uint> ids, int UseSpecialItem = 0, float dist = 0)
+        public void SetFarmMobs(Zone zone, List<uint> ids, int useSpecialItem = 0, float dist = 0)
         {
             try
             {
                 if (!Host.IsAlive())
                     return;
-                specialSkills = null;
-                specialItems = null;
+                SpecialSkills = null;
+                SpecialItems = null;
                 BestMob = null;
-                lock (farmMobsIds)
-                    farmMobsIds = new List<uint>(ids);
-                lock (farmZone)
-                    farmZone = zone;
+                lock (FarmMobsIds)
+                    FarmMobsIds = new List<uint>(ids);
+                lock (FarmZone)
+                    FarmZone = zone;
                 Host.DrawZones(new List<Zone> { zone });
-                if (UseSpecialItem > 0)
+                if (useSpecialItem > 0)
                 {
-                    specialItems = new[] { UseSpecialItem };
-                    specialDist = dist;
+                    SpecialItems = new[] { useSpecialItem };
+                    SpecialDist = dist;
                 }
 
                 else
-                    specialItems = null;
-                farmState = FarmState.FarmMobs;
+                    SpecialItems = null;
+                FarmState = FarmState.FarmMobs;
             }
             catch (Exception e)
             {
@@ -256,25 +1190,25 @@ namespace WowAI.Modules
             }
         }
 
-        public void SetFarmProps(Zone zone, List<uint> ids, int useSpecialItem = 0, float dist = 0)
+        public void SetFarmProps(Zone zone, List<uint> ids, int useSpecialItem = 0)
         {
             try
             {
                 if (!Host.IsAlive())
                     return;
-                specialSkills = null;
-                specialItems = null;
+                SpecialSkills = null;
+                SpecialItems = null;
                 BestProp = null;
-                lock (farmPropIds)
-                    farmPropIds = new List<uint>(ids);
-                lock (farmZone)
-                    farmZone = zone;
+                lock (FarmPropIds)
+                    FarmPropIds = new List<uint>(ids);
+                lock (FarmZone)
+                    FarmZone = zone;
                 Host.DrawZones(new List<Zone> { zone });
                 if (useSpecialItem > 0)
-                    specialItems = new[] { useSpecialItem };
+                    SpecialItems = new[] { useSpecialItem };
                 else
-                    specialItems = null;
-                farmState = FarmState.FarmProps;
+                    SpecialItems = null;
+                FarmState = FarmState.FarmProps;
             }
             catch (Exception e)
             {
@@ -283,28 +1217,23 @@ namespace WowAI.Modules
         }
 
 
-
-
-        public int GatherCount;
-        internal bool InteractWithProp(GameObject prop)
+        public bool InteractWithProp(GameObject prop)
         {
             try
             {
-                Host.log("Проп " + prop.Name + " " + prop.GameObjectType + " " + prop.RequiredGatheringSkill);
+                Host.log("GameObject:" + prop.Name + " " + prop.GameObjectType);
                 foreach (var @ushort in prop.RequiredGatheringSkill)
                 {
                     Host.log("Скилы для сбора " + @ushort);
                 }
-                /*  if (host.GetAgroCreatures().Count > 0)
-                      return false;*/
                 Host.MyCheckIsMovingIsCasting();
 
 
 
-                if (Host.Me.Distance(prop) > 6)
+                if (Host.Me.Distance2D(prop.Location) > 6)
                 {
-                    Host.log("Слишком далеко " + Host.Me.Distance(prop), Host.LogLvl.Error);
-                    if (Host.CommonModule._moveFailCount > 3)
+                    Host.log("Слишком далеко " + Host.Me.Distance(prop), LogLvl.Error);
+                    if (Host.CommonModule.MoveFailCount > 3)
                     {
                         SetBadProp(prop, 60000);
                     }
@@ -312,30 +1241,8 @@ namespace WowAI.Modules
                     return false;
                 }
 
-                if (Host.CharacterSettings.Mode == EMode.Questing)
+                if (Host.CharacterSettings.Mode == Mode.Questing)
                 {
-                    /* uint spellId = 0;
-                     if (prop.Id == 3189 || prop.Id == 3190 || prop.Id == 3192 || prop.Id == 3236 || prop.Id == 3290 || prop.Id == 175708 || prop.Id == 3640 || prop.Id == 207346
-                         || prop.Id == 1673 || prop.Id == 195240 || prop.Id == 195007)
-                     {
-                         spellId = 6478;
-                     }
-
-                     if (prop.Id == 202648 || prop.Id == 194107 || prop.Id == 194179)
-                         spellId = 6247;
-
-                     if (prop.Id == 195074 || prop.Id == 194208 || prop.Id == 194263)
-                         spellId = 3365;
-                     if (prop.Id == 126158 || prop.Id == 195211 || prop.Id == 194145)
-                         spellId = 6477;
-
-                     if (spellId == 0)
-                     {
-                         Host.log("Нет скила для сбора " + prop.Name + " [" + prop.Id + "] " + prop.RequiredGatheringSkill, Host.LogLvl.Error);
-                         return false;
-                     }*/
-
-
                     if (Host.Me.MountId != 0)
                     {
                         Host.log("Отзываю маунта для сбора");
@@ -348,13 +1255,13 @@ namespace WowAI.Modules
                     {
                         if (!prop.Use())
                         {
-                            Host.log("Не смог собрать " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
+                            Host.log("Не смог собрать " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
                             Thread.Sleep(1000);
                             if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                             {
                                 if (!prop.Use())
                                 {
-                                    Host.log("Не смог собрать скилом 2 " + +Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
+                                    Host.log("Не смог собрать скилом 2 " + +Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
 
                                 }
                             }
@@ -365,16 +1272,7 @@ namespace WowAI.Modules
                             Thread.Sleep(500);
                         }
                     }
-                    /*   var result2 = Host.SpellManager.CastSpell(spellId, prop);
-                       Thread.Sleep(500);
-                       if (result2 != ESpellCastError.SUCCESS)//8613 Skinning
-                       {
 
-
-                           Host.log("Не смог собрать скилом " + "  [" + spellId + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  " + result2, Host.LogLvl.Error);
-                           SetBadProp(prop, 300000);
-                           //   }
-                       }*/
 
                     while (Host.SpellManager.IsCasting)
                         Thread.Sleep(100);
@@ -387,27 +1285,26 @@ namespace WowAI.Modules
                              if (!m.PickUp())
                              {*/
                             SetBadProp(prop, 60000);
-                            Host.log("Не смог поднять дроп " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), Host.LogLvl.Error);
+                            Host.log("Не смог поднять дроп " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
                             Host.SetVar(prop, "pickFailed", true);
                             //   }
                         }
                         else
                         {
                             SetBadProp(prop, 60000);
-                            GatherCount = 0;
-                            if (Host.ComboRoute.MobsWithDropCount() < 2)
+                            _gatherCount = 0;
+                            if (Host.FarmModule.MobsWithDropCount() < 2)
                                 Thread.Sleep(500);
                         }
                     }
                     else
                     {
-                        Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), Host.LogLvl.Error);
-                        if (Host.CharacterSettings.FightIfMobs && farmState == FarmState.Disabled)
-                            farmState = FarmState.AttackOnlyAgro;
-                        // if (GatherCount > 1)
+                        Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
+                        if (Host.CharacterSettings.FightIfMobs && FarmState == FarmState.Disabled)
+                            FarmState = FarmState.AttackOnlyAgro;
                         if (Host.GetAgroCreatures().Count == 0)
                             SetBadProp(prop, 60000);
-                        GatherCount++;
+                        _gatherCount++;
                     }
                     return true;
 
@@ -416,7 +1313,7 @@ namespace WowAI.Modules
                 var skillGather = Host.SpellManager.GetGatheringSpell(prop);
                 if (skillGather == null)
                 {
-                    Host.log("Нет скила для сбора " + prop.Name + " " + prop.Id + " " + prop.RequiredGatheringSkill, Host.LogLvl.Error);
+                    Host.log("Нет скила для сбора " + prop.Name + " " + prop.Id + " " + prop.RequiredGatheringSkill, LogLvl.Error);
                     SetBadProp(prop, 60000);
                     return false;
                 }
@@ -424,30 +1321,8 @@ namespace WowAI.Modules
                 {
                     Host.log("Скилл для сбора " + skillGather.Id + "  " + skillGather.Name);
                 }
-                /* uint skillId = 0;
 
-                 switch (prop.RequiredGatheringSkill)
-                 {
-                     case ESkillType.SKILL_MINING:
-                         {
-                             skillId = 195122;
-                         }
-                         break;
-                     case ESkillType.SKILL_HERBALISM:
-                         {
-                             skillId = 195114;
-                         }
-                         break;
 
-                     default:
-                         {
-                             host.log("Сбор не поддерживается " + prop.RequiredGatheringSkill);
-                             return false;
-                         }
-                         break;
-                 }*/
-                /*   if (host.GetAgroCreatures().Count != 0)
-                       return false;*/
 
                 var isNeedUnmount = true;
 
@@ -475,12 +1350,6 @@ namespace WowAI.Modules
                 var isNeedChangeForm = true;
                 foreach (var i in Host.Me.GetAuras())
                 {
-                    /*  if (i.SpellId == 5487)//Облик медведя
-                          i.Cancel();
-                      if (i.SpellId == 768)//Облик кошки
-                          i.Cancel();
-                      if (i.SpellId == 24858)//Облик лунного совуха    
-                          i.Cancel();*/
                     if (i.SpellId == 783 && skillGather.Id == 265835) //Походный облик
                         isNeedChangeForm = false;
                     if (i.SpellId == 783 && skillGather.Id == 265831) //Походный облик
@@ -499,76 +1368,49 @@ namespace WowAI.Modules
                 {
                     if (!prop.Use())
                     {
-                        Host.log("Не смог собрать скилом " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
+                        Host.log("Не смог собрать скилом " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
                         Thread.Sleep(1000);
                         if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                         {
                             if (!prop.Use())
                             {
-                                Host.log("Не смог собрать скилом 2 " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", Host.LogLvl.Error);
+                                Host.log("Не смог собрать скилом 2 " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
 
                             }
                         }
                         SetBadProp(prop, 60000);
                     }
                 }
-                /*  var result = Host.SpellManager.CastSpell(skillGather.Id, prop);
-                  Thread.Sleep(500);*/
-                /*  if (result != ESpellCastError.SUCCESS)//8613 Skinning
-                  {
-
-                      Host.log("Не смог собрать скилом " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  " + result, Host.LogLvl.Error);
-                      Thread.Sleep(1000);
-                      result = Host.SpellManager.CastSpell(skillGather.Id, prop);
-                      Thread.Sleep(500);
-                      if (result != ESpellCastError.SUCCESS) //8613 Skinning
-                      {
-                          Host.log("Не смог собрать скилом 2 " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  " + result, Host.LogLvl.Error);
-                      }
-
-                      SetBadProp(prop, 300000);
-                      //   }
-                  }*/
 
                 while (Host.SpellManager.IsCasting)
                     Thread.Sleep(100);
                 Thread.Sleep(500);
 
-                /*  if (!prop.IsLootable)
-                      continue;*/
 
-                /*if (!host.CanPickupLoot())
-                    if (!host.OpenLoot())
-                        host.log("Не смог открыть лут " + host.Me.Distance(m) + "  " + m.Name + "   " + host.GetLastError(), Host.LogLvl.Error);
-                */
                 if (Host.CanPickupLoot())
                 {
                     if (!Host.PickupLoot())
                     {
-                        /* host.CommonModule.ForceMoveTo(m.Location, 1, 1);
-                         if (!m.PickUp())
-                         {*/
                         SetBadProp(prop, 60000);
-                        Host.log("Не смог поднять дроп " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), Host.LogLvl.Error);
+                        Host.log("Не смог поднять дроп " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
                         Host.SetVar(prop, "pickFailed", true);
-                        //   }
                     }
                     else
                     {
                         SetBadProp(prop, 60000);
-                        GatherCount = 0;
-                        if (Host.ComboRoute.MobsWithDropCount() < 2)
+                        _gatherCount = 0;
+                        if (Host.FarmModule.MobsWithDropCount() < 2)
                             Thread.Sleep(500);
                     }
                 }
                 else
                 {
-                    Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), Host.LogLvl.Error);
-                    if (Host.CharacterSettings.FightIfMobs && farmState == FarmState.Disabled)
-                        farmState = FarmState.AttackOnlyAgro;
-                    if (GatherCount > 1)
+                    Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
+                    if (Host.CharacterSettings.FightIfMobs && FarmState == FarmState.Disabled)
+                        FarmState = FarmState.AttackOnlyAgro;
+                    if (_gatherCount > 1)
                         SetBadProp(prop, 60000);
-                    GatherCount++;
+                    _gatherCount++;
                 }
 
                 return false;
@@ -581,8 +1423,7 @@ namespace WowAI.Modules
             }
         }
 
-
-        internal int NearTargetCount(Unit target, int range)
+        private int NearTargetCount(Unit target, int range)
         {
             var i = 0;
             try
@@ -606,67 +1447,16 @@ namespace WowAI.Modules
         }
 
 
-
-        private bool IsCreatureOccupierMeOrNull(Entity obj)
-        {
-            /*  if (obj.Occupier != null)
-              {
-                  if (obj.Occupier.Type == EBotTypes.Player)
-                      if (obj.Occupier != host.Me)
-                          return false;
-              }*/
-            return true;
-        }
-
-        private int _attackMoveFailCount;
-        public bool AutoAttackStart;
-
-
-        internal bool UseSkillAndWait(uint id, Entity target = null)
-        {
-            try
-            {
-                Host.MyCheckIsMovingIsCasting();
-                while (Host.SpellManager.IsChanneling)
-                    Thread.Sleep(50);
-
-
-                var result2 = Host.SpellManager.CastSpell(id, target);
-                if (result2 != ESpellCastError.SUCCESS)
-                    Host.log("Не удалось использовать скилл  " + id + "  " + result2 + "   " + Host.GetLastError(), Host.LogLvl.Error);
-                else
-                {
-
-                    Host.log("Использовал скилл  " + id, Host.LogLvl.Ok);
-                    Thread.Sleep(200);
-                }
-
-                Host.MyCheckIsMovingIsCasting();
-                while (Host.SpellManager.IsChanneling)
-                    Thread.Sleep(50);
-
-                if (result2 == ESpellCastError.SUCCESS)
-                    return true;
-                return false;
-            }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-                return false;
-            }
-        }
-
-        DateTime UseQuestSpell = DateTime.MinValue;
-        bool IsSpellInstant(uint id)
+        private bool IsSpellInstant(uint id)
         {
             var spell = Host.SpellManager.GetSpell(id);
             if (spell == null)
                 return true;
             return spell.CastTime == 0;
         }
-        bool RandDirLeft;
-        DateTime NextRandomMovesDirChange = DateTime.UtcNow;
-        void UpdateRandomMoveTimes()
+
+
+        private void UpdateRandomMoveTimes()
         {
             if (NextRandomMovesDirChange < DateTime.UtcNow)
             {
@@ -674,1371 +1464,122 @@ namespace WowAI.Modules
                 RandDirLeft = !RandDirLeft;
             }
         }
-        public double GetRandomNumber(double minimum, double maximum)
+
+        private double GetRandomNumber(double minimum, double maximum)
         {
             return Host.RandGenerator.NextDouble() * (maximum - minimum) + minimum;
         }
 
-        //Использование скилов
-        internal bool UseSkillAndWait(SkillSettings skill, bool selfTarget = false, bool suspendMovements = false)
+        public bool IsBadTarget(Unit bestMob)
         {
-            try
-            {
-
-                var useskilllog = Host.CharacterSettings.LogSkill;
-
-                if (Host.CharacterSettings.UseRegen)
-                {
-                    if (Host.Me.HpPercents < Host.CharacterSettings.HpRegen && !Host.Me.IsInCombat && skill.UseInFight)
-                    {
-                        Thread.Sleep(100);
-                        return false;
-                    }
-                    decimal power1 = Host.Me.GetPower(Host.Me.PowerType);
-                    decimal maxPower1 = Host.Me.GetMaxPower(Host.Me.PowerType);
-                    var percent1 = power1 * 100 / maxPower1;
-                    if (Host.Me.Class == EClass.Warrior)
-                        percent1 = 100;
-
-                    if (percent1 < Host.CharacterSettings.MpRegen && !Host.Me.IsInCombat && skill.UseInFight)
-                    {
-                        Thread.Sleep(100);
-                        return false;
-                    }
-                }
-                   
-
-                if (Host.GetAgroCreatures().Count == 0 && (Host.ComboRoute.MobsWithDropCount() + Host.ComboRoute.MobsWithSkinCount()) > 0)
-                    return false;
-
-                if (!skill.Checked || Host.SpellManager.GetSpell(skill.Id) == null)
-                    return false;
-
-                if (Host.MyGetAura(267254) != null)
-                {
-                    if (BestMob != null)
-                    {
-                        Host.CommonModule.MoveTo(BestMob, 3);
-                        var pet = Host.GetNpcById(135825);
-                        if (pet != null)
-                        {
-                            Host.SpellManager.CastPetSpell(pet.Guid, 267206);
-                            Thread.Sleep(1000);
-                        }
-                    }
-                    return false;
-                }
-
-
-
-
-
-                if (Host.MyGetAura(267456) != null)
-                    return false;
-
-                if (Host.MyGetAura(45438) != null)
-                    return false;
-
-                if (!Host.SpellManager.IsSpellReady(skill.Id))
-                {
-                    //  if (useskilllog) Host.log("Скилл не готов [" + skill.Id + "] " + skill.Name, Host.LogLvl.Error);
-                    return false;
-                }
-
-
-
-                if (Host.AutoQuests.BestQuestId == 49126)
-                {
-                    if (Host.MyGetAura(259742) != null)
-                    {
-                        var npc = Host.GetNpcById(131613);
-                        if (npc != null)
-                        {
-                            Host.SpellManager.CastPetSpell(npc.Guid, 259747);
-                            Thread.Sleep(1500);
-                            Host.SpellManager.CastPetSpell(npc.Guid, 259769);
-                            Thread.Sleep(3000);
-                        }
-                        return false;
-                    }
-
-
-                }
-
-                if (Host.AutoQuests.BestQuestId == 47311)
-                {
-                    if (UseQuestSpell < DateTime.UtcNow)
-                    {
-                        UseQuestSpell = DateTime.UtcNow.AddSeconds(5);
-                        var questSpell = Host.SpellManager.GetSpell(245398);
-                        if (questSpell != null)
-                        {
-                            if (Host.SpellManager.GetSpellCooldown(questSpell) == 0 && Host.SpellManager.CheckCanCast(questSpell.Id, Host.Me.Target) == ESpellCastError.SUCCESS)
-                            {
-                                var res = Host.SpellManager.CastSpell(questSpell.Id);
-                                if (res != ESpellCastError.SUCCESS)
-                                    Host.log("Не смог использовать скилл для квеста " + questSpell.Name + "[" + questSpell.Id + "] " + res + " " + Host.GetLastError(), Host.LogLvl.Error);
-                            }
-                        }
-                    }
-                }
-
-
-                if (Host.AutoQuests.BestQuestId == 48996)
-                {
-                    if (UseQuestSpell < DateTime.UtcNow)
-                    {
-                        UseQuestSpell = DateTime.UtcNow.AddSeconds(5);
-                        var questSpell = Host.SpellManager.GetSpell(272331);
-                        if (questSpell != null)
-                        {
-                            if (Host.SpellManager.GetSpellCooldown(questSpell) == 0 && Host.SpellManager.CheckCanCast(questSpell.Id, Host.Me.Target) == ESpellCastError.SUCCESS)
-                            {
-                                var res = Host.SpellManager.CastSpell(questSpell.Id);
-                                if (res != ESpellCastError.SUCCESS)
-                                    Host.log("Не смог использовать скилл для квеста " + questSpell.Name + "[" + questSpell.Id + "] " + res + " " + Host.GetLastError(), Host.LogLvl.Error);
-                            }
-                        }
-                    }
-                }
-
-                //17130 ураган
-                //18313 меч
-                var listArea = new List<uint> { 17130, 18313, 17129, 3282 };
-                foreach (var areaTrigger in Host.GetEntities<AreaTrigger>())
-                {
-                    if (listArea.Contains(areaTrigger.Id) && Host.Me.Distance(areaTrigger) < 4)
-                    {
-                        var safePoint = new List<Vector3F>();
-                        var xc = Host.Me.Location.X;
-                        var yc = Host.Me.Location.Y;
-
-                        var radius = 5;
-                        const double a = Math.PI / 16;
-                        double u = 0;
-                        for (var i = 0; i < 32; i++)
-                        {
-                            var x1 = xc + radius * Math.Cos(u);
-                            var y1 = yc + radius * Math.Sin(u);
-                            // log(" " + i + " x:" + x + " y:" + y);
-                            u = u + a;
-
-                            var z1 = Host.GetNavMeshHeight(new Vector3F(x1, y1, 0));
-                            var nextpoint = false;
-                            foreach (var trigger in Host.GetEntities<AreaTrigger>())
-                            {
-                                if (!listArea.Contains(trigger.Id))
-                                    continue;
-                                if (trigger.Distance(x1, y1, z1) < 4)
-                                    nextpoint = true;
-                            }
-                            if (nextpoint)
-                                continue;
-
-                            if (Host.IsInsideNavMesh(new Vector3F((float)x1, (float)y1, (float)z1)))
-                                safePoint.Add(new Vector3F((float)x1, (float)y1, (float)z1));
-                        }
-                        Host.log("Пытаюсь отойти от тригера" + safePoint.Count);
-                        if (safePoint.Count > 0 && Host.Me.Target != null)
-                        {
-                            Host.SetCTMMovement(false);
-                            var bestPoint = safePoint[Host.RandGenerator.Next(safePoint.Count)];
-                            Host.ForceMoveToWithLookTo(bestPoint, Host.Me.Target.Location);
-                            Host.ForceMoveTo(bestPoint);
-                            Host.SetCTMMovement(true);
-                        }
-
-                    }
-                }
-
-                if (BestMob?.Id == 122666)
-                {
-                    foreach (var entity in Host.GetEntities<Unit>())
-                    {
-                        if (!entity.IsAlive)
-                            continue;
-                        if (entity.Id != 126654)
-                            continue;
-                        BestMob = entity;
-
-                    }
-                }
-
-                if (BestMob?.Id == 124547)
-                {
-                    if (Host.SpellManager.GetSpell(267934) != null && BestMob.HpPercents > 90)
-                        Host.SpellManager.CastSpell(267934);
-                }
-
-                if (BestMob?.Id == 126038)
-                {
-                    if (Host.SpellManager.GetSpell(267934) != null && BestMob.HpPercents > 90)
-                        Host.SpellManager.CastSpell(267934);
-                }
-
-
-                if (BestMob?.Id == 131522 && Host.Me.GetThreats().Count == 0)
-                {
-                    if (Host.SpellManager.GetSpell(8921) != null && Host.Me.Distance(BestMob) < 40)
-                        Host.SpellManager.CastSpell(8921);
-                }
-
-
-                if (BestMob?.Id == 123461)
-                {
-                    var item = Host.ItemManager.GetItemById(151363);
-                    if (item != null)
-                    {
-                        Host.CommonModule.MoveTo(BestMob, 15);
-                        Host.MyUseItemAndWait(item, BestMob);
-                    }
-                }
-
-                if (BestMob?.Id == 130219)
-                {
-
-                    var item = Host.ItemManager.GetItemById(155458);
-                    if (item != null)
-                    {
-                        Host.MyUseItemAndWait(item, BestMob);
-                        BestMob = null;
-                        return false;
-                    }
-
-                }
-
-                if (BestMob?.Id == 131285)
-                {
-                    var use = true;
-                    foreach (var aura in BestMob.GetAuras())
-                    {
-                        if (aura.SpellId == 263088)
-                            use = false;
-                    }
-                    if (use && Host.Me.Distance(BestMob) < 10)
-                    {
-                        var item = Host.ItemManager.GetItemById(156528);
-                        if (item != null)
-                        {
-                            Host.MyUseItemAndWait(item, BestMob);
-                        }
-                    }
-                }
-
-                if (BestMob?.Id == 127253)
-                {
-                    var use = true;
-                    foreach (var aura in BestMob.GetAuras())
-                    {
-                        if (aura.SpellId == 252804)
-                            use = false;
-                    }
-                    if (use)
-                    {
-                        var item = Host.ItemManager.GetItemById(153483);
-                        if (item != null)
-                        {
-                            Host.MyUseItemAndWait(item, BestMob);
-                        }
-                    }
-                }
-
-                if (BestMob?.Id == 126502)
-                {
-                    var item = Host.ItemManager.GetItemById(152572);
-                    if (item != null)
-                    {
-                        var use = true;
-                        foreach (var aura in BestMob.GetAuras())
-                        {
-                            if (aura.SpellId == 251286)
-                                use = false;
-                        }
-
-                        if (use)
-                        {
-                            Host.CommonModule.ForceMoveTo(BestMob, 30);
-                            if (Host.Me.Distance(BestMob) < 40 && !Host.SpellManager.IsCasting)
-                                Host.MyUseItemAndWait(item, BestMob);
-                        }
-                    }
-                }
-
-                if (BestMob?.Id == 126702)
-                {
-                    var item = Host.ItemManager.GetItemById(152610);
-                    if (item != null)
-                    {
-
-                        if (Host.Me.Distance(BestMob) > 10)
-                        {
-                            Host.CommonModule.ForceMoveTo(BestMob, 50);
-                            if (Host.Me.Distance(BestMob) < 60 && !Host.SpellManager.IsCasting)
-                            {
-                                Host.MyUseItemAndWait(item, BestMob);
-                                Host.CommonModule.ForceMoveTo(BestMob, 10);
-                            }
-                        }
-                    }
-                }
-
-                if (BestMob?.Id == 132189)
-                {
-
-                }
-                else
-                {
-                    if (Host.ClientType == EWoWClient.Retail)
-                        if (Host.GetAgroCreatures().Count > 0 && !Host.GetAgroCreatures().Contains(BestMob) || (Host.GetAgroCreatures().Count > 1))
-                            BestMob = GetBestAgroMob();
-                }
-
-
-                if (BestMob?.Id == 127298)
-                {
-                    foreach (var entity in Host.GetEntities<Unit>())
-                    {
-                        if (!entity.IsAlive)
-                            continue;
-                        if (entity.Id != 127407)
-                            continue;
-                        BestMob = entity;
-                        break;
-                    }
-                }
-
-                if (Host.Me.MountId != 0)
-                {
-                    Host.log("Отзываю маунта для боя");
-                    Host.CommonModule.MyUnmount();
-                }
-
-
-                if (Host.Me.Class == EClass.DeathKnight)
-                {
-                    var needsummon = true;
-                    foreach (var entity in Host.GetEntities<Unit>())
-                    {
-                        if (entity.Owner != Host.Me)
-                            continue;
-                        needsummon = false;
-                    }
-
-                    if (needsummon && Host.CharacterSettings.SummonBattlePet)
-                    {
-                        var pet = Host.SpellManager.CastSpell(46584);
-                        if (pet == ESpellCastError.SUCCESS)
-                        {
-                            Host.log("Призвал питомца", Host.LogLvl.Ok);
-                            Thread.Sleep(1000);
-                        }
-                        else
-                        {
-                            Host.log("Не удалось призвать питомца " + pet, Host.LogLvl.Error);
-                        }
-                        while (Host.SpellManager.IsCasting)
-                        {
-                            Thread.Sleep(100);
-                        }
-                    }
-                }
-
-                if (Host.Me.Class == EClass.Mage)
-                {
-                    var needsummon = true;
-                    foreach (var entity in Host.GetEntities<Unit>())
-                    {
-                        if (entity.Owner != Host.Me)
-                            continue;
-                        needsummon = false;
-                    }
-
-                    if (needsummon && Host.CharacterSettings.SummonBattlePet)
-                    {
-                        var pet = Host.SpellManager.CastSpell(31687);
-                        if (pet == ESpellCastError.SUCCESS)
-                        {
-                            Host.log("Призвал питомца", Host.LogLvl.Ok);
-                            Thread.Sleep(1000);
-                        }
-                        else
-                        {
-                            Host.log("Не удалось призвать питомца " + pet, Host.LogLvl.Error);
-                        }
-                        while (Host.SpellManager.IsCasting)
-                        {
-                            Thread.Sleep(100);
-                        }
-                    }
-                }
-
-
-                if (Host.Me.Class == EClass.Hunter)
-                {
-                    var needsummon = true;
-                    var needrevive = false;
-                    foreach (var entity in Host.GetEntities<Unit>())
-                    {
-                        if (entity.Owner != Host.Me)
-                            continue;
-                        needsummon = false;
-                        /* if (!entity.IsAlive)
-                             needrevive = true;*/
-                    }
-                    if (Host.Me.GetPet() != null)
-                        if (!Host.Me.GetPet().IsAlive)
-                            needrevive = true;
-                    if (needrevive)
-                    {
-                        var pet = Host.SpellManager.CastSpell(982);
-                        if (pet == ESpellCastError.SUCCESS)
-                        {
-                            Host.log("Воскрешаю питомца", Host.LogLvl.Ok);
-                        }
-                        else
-                        {
-                            Host.log("Не удалось воскресить питомца " + pet, Host.LogLvl.Error);
-                        }
-                        Thread.Sleep(2000);
-                        while (Host.SpellManager.IsCasting)
-                        {
-                            Thread.Sleep(100);
-                        }
-
-                    }
-                    if (needsummon && Host.CharacterSettings.SummonBattlePet)
-                    {
-                        uint petSkill = 0;
-                        switch (Host.CharacterSettings.BattlePetNumber)
-                        {
-                            case 0:
-                                {
-                                    petSkill = 883;
-                                }
-                                break;
-                            case 1:
-                                {
-                                    petSkill = 83242;
-                                }
-                                break;
-                            case 2:
-                                {
-                                    petSkill = 83243;
-                                }
-                                break;
-                            case 3:
-                                {
-                                    petSkill = 83244;
-                                }
-                                break;
-                            case 4:
-                                {
-                                    petSkill = 83245;
-                                }
-                                break;
-                        }
-
-                        if (petSkill == 0)
-                        {
-                            Host.log("Неизвестный питомец " + Host.CharacterSettings.BattlePetNumber, Host.LogLvl.Error);
-                        }
-                        else
-                        {
-                            var pet = Host.SpellManager.CastSpell(petSkill);
-                            if (pet == ESpellCastError.SUCCESS)
-                            {
-                                Host.log("Призвал питомца", Host.LogLvl.Ok);
-                                Thread.Sleep(1000);
-                            }
-                            else
-                            {
-                                if (Host.PetTameFailureReason == EPetTameFailureReason.Dead)
-                                {
-                                    Thread.Sleep(1000);
-                                    Host.log("Pet = null");
-                                    var pet2 = Host.SpellManager.CastSpell(982);
-                                    if (pet2 == ESpellCastError.SUCCESS)
-                                    {
-                                        Host.log("Воскрешаю питомца", Host.LogLvl.Ok);
-                                    }
-                                    else
-                                    {
-                                        Host.log("Не удалось воскресить питомца " + pet2, Host.LogLvl.Error);
-                                    }
-                                    Thread.Sleep(2000);
-                                    while (Host.SpellManager.IsCasting)
-                                    {
-                                        Thread.Sleep(100);
-                                    }
-                                }
-                                else
-                                {
-                                    Host.log(Host.Me.GetPet().IsAlive + " " + Host.Me.GetPet().Name);
-                                }
-                                Host.log("Не удалось призвать питомца " + pet, Host.LogLvl.Error);
-                            }
-                            while (Host.SpellManager.IsCasting)
-                            {
-                                Thread.Sleep(100);
-                            }
-                        }
-
-
-                    }
-
-                    if (Host.Me.GetPet() != null && Host.Me.Target != null)
-                    {
-                        if (Host.Me.GetPet().Target != BestMob && Host.Me.Target == BestMob)
-                        {
-
-                            Host.log("Нажимаю кнопку 1, отправляю питомца в атаку");
-                            Host.SendKeyPress(0x31);
-                            Thread.Sleep(1000);
-                            return true;
-                        }
-                    }
-                }
-
-                if (Host.Me.Class == EClass.Druid)
-                {
-                    if (Host.CharacterSettings.FormForFight != "Не используется")
-                    {
-                        var formId = 0;
-                        if (Host.CharacterSettings.FormForFight == "Облик медведя")
-                            formId = 5487;
-                        if (Host.CharacterSettings.FormForFight == "Облик кошки")
-                            formId = 768;
-                        if (Host.CharacterSettings.FormForFight == "Походный облик")
-                            formId = 783;
-                        if (Host.CharacterSettings.FormForFight == "Облик лунного совуха")
-                            formId = 24858;
-
-
-                        var isNeedAura = false;
-                        foreach (var aura in Host.Me.GetAuras())
-                        {
-                            if (aura.SpellId == formId)
-                            {
-                                //   Host.log("Нашел ауру");
-                                isNeedAura = true;
-                            }
-                        }
-
-                        if (!isNeedAura)
-                        {
-                            Host.CanselForm();
-                            foreach (var spell in Host.SpellManager.GetSpells())
-                            {
-                                if (spell.Id == formId)
-                                {
-                                    if (Host.SpellManager.CheckCanCast(spell.Id, Host.Me) != ESpellCastError.SUCCESS)
-                                    {
-                                        if (useskilllog) Host.log("CheckCanCast сообщает что скилл не готов [" + spell.Id + "] " + spell.Name + " " + Host.SpellManager.CheckCanCast(spell.Id, Host.Me), Host.LogLvl.Error);
-                                        return false;
-                                    }
-
-                                    var resultForm = Host.SpellManager.CastSpell(spell.Id, null);
-                                    if (resultForm != ESpellCastError.SUCCESS)
-                                    {
-                                        if (Host.Me.Target == null)
-                                            Host.log("Target null");
-                                        else
-                                        {
-                                            Host.log("Цель: " + Host.Me.Target.Name);
-                                        }
-                                        if (Host.AdvancedLog)
-                                            Host.log("Не удалось поменять форму " + spell.Name + "  " + resultForm, Host.LogLvl.Error);
-                                    }
-
-
-
-                                    while (Host.SpellManager.IsCasting)
-                                        Thread.Sleep(100);
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-
-                if (BestMob == null)
-                    return false;
-                var spellInstant = IsSpellInstant(skill.Id);
-
-                if (BestMob.Id == 151639)
-                    if (Host.Me.Distance(BestMob) < 10 && spellInstant && !Host.Me.IsMoving)
-                    {
-                        UpdateRandomMoveTimes();
-                        double angle = Host.Me.Rotation.Y;
-                        if (RandDirLeft)
-                            angle += Math.PI / 2f;
-                        else
-                            angle -= Math.PI / 2f;
-                        var pos = new Vector3F(BestMob.Location.X + GetRandomNumber(2.5, 5) * Math.Cos(angle), BestMob.Location.Y + GetRandomNumber(2.5, 5) * Math.Sin(angle), Host.Me.Location.Z);
-                        new Task(() =>
-                        {
-                            Host.SetCTMMovement(false);
-                            Host.ForceMoveToWithLookTo(pos, Host.Me.Target.Location);
-                            Host.SetCTMMovement(true);
-                        }).Start();
-                    }
-
-                if (Host.Me.HpPercents < 65 && !Host.CommonModule.InFight())
-                {
-                    Thread.Sleep(500);
-                    return true;
-                }
-
-
-
-                if (BestMob.Id == 39072)
-                {
-                    if (BestMob.HpPercents > 0 && BestMob.HpPercents < 90 && Host.Me.Distance(BestMob) > 2)
-                        Thread.Sleep(1300);
-                }
-
-
-
-                if (Host.Me.Target != BestMob)
-                {
-                    if (BestMob.Id == 26631 && Host.CanAttack(BestMob, Host.CanSpellAttack))
-                    {
-
-                    }
-                    else
-                    {
-                        if (Host.Me.GetPet() != null && Host.Me.Class == EClass.Hunter)
-                        {
-
-
-                            if (Host.Me.Distance(BestMob) > 35)
-                                Host.CommonModule.ForceMoveTo(BestMob, 35);
-                            Host.TurnDirectly(BestMob);
-                            Host.log("Нажимаю таб, пытаюсь выбрать цель в клиенте ");
-                            Host.SendKeyPress(0x9);
-                            Thread.Sleep(500);
-                            return true;
-
-
-                        }
-                        else
-                        {
-                            if (!Host.SetTarget(BestMob))
-                                Host.log("Не смог выбрать цель " + Host.GetLastError(), Host.LogLvl.Error);
-                        }
-
-                    }
-
-                }
-                //Цель
-                if (Host.Me.Target == null)
-                {
-                    if (BestMob.Id == 26631 && Host.CanAttack(BestMob, Host.CanSpellAttack))
-                    {
-
-                    }
-                    else
-                    {
-                        if (useskilllog)
-                            Host.log("Нет цели [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-
-
-
-                if (BestMob.Type == EBotTypes.Player)
-                {
-                    if (Host.Me.Distance(BestMob) > 30)
-                    {
-                        BestMob = null;
-                        if (useskilllog)
-                            Host.log("Цель - игрок " + skill.Name + "  " + skill.Id);
-                        return true;
-                    }
-                }
-
-
-
-
-                /*  if (!host.CanUseSkill(skill.Id))
-                  {
-                      if (useskilllog) host.log("Ядро сообщает что скилл не готов [" + skill.Id + "] " + skill.Name + "   " + host.GetLastError());
-
-
-                      return false;
-                  }*/
-
-
-
-                //Проверка настроек из интерфейса
-
-                //Использовать на себя
-                if (skill.SelfTarget)
-                    selfTarget = true;
-                Entity target = BestMob;
-                if (selfTarget)
-                    target = Host.Me;
-
-
-                if (skill.Id == 197835)
-                    target = null;
-                if (skill.Id == 63560)
-                    target = null;
-                if (skill.Id == 45438)
-                    target = null;
-                if (skill.Id == 11426)
-                    target = null;
-                if (skill.Id == 12472)
-                    target = null;
-                if (skill.Id == 192081)
-                    target = Host.Me;
-
-                var preResult = Host.SpellManager.CheckCanCast(skill.Id, target);
-                if (preResult != ESpellCastError.SUCCESS)
-                {
-                    switch (preResult)
-                    {
-                        case ESpellCastError.LINE_OF_SIGHT:
-                            {
-                                if (useskilllog)
-                                    Host.log("Не смог использовать скилл: " + " [" + skill.Id + "] " + skill.Name + " " + "   " + preResult + "  на " + target.Name + "   " +
-                                  Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                  , Host.LogLvl.Important);
-                                if (Host.Me.Distance(BestMob) <= 2)
-                                    Host.FarmModule.SetImmuneTarget(BestMob);
-                                else if (Host.Me.Distance(BestMob) <= 5)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 2);
-                                else if (Host.Me.Distance(BestMob) <= 10)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 5);
-                                else if (Host.Me.Distance(BestMob) < 20)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 10);
-                                else
-                                    Host.CommonModule.ForceMoveTo(BestMob, 19);
-                            }
-                            break;
-                        case ESpellCastError.OUT_OF_RANGE:
-                            {
-                                if (useskilllog)
-                                    Host.log("Не смог использовать скилл: " + " [" + skill.Id + "] " + skill.Name + " " + "   " + preResult + "  на " + target.Name + "   " +
-                                 Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                 , Host.LogLvl.Important);
-                                /*  if (Host.Me.Distance(bestMob) <= 2)
-                                      Host.FarmModule.SetImmuneTarget(bestMob);
-                                  else if (Host.Me.Distance(bestMob) <= 5)
-                                      Host.CommonModule.ForceMoveTo(bestMob, 2);
-                                  else if (Host.Me.Distance(bestMob) <= 10)
-                                      Host.CommonModule.ForceMoveTo(bestMob, 5);
-                                  else if (Host.Me.Distance(bestMob) < 20)
-                                      Host.CommonModule.ForceMoveTo(bestMob, 10);
-                                  else
-                                      Host.CommonModule.ForceMoveTo(bestMob, 19);*/
-
-                            }
-                            break;
-                        case ESpellCastError.UNIT_NOT_INFRONT:
-                            {
-                                if (useskilllog)
-                                    Host.log("Плохой угол, поворачиваюсь UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
-                                Host.ForceMoveToWithLookTo(new Vector3F(Host.Me.Location.X + 1, Host.Me.Location.Y,
-                                    Host.Me.Location.Z), BestMob.Location);
-                                Host.TurnDirectly(BestMob);
-                                Thread.Sleep(100);
-                                if (useskilllog)
-                                    Host.log("Плохой угол, повернулся UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
-                                // Host.CommonModule.ForceMoveTo(bestMob, Host.Me.Distance(bestMob) - 1);
-                            }
-                            break;
-
-                        case ESpellCastError.NO_POWER:
-                            {
-                                /*  Host.log("Не смог использовать скилл: " + " [" + skill.Id + "] " + skill.Name + " " + "   " + preResult + "  на " + target.Name + "   " +
-                                           Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.bestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                       , Host.LogLvl.Important);*/
-                                return false;
-                            }
-
-                        case ESpellCastError.NOT_READY:
-                            {
-                                /*  Host.log("Не смог использовать скилл: " + " [" + skill.Id + "] " + skill.Name + " " + "   " + preResult + "  на " + target.Name + "   " +
-                                           Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                        , Host.LogLvl.Important);*/
-                                return false;
-                            }
-                        case ESpellCastError.NOT_SHAPESHIFT:
-                            {
-                                if (skill.Id == 8936 || skill.Id == 18562 || skill.Id == 774) // [18562] Быстрое восстановление [774] Омоложение
-                                {
-                                    var isNeedCanselForm = true;
-                                    foreach (var aura in Host.Me.GetAuras())
-                                    {
-                                        if (aura.SpellId == 69369)
-                                            isNeedCanselForm = false;
-
-                                        if (aura.SpellId == 24858 && skill.Id == 8936)//Облик лунного совуха    
-                                            isNeedCanselForm = false;
-                                    }
-                                    if (isNeedCanselForm)
-                                    {
-                                        if (useskilllog)
-                                            Host.log("Снимаю облик для использования скила " + skill.Id + "[" + skill.Name + "]", Host.LogLvl.Important);
-                                        Host.CanselForm();
-                                        Thread.Sleep(200);
-                                    }
-                                }
-                            }
-                            break;
-                        default:
-                            {
-                                if (useskilllog)
-                                    Host.log("Не смог использовать скилл: " + " [" + skill.Id + "] " + skill.Name + " " + "   " + preResult + "  на " + target.Name + "   " +
-                                    Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                    , Host.LogLvl.Important);
-                            }
-                            return false;
-                    }
-
-                }
-                // Host.log("Пытаюсь использовать скилл  " + skill.Name +"[" + skill.Id + "]   " + Host.SpellManager.HasGlobalCooldown(skill.Id) + "  " + Host.SpellManager.IsSpellReady(skill.Id) + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds + " Приоритет: " + skill.Priority);
-
-                if (Host.CommonModule.InFight() && !skill.UseInFight)
-                {
-                    if (useskilllog)
-                        Host.log("Скилл используется только в бою " + skill.Name + "[" + skill.Id + "]");
-                    return false;
-                }
-
-
-                var alternatePower = EPowerType.AlternatePower;
-                if (Host.Me.Class == EClass.Druid || Host.Me.Class == EClass.Rogue)
-                    alternatePower = EPowerType.ComboPoints;
-                if (Host.Me.Class == EClass.Monk)
-                    alternatePower = EPowerType.Chi;
-
-                if (skill.CombatElementCountLess != 0)
-                    if (Host.Me.GetPower(alternatePower) > skill.CombatElementCountLess)
-                    {
-                        if (useskilllog)
-                            Host.log("Кол-во AlternatePower больше нужного " + skill.CombatElementCountLess + "/" + Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-
-
-                if (skill.CombatElementCountMore != 0)
-                    if (Host.Me.GetPower(alternatePower) < skill.CombatElementCountMore)
-                    {
-                        if (useskilllog)
-                            Host.log("Кол-во AlternatePower меньше нужного " + skill.CombatElementCountMore + "/" + Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-
-
-
-
-                //Персонаж ХП и МП
-                if (Host.Me.HpPercents < skill.MeMinHp || Host.Me.HpPercents > skill.MeMaxHp)
-                {
-                    if (useskilllog)
-                        Host.log("HP персонажа не соответсвует условиям [" + skill.Id + "] " + skill.Name);
-                    return false;
-                }
-
-                if (skill.TargetId != 0)
-                {
-                    if (skill.TargetId != BestMob.Id)
-                    {
-                        if (useskilllog)
-                            Host.log("ID цели не соответсвует условиям " + skill.TargetId + " != " + BestMob.Id + "[" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-
-                decimal power = Host.Me.GetPower(Host.Me.PowerType);
-                decimal maxPower = Host.Me.GetMaxPower(Host.Me.PowerType);
-
-                if (power != 0)
-                    if (maxPower != 0)
-                    {
-                        var percent = power * 100 / maxPower;
-
-                        if (percent <= skill.MeMinMp || percent > skill.MeMaxMp)
-                        {
-                            if (useskilllog)
-                                Host.log("MP персонажа не соответсвует условиям " + Host.Me.GetPower(Host.Me.PowerType) + " / " + Host.Me.GetMaxPower(Host.Me.PowerType) + "     " + percent + "/" + skill.MeMinMp + "/" + skill.MeMaxMp + " [" + skill.Id + "] " + skill.Name);
-                            return false;
-                        }
-                    }
-
-
-
-
-                //Эффекта нет на цели
-                var findEffect = false;
-                if (skill.NotTargetEffect != 0)
-                {
-                    foreach (var abnormalStatuse in BestMob.GetAuras())
-                        if (abnormalStatuse.SpellId == skill.NotTargetEffect)
-                            findEffect = true;
-                    if (findEffect)
-                    {
-                        if (useskilllog)
-                            Host.log("Нашел эффект на цели " + skill.NotTargetEffect + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-                //Эффекта нет на персонаже
-                // findEffect = false;
-                if (skill.NotMeEffect != 0)
-                {
-                    foreach (var abnormalStatuse in Host.Me.GetAuras())
-                        if (abnormalStatuse.SpellId == skill.NotMeEffect)
-                            findEffect = true;
-                    if (findEffect)
-                    {
-                        if (useskilllog)
-                            Host.log("Нашел эффект на персонаже " + skill.NotMeEffect + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-                //есть эффект на цели
-                if (skill.IsTargetEffect != 0)
-                {
-                    foreach (var abnormalStatuse in BestMob.GetAuras())
-                        if (abnormalStatuse.SpellId == skill.IsTargetEffect)
-                            findEffect = true;
-                    if (!findEffect)
-                    {
-                        if (useskilllog)
-                            Host.log("Не нашел эффект на цели " + skill.IsTargetEffect + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-                //есть эффект на персе
-                if (skill.IsMeEffect != 0)
-                {
-                    foreach (var abnormalStatuse in Host.Me.GetAuras())
-                        if (abnormalStatuse.SpellId == skill.IsMeEffect)
-                        {
-                            findEffect = true;
-                            //  Host.log("нашел ", Host.LogLvl.Ok);
-                        }
-
-                    if (!findEffect)
-                    {
-                        if (useskilllog)
-                            Host.log("Не нашел эффект на персонаже " + skill.IsMeEffect + " [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                }
-
-                //ХП цели
-                if (BestMob?.HpPercents < skill.TargetMinHp || BestMob?.HpPercents > skill.TargetMaxHp)
-                {
-                    if (useskilllog)
-                        Host.log("HP цели не соответсвует условиям [" + skill.Id + "] " + skill.Name);
-                    return false;
-                }
-
-
-
-                if (BestMob?.Hp == 0)
-                    _attackMoveFailCount++;
-
-                if (skill.MoveDist)
-                    if (!selfTarget)
-                    {
-
-                        if (Host.Me.Distance(BestMob) >= skill.MaxDist)
-                        {
-                            if (useskilllog)
-                                Host.log("Подбегаю что бы использовать [" + skill.Id + "] " + skill.Name + "  дист: " + Host.Me.Distance(BestMob) + "  " + skill.MaxDist);
-                            /* if (host.Me.Distance(bestMob) > 40)
-                             {
-                                 host.CommonModule.ForceMoveTo(bestMob, 40, 40);
-                                 if (useskilllog)
-                                     host.log("Подбежал 1");
-                                 return true;
-                             }*/
-
-
-                            if (Host.Me.Distance(BestMob) >= skill.MaxDist)
-                            {
-                                if (useskilllog)
-                                    Host.log("Начинаю бег " + "  дист: " + Host.Me.Distance(BestMob));
-                                if (!Host.CommonModule.ForceMoveTo(BestMob, skill.MaxDist - 1, skill.MaxDist - 1))
-                                {
-                                    if (Host.GetLastError() != ELastError.Movement_MoveCanceled)
-                                        Host.log("Ошибка передвижения к цели: " + Host.GetLastError() + "(" + _attackMoveFailCount + ")", Host.LogLvl.Error);
-                                }
-                                if (useskilllog)
-                                    Host.log("Закончил бег " + "  дист: " + Host.Me.Distance(BestMob));
-                                if (!spellInstant)
-                                    Host.CancelMoveTo();
-
-                                if (Host.GetLastError() == ELastError.Movement_MovePossibleFullStop)
-                                    _attackMoveFailCount++;
-                                else
-                                    _attackMoveFailCount = 0;
-                                BestMob = GetBestMob();
-                                return true;
-                            }
-
-                        }
-
-
-                    }
-
-                //Дистанция Подбегание
-                if (_attackMoveFailCount > 5)
-                {
-                    //Плохая цель
-                    Host.log("Плохая цель 3 :" + BestMob.Name);
-                    SetBadTarget(BestMob, 60000);
-                    BestMob = null;
-                    _attackMoveFailCount = 0;
-                    // host.SetTarget(null);
-                    return true;
-                }
-
-                if (Host.Me.GetAngle(BestMob) > 20 && Host.Me.GetAngle(BestMob) < 340)
-                {
-                    if (useskilllog)
-                        Host.log("Плохой угол, поворачиваюсь к мобу " + Host.Me.Distance(BestMob) + "  " + Host.Me.GetAngle(BestMob));
-                    Host.TurnDirectly(BestMob);
-                    Thread.Sleep(100);
-                    if (useskilllog)
-                        Host.log("Плохой угол, повернулся к мобу " + Host.Me.Distance(BestMob) + "  " + Host.Me.GetAngle(BestMob));
-                }
-
-
-                //Дистанция - максимальная
-                if (Host.Me.Distance(BestMob) > skill.MaxDist + 1)
-                    if (!selfTarget)
-                    {
-                        if (useskilllog)
-                            Host.log("Максимальаня дистанция не соответсвует условиям [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-                //Дистанция минимальная
-                if (Host.Me.Distance(BestMob) < skill.MinDist)
-                    if (!selfTarget)
-                    {
-                        if (useskilllog)
-                            Host.log("Минимальная дистанция не соответсвует условиям [" + skill.Id + "] " + skill.Name);
-                        return false;
-                    }
-
-                //Аое
-                Unit aoeTarget = null;
-                if (skill.AoeMe)
-                    aoeTarget = Host.Me; //Рядом со мной
-                else
-                    aoeTarget = BestMob;
-                if (NearTargetCount(aoeTarget, skill.AoeRadius) < skill.AoeMin ||
-                    NearTargetCount(aoeTarget, skill.AoeRadius) > skill.AoeMax)
-                {
-                    if (useskilllog)
-                        Host.log("Кол-во целей не соответсвует условиям [" + skill.Id + "] " + skill.Name + "   " + NearTargetCount(aoeTarget, skill.AoeRadius) + " " + skill.AoeMin + "/" + skill.AoeMax);
-                    return false;
-                }
-
-
-
-
-
-
-
-
-
-                if ( /*!selfTarget && bestMob != null && */!Host.IsAlive(BestMob))
-                {
-                    Host.log("Моб умер " + skill.Id + " " + skill.Name);
-                    return true;
-                }
-
-
-
-
-
-                switch (Host.Me.Class)
-                {
-                    default:
-                        {
-
-                            if (!Host.IsAutoAttacking && Host.Me.Distance(Host.Me.Target) < 3)
-                            {
-
-                                if (!Host.SpellManager.StartAutoAttack(Host.Me.Target))
-                                    Host.log("Авто атака " + Host.GetLastError(), Host.LogLvl.Error);
-                                else
-                                    Host.log("Авто атака");                            
-                            }
-
-                            if (skill.Id == 6603)
-                            {
-                                return false;
-                            }
-
-                            if (skill.Id == Host.CurrentAutoRepeatSpellId)
-                            {
-                                return false;
-                            }
-                        }
-                        break;
-                }
-
-                if (skill.Id == 275699)
-                {
-                    var use = false;
-                    foreach (var aura in BestMob.GetAuras())
-                    {
-                        if (aura.SpellId == 194310 && aura.StackOrCharges > 3)
-                            use = true;
-                    }
-
-                    if (!use)
-                        return false;
-                }
-
-
-
-                var result = new ESpellCastError();
-
-
-
-
-                if (useskilllog)
-                    Host.log("Пытаюсь использовать: [" + skill.Id + "] " + skill.Name + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds + " Приоритет:" + skill.Priority, Host.LogLvl.Important);
-
-                if (!spellInstant)
-                    Host.CancelMoveTo();
-                Host.MyCheckIsMovingIsCasting(spellInstant);
-                while (Host.SpellManager.IsCasting || Host.SpellManager.IsChanneling || Host.SpellManager.HasGlobalCooldown(skill.Id))
-                {
-                    if (!Host.Me.IsAlive)
-                        return false;
-                    if (!BestMob.IsAlive)
-                    {
-                        Host.SpellManager.CancelSpellCast();
-                        Host.SpellManager.CancelSpellChanneling();
-                    }
-                    // host.log("IsCasting: " + host.SpellManager.IsCasting + "  IsMoving:" + host.Me.IsMoving);
-                    Thread.Sleep(50);
-                }
-
-                if (Host.CharacterSettings.Mode == EMode.Questing)
-                {
-                    if (Host.SpellManager.GetSpell(301690) != null)
-                    {
-                        if (Host.SpellManager.CheckCanCast(301690, Host.Me.Target) == ESpellCastError.SUCCESS)
-                        {
-                            result = Host.SpellManager.CastSpell(301690);
-                            if (result != ESpellCastError.SUCCESS)
-                                Host.log("Не смог использовать скил 301690 " + result + " " + Host.GetLastError(), Host.LogLvl.Error);
-                            return false;
-                        }
-                    }
-                }
-
-
-                result = Host.SpellManager.CastSpell(skill.Id, target/*, host.Me.Target.Location*/);
-                // Thread.Sleep(1000);
-                //использую скилл
-                while (Host.SpellManager.IsCasting || Host.SpellManager.IsChanneling)
-                {
-                    if (!Host.Me.IsAlive)
-                        return false;
-                    if (!BestMob.IsAlive)
-                    {
-                        Host.SpellManager.CancelSpellCast();
-                        Host.SpellManager.CancelSpellChanneling();
-                    }
-                    //  host.log("IsCasting: " + host.SpellManager.IsCasting + "  IsMoving:" + host.Me.IsMoving);
-                    Thread.Sleep(50);
-                }
-
-                if (result != ESpellCastError.SUCCESS)
-                {
-                    var le = Host.GetLastError();
-
-                    switch (result)
-                    {
-                        case ESpellCastError.LINE_OF_SIGHT:
-                            {
-                                Host.log("Не смог использовать скилл: " + le + " [" + skill.Id + "] " + skill.Name + " " + "   " + result + "  на " + target.Name + "   " +
-                                  Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                  , Host.LogLvl.Error);
-                                if (Host.Me.Distance(BestMob) <= 2)
-                                    Host.FarmModule.SetImmuneTarget(BestMob);
-                                else if (Host.Me.Distance(BestMob) <= 5)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 2);
-                                else if (Host.Me.Distance(BestMob) <= 15)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 5);
-                                else if (Host.Me.Distance(BestMob) < 20)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 10);
-                                else
-                                    Host.CommonModule.ForceMoveTo(BestMob, 19);
-                            }
-                            break;
-                        case ESpellCastError.OUT_OF_RANGE:
-                            {
-                                Host.log("Не смог использовать скилл: " + le + " [" + skill.Id + "] " + skill.Name + " " + "   " + result + "  на " + target.Name + "   " +
-                                 Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                 , Host.LogLvl.Error);
-                                if (Host.Me.Distance(BestMob) <= 2)
-                                    Host.FarmModule.SetImmuneTarget(BestMob);
-                                else if (Host.Me.Distance(BestMob) <= 5)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 2);
-                                else if (Host.Me.Distance(BestMob) <= 10)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 5);
-                                else if (Host.Me.Distance(BestMob) < 20)
-                                    Host.CommonModule.ForceMoveTo(BestMob, 10);
-                                else
-                                    Host.CommonModule.ForceMoveTo(BestMob, 19);
-
-                            }
-                            break;
-                        case ESpellCastError.UNIT_NOT_INFRONT:
-                            {
-                                Host.log("Плохой угол, поворачиваюсь UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
-                                Host.ForceMoveToWithLookTo(new Vector3F(Host.Me.Location.X + 1, Host.Me.Location.Y, Host.Me.Location.Z), BestMob.Location);
-                                Host.TurnDirectly(BestMob);
-                                Host.log("Плохой угол, повернулся UNIT_NOT_INFRONT дист:" + Host.Me.Distance(BestMob) + "   " + Host.Me.GetAngle(BestMob));
-                            }
-                            break;
-
-                        case ESpellCastError.NO_POWER:
-                            {
-                                Host.log("Не смог использовать скилл: " + le + " [" + skill.Id + "] " + skill.Name + " " + "   " + result + "  на " + target.Name + "   " +
-                                         Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                     , Host.LogLvl.Error);
-                                return false;
-                            }
-
-                        case ESpellCastError.NOT_READY:
-                            {
-                                Host.log("Не смог использовать скилл: " + le + " [" + skill.Id + "] " + skill.Name + " " + "   " + result + "  на " + target.Name + "   " +
-                                          Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                       , Host.LogLvl.Error);
-                                return false;
-                            }
-
-
-                        default:
-                            {
-
-                                Host.log("Не смог использовать скилл: " + le + " [" + skill.Id + "] " + skill.Name + " " + "   " + result + "  на " + target.Name + "   " +
-                                    Host.Me.Distance(Host.Me.Target) + "/" + Host.Me.Distance(Host.FarmModule.BestMob) + "/" + Host.SpellManager.GetSpell(skill.Id).GetMaxCastRange(Host.Me.Target)
-                                    , Host.LogLvl.Error);
-                            }
-                            break;
-                    }
-
-
-
-
-                    if (BestMob?.HpPercents == 100 && le != ELastError.Unknown)
-                        _attackMoveFailCount++;
-
-                    return false;
-                    // Thread.Sleep(3000);
-                }
-                else
-                {
-                    _attackMoveFailCount = 0;
-                    if (useskilllog)
-                        Host.log("Использую скилл: [" + skill.Id + "] " + skill.Name + " на " + target.Name + "   Время " + Host.ComboRoute.swUseSkill.ElapsedMilliseconds, Host.LogLvl.Ok);
-                    Host.ComboRoute.swUseSkill.Reset();
-                    if (skill.Id == 198013)
-                        Thread.Sleep(3000);
-                    return true;
-                }
-
-            }
-            catch (ThreadAbortException) { return false; }
-            catch (Exception e)
-            {
-
-                Host.log(e.ToString());
+            if (bestMob.Target == Host.Me)
                 return false;
+            if (bestMob.Target == Host.Me.GetPet())
+                return false;
+            if (bestMob.Target == null)
+                return false;
+            foreach (var groupMember in Host.Group.GetMembers())
+            {
+                if (bestMob.Target.Name == groupMember.Name)
+                    return false;
             }
+            BestMob = null;
+            Host.CancelMoveTo();
+            if (Host.SpellManager.CurrentAutoRepeatSpellId != 0)
+                Host.SpellManager.CancelAutoRepeatSpell();
+            return true;
         }
 
-        internal Entity GetNearestCreatureInZone(int Id, Zone zone)
+        private Unit GetHightPrioritiMob()
+        {
+            if (Host.GetBotLogin() == "deathstar")
+            {
+                if (Host.Me.GetThreats().Count > 1)
+                    return null;
+            }
+
+            foreach (var unit in Host.GetAgroCreatures())
+            {
+                var zRange = Math.Abs(Host.Me.Location.Z - unit.Location.Z);
+
+                if (zRange > Host.CharacterSettings.Zrange)
+                    continue;
+
+                if (!Host.IsAlive(unit))
+                    continue;
+                if (Host.FarmModule.IsBadTarget(unit, Host.FarmModule.TickTime))
+                    continue;
+                if (Host.FarmModule.IsImmuneTarget(unit))
+                    continue;
+
+                if (Host.FarmModule.SpecialItems != null)
+                {
+                    if (Host.FarmModule.SpecialItems.Length == 0)
+                        if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                            continue;
+                }
+                else
+                {
+                    if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                        continue;
+                }
+
+                foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
+                {
+                    if (unit.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                        if (characterSettingsMobsSetting.Priority == Priority.VeryHight)
+                            return unit;
+                }
+            }
+
+            foreach (var unit in Host.GetAgroCreatures())
+            {
+                var zRange = Math.Abs(Host.Me.Location.Z - unit.Location.Z);
+
+                if (zRange > Host.CharacterSettings.Zrange)
+                    continue;
+
+                if (!Host.IsAlive(unit))
+                    continue;
+                if (Host.FarmModule.IsBadTarget(unit, Host.FarmModule.TickTime))
+                    continue;
+                if (Host.FarmModule.IsImmuneTarget(unit))
+                    continue;
+
+                if (Host.FarmModule.SpecialItems != null)
+                {
+                    if (Host.FarmModule.SpecialItems.Length == 0)
+                        if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                            continue;
+                }
+                else
+                {
+                    if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                        continue;
+                }
+
+                foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
+                {
+                    if (unit.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                        if (characterSettingsMobsSetting.Priority == Priority.Hight)
+                            return unit;
+                }
+            }
+            return null;
+        }
+
+        private GameObject GetNearestPropInZone(uint id, bool mobInsideMesh)
         {
             try
             {
-                double minDist = 999999;
-                Entity bestCreature = null;
-                foreach (var obj in Host.GetEntities<Entity>())
-                {
-
-                    if (obj.Guid.GetEntry() == Id && zone.ObjInZone(obj))
-                    {
-                        if (minDist > Host.Me.Distance(obj))
-                        {
-                            minDist = Host.Me.Distance(obj);
-                            bestCreature = obj;
-                        }
-                    }
-                }
-                return bestCreature;
-            }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-                return null;
-            }
-        }
-
-        internal Entity GetNearestCreatureInZone(int Id)
-        {
-            double minDist = 999999;
-            Entity bestCreature = null;
-            foreach (var obj in Host.GetEntities<Entity>())
-            {
-
-                if (obj.Guid.GetEntry() == Id && farmZone.ObjInZone(obj))
-                {
-                    if (minDist > Host.Me.Distance(obj))
-                    {
-                        minDist = Host.Me.Distance(obj);
-                        bestCreature = obj;
-                    }
-                }
-            }
-            return bestCreature;
-        }
-
-        internal GameObject GetNearestPropInZone(uint id, bool mobInsideMesh)
-        {
-            try
-            {
-
-
-                /* if (host.CharacterSettings.Mode == "Сбор ресурсов" || host.CharacterSettings.Mode == "Сбор Dacanda")
-                 {
-                     if (host.GetBotLogin() == "alxpro" || host.GetBotLogin() == "Daredevi1")
-                         return GetBestPropInZone(true);
-                 }
-                 */
-                // mobInsideMesh = true;
                 double minDist = 999999;
                 GameObject bestProp = null;
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
-                    /*  if (Host.CharacterSettings.Mode != EMode.Questing)
-                          if (prop.GameObjectType != EGameObjectType.GatheringNode)
-                              continue;*/
+
                     if (!Host.IsExists(prop))
                         continue;
-                    if (IsBadProp(prop, Host.ComboRoute.TickTime))
+                    if (IsBadProp(prop, Host.FarmModule.TickTime))
                         continue;
                     if (prop.Id != id)
                         continue;
@@ -2089,8 +1630,9 @@ namespace WowAI.Modules
                         if (minDist < GetDistToMobFromMech(prop.Location))
                             continue;
                     }
-                    Host.log(mobInsideMesh + "  " + id + "  " + farmZone.ObjInZone(prop));
-                    if (!farmZone.ObjInZone(prop))
+
+
+                    if (!FarmZone.ObjInZone(prop))
                         continue;
 
 
@@ -2110,7 +1652,7 @@ namespace WowAI.Modules
             }
         }
 
-        public double GetDistancePoint(GameObject prop)
+        private double GetDistancePoint(GameObject prop)
         {
             try
             {
@@ -2132,7 +1674,7 @@ namespace WowAI.Modules
             }
         }
 
-        internal GameObject GetBestPropInZone(bool mobInsideMesh)
+        private GameObject GetBestPropInZone(bool mobInsideMesh)
         {
             try
             {
@@ -2144,22 +1686,21 @@ namespace WowAI.Modules
                 GameObject bestProp = null;
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
-                    if (prop.GameObjectType != EGameObjectType.GatheringNode)
-                        continue;
+                    /* if (prop.GameObjectType != EGameObjectType.GatheringNode)
+                         continue;*/
                     if (!Host.IsExists(prop))
                         continue;
                     /*    if (!farmPropIds.Contains(prop.Id))
                             continue;*/
-                    if (IsBadProp(prop, Host.ComboRoute.TickTime))
+                    if (IsBadProp(prop, Host.FarmModule.TickTime))
                         continue;
                     if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) != 0)
                         continue;
-                    double bestdist = 999999;
-                    if (Host.CharacterSettings.Mode == EMode.Script)
+                    if (Host.CharacterSettings.Mode == Mode.Script)
                     {
                         if (Host.Me.Distance(prop) > Host.CharacterSettings.GatherRadiusScript)
                             continue;
-                        bestdist = GetDistancePoint(prop);
+                        var bestdist = GetDistancePoint(prop);
                         if (bestdist > Host.CharacterSettings.GatherRadiusScript)
                             continue;
 
@@ -2227,38 +1768,6 @@ namespace WowAI.Modules
             }
         }
 
-        internal bool CircleIntersects(double x, double y, double R, double AX, double AY, double BX, double BY)
-        {
-            try
-            {
-                var L = Math.Sqrt(Math.Pow((BX - AX), 2) + Math.Pow((BY - AY), 2));
-                // единичный вектор отрезка AB 
-                var Xv = (BX - AX) / L;
-                var Yv = (BY - AY) / L;
-                var Xd = (AX - x);
-                var Yd = (AY - y);
-                var b = 2 * (Xd * Xv + Yd * Yv);
-                var c = Xd * Xd + Yd * Yd - R * R;
-                var c4 = c + c;
-                c4 += c4;
-                var D = b * b - c4;
-                if (D < 0) return false; // нет корней, нет пересечений
-
-                D = Math.Sqrt(D);
-                var l1 = (-b + D) * 0.5;
-                var l2 = (-b - D) * 0.5;
-                var intersects1 = ((l1 >= 0.0) && (l1 <= L));
-                var intersects2 = ((l2 >= 0.0) && (l2 <= L));
-                var intersects = intersects1 || intersects2;
-                return intersects;
-            }
-            catch (Exception e)
-            {
-                Host.log(e.ToString());
-                return false;
-            }
-        }
-
         public void SetBadProp(GameObject obj, int addTime)
         {
             //  Host.log("бад " + addTime);
@@ -2305,7 +1814,7 @@ namespace WowAI.Modules
             return false;
         }
 
-        public void SetImmuneTarget(Entity obj)
+        private void SetImmuneTarget(Entity obj)
         {
             if (obj != null)
             {
@@ -2329,7 +1838,7 @@ namespace WowAI.Modules
                         var immuneX = (double)(Host.GetVar(obj, "immuneX"));
                         var immuneY = (double)(Host.GetVar(obj, "immuneY"));
                         var immuneZ = (double)(Host.GetVar(obj, "immuneZ"));
-                        return (Host.Distance(immuneX, immuneY, immuneZ, obj.Location.X, obj.Location.Y, obj.Location.Z) < 3);
+                        return (Host.MyDistance(immuneX, immuneY, immuneZ, obj.Location.X, obj.Location.Y, obj.Location.Z) < 3);
                     }
                     return false;
                 }
@@ -2342,11 +1851,6 @@ namespace WowAI.Modules
             }
         }
 
-        /// <summary>
-        /// Получить лучшего агро моба
-        /// </summary>
-        /// <param name="mobInsideMesh"></param>
-        /// <returns></returns>
         internal Unit GetBestAgroMob(bool mobInsideMesh = false)
         {
             try
@@ -2361,8 +1865,10 @@ namespace WowAI.Modules
 
                     if (!Host.CanAttack(obj, Host.CanSpellAttack))
                         continue;
-                    /*  if (obj.Type != EBotTypes.Npc)
-                          continue;*/
+                    if (obj.Type == EBotTypes.Player)
+                        continue;
+                    if (obj.Type == EBotTypes.Pet)
+                        continue;
                     if (!Host.IsAlive(obj))
                         continue;
 
@@ -2394,7 +1900,7 @@ namespace WowAI.Modules
             }
         }
 
-        internal double GetDistToMobFromMech(Vector3F loc)
+        private double GetDistToMobFromMech(Vector3F loc)
         {
             double allDist = 0;
             var test = Host.GetSmoothPath(Host.Me.Location, loc);
@@ -2402,70 +1908,35 @@ namespace WowAI.Modules
             {
                 double dist = 0;
                 if (i + 1 < test.Path.Count)
-                    dist = Host.Distance(test.Path[i].X, test.Path[i].Y, test.Path[i].Z, test.Path[i + 1].X,
+                    dist = Host.MyDistance(test.Path[i].X, test.Path[i].Y, test.Path[i].Z, test.Path[i + 1].X,
                     test.Path[i + 1].Y, test.Path[i + 1].Z);
-                allDist = allDist + dist;
+                allDist += dist;
             }
             // Host.log(allDist.ToString());
             return allDist;
         }
-        /*  internal double GetDistToMobFromMech(Prop prop)
-          {
-              double allDist = 0;
-              var test = host.GetSmoothPath(host.Me.Location, prop.Location);
-              for (var i = 0; i < test.Path.Count; i++)
-              {
-                  double dist = 0;
-                  if (i + 1 < test.Path.Count)
-                      dist = host.Distance(test.Path[i].X, test.Path[i].Y, test.Path[i].Z, test.Path[i + 1].X,
-                      test.Path[i + 1].Y, test.Path[i + 1].Z);
-                  allDist = allDist + dist;
-              }
-              // host.log(allDist.ToString());
-              return allDist;
-          }
-  */
 
-        /* public bool CheckEliteInradius(Creature creature)
-         {
-             foreach (var elitecreature in host.GetCreatures())
-             {
-                 if (elitecreature.Type != EBotTypes.Npc)
-                     continue;
-                 if ((elitecreature as Npc).Db.Grade != ENPCGradeType.Elite)
-                     continue;
-                 if (!elitecreature.IsEnemy)
-                     continue;
-                 if (elitecreature.Distance(creature) < 20)
-                     return true;
-             }
-             return false;
-         }*/
-
-
-
-        /// <summary>
-        /// Получить лучшего моба
-        /// </summary>
-        /// <param name="mobInsideMesh"></param>
-        /// <returns></returns>
-        internal Unit GetBestMob(bool mobInsideMesh = false)
+        private Unit GetBestMob(bool mobInsideMesh = false)
         {
             try
             {
-                //   Host.log("Ищу моба " + mobInsideMesh);
                 double bestDist = 999999;
                 Unit bestMob = null;
                 var aggroMobs = Host.GetAgroCreatures();
-
                 foreach (var obj in Host.GetEntities<Unit>())
                 {
                     if (obj.Id == 126702 && obj.Location.Z < 28)
                         continue;
+                    if (obj.Type == EBotTypes.Player)
+                        continue;
+                    if (obj.Type == EBotTypes.Pet)
+                        continue;
+                    if (obj.IsTotem())
+                        continue;
 
-                    if (Host.ComboRoute.SpecialItems != null)
+                    if (Host.FarmModule.SpecialItems != null)
                     {
-                        if (Host.ComboRoute.SpecialItems?.Length == 0)
+                        if (Host.FarmModule.SpecialItems?.Length == 0)
                             if (!Host.CanAttack(obj, Host.CanSpellAttack))
                                 continue;
                     }
@@ -2474,13 +1945,13 @@ namespace WowAI.Modules
                         if (!Host.CanAttack(obj, Host.CanSpellAttack))
                             continue;
                     }
-                    //  Host.log("Тест");
 
-                    if (Host.CharacterSettings.Mode != EMode.Questing)
+
+                    if (Host.CharacterSettings.Mode != Mode.Questing)
                         if (obj.Victim != null && obj.Victim != Host.Me && obj.Victim != Host.Me.GetPet())
                             continue;
 
-                    if (Host.CharacterSettings.Mode == EMode.Questing)
+                    if (Host.CharacterSettings.Mode == Mode.Questing)
                     {
                         if (obj.Distance(-349.34, -3545.83, 31.01) < 10)
                             continue;
@@ -2517,42 +1988,41 @@ namespace WowAI.Modules
                         if (obj.Distance(776.45, 1654.16, 1.57) < 20)
                             continue;
 
-                        if ((!farmZone.ObjInZone(obj) || !farmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                        if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
                             continue;
                     }
 
-                    if (Host.CharacterSettings.Mode == EMode.QuestingClassic)
+                    if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
                     {
-                        if (!farmZone.ObjInZone(obj) && !aggroMobs.Contains(obj))
+                        if (!FarmZone.ObjInZone(obj) && !aggroMobs.Contains(obj))
                             continue;
+                        if (FarmMobsIds.Count == 0)
+                        {
+                            if (!FarmZone.ObjInZone(obj))
+                                continue;
+                            var levelRange = Math.Abs(Host.Me.Level - obj.Level);
 
-                        if (!CheckFactionId(obj) && !aggroMobs.Contains(obj))
-                            continue;
+                            if (levelRange > 7)
+                                continue;
+                        }
+                        else
+                        {
+                            if (!CheckFactionId(obj) && !aggroMobs.Contains(obj))
+                                continue;
+                        }
+
                     }
 
 
-
-
-
-
-                    /*     if (obj.Occupier != null)// проверка на агр
-                             if (obj.Occupier != host.Me)
-                                 continue;*/
 
                     if (mobInsideMesh)
-                        if (!Host.IsInsideNavMesh(obj.Location)/* && host.GetBotLogin() == "Daredevi1"*/)
-                        {
-                            /* if (host.FindNearPointInRadiusNoZ(obj.Location.X, obj.Location.Y, 5))
-                                 continue;
-                               host.log("Добавляю точку");
-                               host.CreateNewEditorGpsPoint(obj.Location, (obj as Npc).Db.LocalName + "[" + obj.Sid + "]");*/
-                            continue;// в мешах   
-                        }
+                        if (!Host.IsInsideNavMesh(obj.Location))
+                            continue; // в мешах   
 
 
 
                     var zRange = Math.Abs(Host.Me.Location.Z - obj.Location.Z);
-                    if (mobInsideMesh)
+                    if (Host.Me.MovementFlags == EMovementFlag.Swimming)
                         zRange = 0;
                     if (zRange > Host.CharacterSettings.Zrange)
                         continue;
@@ -2560,10 +2030,13 @@ namespace WowAI.Modules
 
                     if (!Host.IsAlive(obj))
                         continue;
-                    if (IsBadTarget(obj, Host.ComboRoute.TickTime))
+                    if (IsBadTarget(obj, Host.FarmModule.TickTime))
                         continue;
                     if (IsImmuneTarget(obj))
                         continue;
+                    if (Host.Me.MovementFlags != EMovementFlag.Swimming)
+                        if (!Host.CommonModule.CheckPathForLoc(Host.Me.Location, obj.Location))
+                            continue;
 
                     if (!mobInsideMesh)
                     {
@@ -2576,9 +2049,9 @@ namespace WowAI.Modules
                             continue;
                     }
 
-                  
 
-                    if (Host.CharacterSettings.Mode == EMode.FarmMob || Host.CharacterSettings.Mode == EMode.FarmResource || Host.CharacterSettings.Mode == EMode.Script)
+
+                    if (Host.CharacterSettings.Mode == Mode.FarmMob || Host.CharacterSettings.Mode == Mode.FarmResource || Host.CharacterSettings.Mode == Mode.Script)
                     {
                         if (Host.CharacterSettings.UseFilterMobs)
                         {
@@ -2586,7 +2059,7 @@ namespace WowAI.Modules
                             foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                             {
                                 if (obj.Guid.GetEntry() == characterSettingsMobsSetting.Id)
-                                    if (characterSettingsMobsSetting.Priority == 1)
+                                    if (characterSettingsMobsSetting.Priority == Priority.Ignore)
                                         mobsIgnore = true;
                             }
                             if (mobsIgnore)
@@ -2595,22 +2068,47 @@ namespace WowAI.Modules
                             foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                             {
                                 if (obj.Guid.GetEntry() == characterSettingsMobsSetting.Id)
-                                    if (characterSettingsMobsSetting.Priority == 2)
+                                    if (characterSettingsMobsSetting.Priority == Priority.Hight)
                                         return obj;
                             }
-                            if (Host.FarmModule.farmState == FarmState.Disabled)
+                            if (Host.FarmModule.FarmState == FarmState.Disabled)
                                 return null;
+                            if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                                continue;
+                        }
+                        else
+                        {
+                            if (Host.CharacterSettings.UseMultiZone)
+                            {
+                                if (Host.AutoQuests.BestMultizone.UseFilter)
+                                {
+                                    if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                                        continue;
+                                }
+                                else
+                                {
+                                    if (!FarmZone.ObjInZone(obj))
+                                        continue;
+                                }
+                            }
+                            else
+                            {
+                                if (!FarmZone.ObjInZone(obj))
+                                    continue;
+                            }
+
+
                         }
 
-                        if ((!farmZone.ObjInZone(obj) || !farmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
-                            continue;
-                       
+
                     }
-                    if (Host.ClientType == EWoWClient.Classic)
+
+                    if (Host.ClientType == EWoWClient.Classic && BestMob != null)
                     {
-                        if (!CheckTarget(obj))
+                        if (IsBadTarget(BestMob))
                             continue;
                     }
+
 
                     if (!mobInsideMesh)
                     {
@@ -2619,22 +2117,9 @@ namespace WowAI.Modules
                     else
                     {
                         bestDist = GetDistToMobFromMech(obj.Location);
-
                     }
-
-
-                    // bestDist = Host.Me.Distance(obj);
-                    //bestDist = GetDistToMobFromMech(obj);
                     bestMob = obj;
                 }
-
-                //Если bestMob != null - это наш лучший моб. Но нужно еще проверить путь к нему теперь.
-                /*   var finalMob = CheckBestMob(bestMob);
-                   while (finalMob != bestMob)
-                   {
-                       bestMob = finalMob;
-                       finalMob = CheckBestMob(bestMob);
-                   }*/
                 return bestMob;
             }
             catch (Exception e)
@@ -2644,88 +2129,16 @@ namespace WowAI.Modules
             }
         }
 
-        public bool CheckTarget(Unit unit)
-        {
-            if (unit.Target == null)
-                return true;
-            if (unit.Target.Type == EBotTypes.Player && unit.Target != Host.Me)
-                return false;
-            if (unit.Target.Type == EBotTypes.Pet && unit.Target != Host.Me.GetPet())
-                return false;
-
-            return true;
-        }
-        public bool CheckFactionId(Unit unit)
+        private bool CheckFactionId(Unit unit)
         {
             if (unit == null)
                 return false;
-            if (farmMobsIds.Contains(unit.Id))
+            if (FarmMobsIds.Contains(unit.Id))
                 return true;
-            if (factionIds.Contains(unit.FactionId))
+            if (FactionIds.Contains(unit.FactionId))
                 return true;
             return false;
 
         }
-
-        /// <summary>
-        /// Проверка лучшего моба
-        /// </summary>
-        /// <param name="best"></param>
-        /// <returns></returns>
-        /*  internal Npc CheckBestMob(Npc best)
-          {
-              try
-              {
-                  if (best == null)
-                      return null;
-                  var finalResult = new List<Npc>();
-                  if (best.Type != EBotTypes.Prop)
-                      finalResult.Add((Creature)best);
-
-                  foreach (var obj in host.GetEntities<Npc>())
-                  {
-
-                      if (!obj.IsVisible)//Не видно
-                          continue;
-                      if (obj.Type != EBotTypes.Npc)//не нпс
-                          continue;
-                      var zRange = Math.Abs(host.Me.Location.Z - obj.Location.Z);
-                      if (zRange > 10)
-                          continue;
-                      if (!host.IsAlive(obj))
-                          continue;
-                      if (!obj.IsEnemy)
-                          continue;
-
-                      if (!host.CheckBuff(2000581, obj)
-                          && !IsBadTarget(obj, host.ComboRoute.TickTime) // не в списке плохих
-                          && (obj as Npc).Db.AggressiveType == EAggressiveType.Aggressive //агресивный                
-                          && host.FarmModule.CircleIntersects(obj.Location.X, obj.Location.Y, 4, host.Me.Location.X, host.Me.Location.Y, best.Location.X, best.Location.Y))// может ссагрится
-                      {
-                          finalResult.Add(obj);
-                      }
-                  }
-
-                  double finalDist = 999999;
-                  Creature finalMob = null;
-                  foreach (var obj in finalResult)
-                  {
-                      if (finalDist > host.Me.Distance(obj))
-                      {
-                          // finalDist = GetDistToMobFromMech(obj);
-                          finalDist = host.Me.Distance(obj);
-                          finalMob = obj;
-                      }
-                  }
-                  return finalMob;
-              }
-              catch (Exception e)
-              {
-                  host.log(e.ToString());
-                  return null;
-              }
-          }*/
-
-
     }
 }

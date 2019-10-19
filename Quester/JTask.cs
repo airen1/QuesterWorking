@@ -2,37 +2,37 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AlbionAI
+namespace WowAI
 {
     public class JTask
     {
-        private Task task;
-        private CancellationTokenSource cts;
+        private readonly Task _task;
+        private readonly CancellationTokenSource _cts;
 
 
         public JTask(Action action)
         {
-            cts = new CancellationTokenSource();
-            task = new Task(action, cts.Token);
+            _cts = new CancellationTokenSource();
+            _task = new Task(action, _cts.Token);
         }
 
-        public CancellationToken token { get { return cts.Token; } }
+        public CancellationToken Token => _cts.Token;
 
         public void Start()
         {
-            if (task != null)
-                task.Start();
+            _task?.Start();
         }
 
         public bool CancelSync()
         {
             try
             {
-                cts.Cancel();
-                return task.Wait(2000);
+                _cts.Cancel();
+                return _task.Wait(2000);
             }
             catch
             {
+                // ignored
             }
             return false;
         }
