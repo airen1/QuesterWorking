@@ -102,8 +102,8 @@ namespace WowAI
                     return;
                 }
 
-                
-                   
+
+
                 if (fixMove > 50)
                 {
                     SetMoveStateForClient(true);
@@ -974,16 +974,19 @@ namespace WowAI
             return null;
         }
 
-        internal Item MyGetItem(uint id)
+        internal Item MyGetItem(uint id, bool checkEquip = false)
         {
             foreach (var item in ItemManager.GetItems())
             {
+                if (item.Id != id)
+                    continue;
+                if (checkEquip && item.Place == EItemPlace.Equipment)
+                {
+                    return item;
+                }
                 if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 || item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 || item.Place == EItemPlace.InventoryItem)
                 {
-                    if (item.Id == id)
-                    {
-                        return item;
-                    }
+                    return item;
                 }
             }
             return null;
@@ -2955,7 +2958,7 @@ namespace WowAI
                     _isneedSave = false;
                 }
 
-               
+
                 foreach (var entity in GetEntities<Unit>())
                 {
                     if (entity.Id == 0)
@@ -3109,7 +3112,7 @@ namespace WowAI
 
                 if (_isneedSave && DateTime.UtcNow > NextSave)
                 {
-                    
+
                     NextSave = DateTime.UtcNow.AddMinutes(3);
                     var sw = new Stopwatch();
                     sw.Start();

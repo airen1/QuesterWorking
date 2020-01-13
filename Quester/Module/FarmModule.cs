@@ -1083,7 +1083,7 @@ namespace WowAI.Module
                         continue;
                     }
 
-                    var buffItem = Host.MyGetItem(regenItemse.ItemId);
+                    var buffItem = Host.MyGetItem(regenItemse.ItemId, true);
 
                     if (buffItem == null)
                     {
