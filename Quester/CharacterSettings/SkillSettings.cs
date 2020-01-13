@@ -19,7 +19,11 @@ namespace WowAI
 
             set
             {
-                if (_checked == value) return;
+                if (_checked == value)
+                {
+                    return;
+                }
+
                 _checked = value;
                 NotifyPropertyChanged();
             }
@@ -31,7 +35,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -43,7 +51,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -55,7 +67,11 @@ namespace WowAI
             get => _priority;
             set
             {
-                if (_priority == value) return;
+                if (_priority == value)
+                {
+                    return;
+                }
+
                 _priority = value;
                 NotifyPropertyChanged();
             }
@@ -67,7 +83,11 @@ namespace WowAI
             get => _meMaxHp;
             set
             {
-                if (_meMaxHp == value) return;
+                if (_meMaxHp == value)
+                {
+                    return;
+                }
+
                 _meMaxHp = value;
                 NotifyPropertyChanged();
             }
@@ -78,7 +98,11 @@ namespace WowAI
             get => _meMinHp;
             set
             {
-                if (_meMinHp == value) return;
+                if (_meMinHp == value)
+                {
+                    return;
+                }
+
                 _meMinHp = value;
                 NotifyPropertyChanged();
             }
@@ -90,7 +114,11 @@ namespace WowAI
             get => _meMaxMp;
             set
             {
-                if (_meMaxMp == value) return;
+                if (_meMaxMp == value)
+                {
+                    return;
+                }
+
                 _meMaxMp = value;
                 NotifyPropertyChanged();
             }
@@ -102,7 +130,11 @@ namespace WowAI
             get => _meMinMp;
             set
             {
-                if (_meMinMp == value) return;
+                if (_meMinMp == value)
+                {
+                    return;
+                }
+
                 _meMinMp = value;
                 NotifyPropertyChanged();
             }
@@ -114,7 +146,11 @@ namespace WowAI
             get => _targetMinHp;
             set
             {
-                if (_targetMinHp == value) return;
+                if (_targetMinHp == value)
+                {
+                    return;
+                }
+
                 _targetMinHp = value;
                 NotifyPropertyChanged();
             }
@@ -126,7 +162,11 @@ namespace WowAI
             get => _targetMaxHp;
             set
             {
-                if (_targetMaxHp == value) return;
+                if (_targetMaxHp == value)
+                {
+                    return;
+                }
+
                 _targetMaxHp = value;
                 NotifyPropertyChanged();
             }
@@ -138,7 +178,11 @@ namespace WowAI
             get => _petMinHp;
             set
             {
-                if (_petMinHp == value) return;
+                if (_petMinHp == value)
+                {
+                    return;
+                }
+
                 _petMinHp = value;
                 NotifyPropertyChanged();
             }
@@ -150,7 +194,11 @@ namespace WowAI
             get => _petMaxHp;
             set
             {
-                if (_petMaxHp == value) return;
+                if (_petMaxHp == value)
+                {
+                    return;
+                }
+
                 _petMaxHp = value;
                 NotifyPropertyChanged();
             }
@@ -162,7 +210,11 @@ namespace WowAI
             get => _maxDist;
             set
             {
-                if (_maxDist == value) return;
+                if (_maxDist == value)
+                {
+                    return;
+                }
+
                 _maxDist = value;
                 NotifyPropertyChanged();
             }
@@ -174,7 +226,11 @@ namespace WowAI
             get => _minDist;
             set
             {
-                if (_minDist == value) return;
+                if (_minDist == value)
+                {
+                    return;
+                }
+
                 _minDist = value;
                 NotifyPropertyChanged();
             }
@@ -186,7 +242,11 @@ namespace WowAI
             get => _baseDist;
             set
             {
-                if (_baseDist == value) return;
+                if (_baseDist == value)
+                {
+                    return;
+                }
+
                 _baseDist = value;
                 NotifyPropertyChanged();
             }
@@ -198,7 +258,11 @@ namespace WowAI
             get => _moveDist;
             set
             {
-                if (_moveDist == value) return;
+                if (_moveDist == value)
+                {
+                    return;
+                }
+
                 _moveDist = value;
                 NotifyPropertyChanged();
             }
@@ -210,7 +274,11 @@ namespace WowAI
             get => _aoeRadius;
             set
             {
-                if (_aoeRadius == value) return;
+                if (_aoeRadius == value)
+                {
+                    return;
+                }
+
                 _aoeRadius = value;
                 NotifyPropertyChanged();
             }
@@ -222,7 +290,11 @@ namespace WowAI
             get => _aoeMin;
             set
             {
-                if (_aoeMin == value) return;
+                if (_aoeMin == value)
+                {
+                    return;
+                }
+
                 _aoeMin = value;
                 NotifyPropertyChanged();
             }
@@ -233,7 +305,11 @@ namespace WowAI
             get => _aoeMax;
             set
             {
-                if (_aoeMax == value) return;
+                if (_aoeMax == value)
+                {
+                    return;
+                }
+
                 _aoeMax = value;
                 NotifyPropertyChanged();
             }
@@ -246,7 +322,11 @@ namespace WowAI
             get => _aoeMe;
             set
             {
-                if (_aoeMe == value) return;
+                if (_aoeMe == value)
+                {
+                    return;
+                }
+
                 _aoeMe = value;
                 NotifyPropertyChanged();
             }
@@ -258,7 +338,11 @@ namespace WowAI
             get => _selfTarget;
             set
             {
-                if (_selfTarget == value) return;
+                if (_selfTarget == value)
+                {
+                    return;
+                }
+
                 _selfTarget = value;
                 NotifyPropertyChanged();
             }
@@ -270,7 +354,11 @@ namespace WowAI
             get => _notTargetEffect;
             set
             {
-                if (_notTargetEffect == value) return;
+                if (_notTargetEffect == value)
+                {
+                    return;
+                }
+
                 _notTargetEffect = value;
                 NotifyPropertyChanged();
             }
@@ -282,7 +370,11 @@ namespace WowAI
             get => _notMeEffect;
             set
             {
-                if (_notMeEffect == value) return;
+                if (_notMeEffect == value)
+                {
+                    return;
+                }
+
                 _notMeEffect = value;
                 NotifyPropertyChanged();
             }
@@ -294,7 +386,11 @@ namespace WowAI
             get => _isTargetEffect;
             set
             {
-                if (_isTargetEffect == value) return;
+                if (_isTargetEffect == value)
+                {
+                    return;
+                }
+
                 _isTargetEffect = value;
                 NotifyPropertyChanged();
             }
@@ -306,7 +402,11 @@ namespace WowAI
             get => _isMeEffect;
             set
             {
-                if (_isMeEffect == value) return;
+                if (_isMeEffect == value)
+                {
+                    return;
+                }
+
                 _isMeEffect = value;
                 NotifyPropertyChanged();
             }
@@ -318,7 +418,11 @@ namespace WowAI
             get => _minLevel;
             set
             {
-                if (_minLevel == value) return;
+                if (_minLevel == value)
+                {
+                    return;
+                }
+
                 _minLevel = value;
                 NotifyPropertyChanged();
             }
@@ -330,7 +434,11 @@ namespace WowAI
             get => _maxLevel;
             set
             {
-                if (_maxLevel == value) return;
+                if (_maxLevel == value)
+                {
+                    return;
+                }
+
                 _maxLevel = value;
                 NotifyPropertyChanged();
             }
@@ -342,7 +450,11 @@ namespace WowAI
             get => _combatElementCountMore;
             set
             {
-                if (_combatElementCountMore == value) return;
+                if (_combatElementCountMore == value)
+                {
+                    return;
+                }
+
                 _combatElementCountMore = value;
                 NotifyPropertyChanged();
             }
@@ -354,7 +466,11 @@ namespace WowAI
             get => _combatElementCountLess;
             set
             {
-                if (_combatElementCountLess == value) return;
+                if (_combatElementCountLess == value)
+                {
+                    return;
+                }
+
                 _combatElementCountLess = value;
                 NotifyPropertyChanged();
             }
@@ -366,7 +482,11 @@ namespace WowAI
             get => _useInFight;
             set
             {
-                if (_useInFight == value) return;
+                if (_useInFight == value)
+                {
+                    return;
+                }
+
                 _useInFight = value;
                 NotifyPropertyChanged();
             }
@@ -379,7 +499,11 @@ namespace WowAI
             get => _useInPvp;
             set
             {
-                if (_useInPvp == value) return;
+                if (_useInPvp == value)
+                {
+                    return;
+                }
+
                 _useInPvp = value;
                 NotifyPropertyChanged();
             }
@@ -391,7 +515,11 @@ namespace WowAI
             get => _targetId;
             set
             {
-                if (_targetId == value) return;
+                if (_targetId == value)
+                {
+                    return;
+                }
+
                 _targetId = value;
                 NotifyPropertyChanged();
             }
@@ -403,7 +531,11 @@ namespace WowAI
             get => _nottargetId;
             set
             {
-                if (_nottargetId == value) return;
+                if (_nottargetId == value)
+                {
+                    return;
+                }
+
                 _nottargetId = value;
                 NotifyPropertyChanged();
             }

@@ -10,6 +10,7 @@
         Use = 5,
         SendByMail = 6,
         FoodPet = 7,
-        Buy = 8
+        Buy = 8,
+        NotEquip
     }
 }

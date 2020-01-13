@@ -25,7 +25,10 @@ namespace WowAI
                 _allGain = me.Exp - _startExp;
                 var result = me.Exp - _startExp;
                 if (result == 0)
+                {
                     result = 1;
+                }
+
                 return result;
             }
 

@@ -19,7 +19,11 @@ namespace WowAI
             get => _slot;
             set
             {
-                if (_slot == value) return;
+                if (_slot == value)
+                {
+                    return;
+                }
+
                 _slot = value;
                 NotifyPropertyChanged();
             }
@@ -31,7 +35,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -43,7 +51,11 @@ namespace WowAI
             get => _maxPrice;
             set
             {
-                if (_maxPrice == value) return;
+                if (_maxPrice == value)
+                {
+                    return;
+                }
+
                 _maxPrice = value;
                 NotifyPropertyChanged();
             }
@@ -55,8 +67,28 @@ namespace WowAI
             get => _level;
             set
             {
-                if (_level == value) return;
+                if (_level == value)
+                {
+                    return;
+                }
+
                 _level = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _melevel;
+        public int MeLevel
+        {
+            get => _melevel;
+            set
+            {
+                if (_melevel == value)
+                {
+                    return;
+                }
+
+                _melevel = value;
                 NotifyPropertyChanged();
             }
         }
@@ -67,7 +99,11 @@ namespace WowAI
             get => _stat1;
             set
             {
-                if (_stat1 == value) return;
+                if (_stat1 == value)
+                {
+                    return;
+                }
+
                 _stat1 = value;
                 NotifyPropertyChanged();
             }
@@ -79,7 +115,11 @@ namespace WowAI
             get => _stat2;
             set
             {
-                if (_stat2 == value) return;
+                if (_stat2 == value)
+                {
+                    return;
+                }
+
                 _stat2 = value;
                 NotifyPropertyChanged();
             }

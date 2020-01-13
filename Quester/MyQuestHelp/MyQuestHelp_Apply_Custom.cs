@@ -7,12 +7,18 @@ namespace WowAI
     {
         public readonly Dictionary<uint, MyQuestInfo> MyQuestInfosApplyCustom = new Dictionary<uint, MyQuestInfo>
         {
+            {5925, new MyQuestInfo(3602, new Vector3F(9741.70, 965.33, 1293.70)) },
+            {7383, new MyQuestInfo(3515, new Vector3F(9739.24, 958.21, 1293.82)) },
+            {5928, new MyQuestInfo(3064, new Vector3F(-2313.10, -442.25, -5.44)) },
+            {781, new MyQuestInfo(3076, new Vector3F(-3105.9, -1201.1, 0)) },
+            {5635, new MyQuestInfo(377, new Vector3F(-9461, 33, 0)) },
+            {958, new MyQuestInfo(0, new Vector3F(6580.5, 492.2, 8.24)) },
             {1470, new MyQuestInfo(5667, new Vector3F(1633.4, 1838, 0))},
             {24764, new MyQuestInfo(37951, new Vector3F(-1169.19, -5265.05, 0.85))},
             {24765, new MyQuestInfo(38243, new Vector3F(-1177.05, -5536.36, 11.95))},
             {24767, new MyQuestInfo(38046, new Vector3F(-1177.05, -5536.36, 11.95))},
             {46, new MyQuestInfo(261, new Vector3F(-9610.4, -1032.3, 0))},
-            {433, new MyQuestInfo(0, new Vector3F(-5715.1, -1580.2, 70))},
+           // {433, new MyQuestInfo(0, new Vector3F(-5715.1, -1580.2, 70))},
             {1883, new MyQuestInfo(7311, new Vector3F(1468.3, -4228.4, 0))},
             {1884, new MyQuestInfo(5880, new Vector3F(-839, -4938, 21))},
             {5649, new MyQuestInfo(3707, new Vector3F(-617.5, -4203.1, 0))},

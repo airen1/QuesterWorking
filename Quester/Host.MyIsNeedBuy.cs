@@ -13,14 +13,27 @@ namespace WowAI
             foreach (var characterSettingsItemSetting in CharacterSettings.ItemSettings)
             {
                 if (characterSettingsItemSetting.Use != EItemUse.Buy)
+                {
                     continue;
+                }
+
                 if (MeGetItemsCount(characterSettingsItemSetting.Id, true, true) >= characterSettingsItemSetting.MinCount)
+                {
                     continue;
+                }
+
                 if (Me.Level < characterSettingsItemSetting.MeLevel)
+                {
                     continue;
+                }
+
                 if (characterSettingsItemSetting.BuyPricePerOne != 0)
+                {
                     if (Me.Money < characterSettingsItemSetting.BuyPricePerOne * characterSettingsItemSetting.MinCount)
+                    {
                         continue;
+                    }
+                }
 
                 log("Необходимо купить " + characterSettingsItemSetting.Name + " " + MeGetItemsCount(characterSettingsItemSetting.Id, true, true) + "/" + characterSettingsItemSetting.MinCount, LogLvl.Important);
                 return true;
@@ -32,19 +45,33 @@ namespace WowAI
         {
             try
             {
-                log("Проверяю покупку");
+                //log("Проверяю покупку");
                 var listItem = new Dictionary<uint, List<ItemSettings>>();
                 foreach (var characterSettingsItemSetting in CharacterSettings.ItemSettings)
                 {
                     if (characterSettingsItemSetting.Use != EItemUse.Buy)
+                    {
                         continue;
+                    }
+
                     if (Me.Level < characterSettingsItemSetting.MeLevel)
+                    {
                         continue;
+                    }
+
                     if (characterSettingsItemSetting.BuyPricePerOne != 0)
+                    {
                         if (Me.Money < characterSettingsItemSetting.BuyPricePerOne * characterSettingsItemSetting.MinCount)
+                        {
                             continue;
+                        }
+                    }
+
                     if (MeGetItemsCount(characterSettingsItemSetting.Id, true) > characterSettingsItemSetting.MaxCount)
+                    {
                         continue;
+                    }
+
                     if (listItem.ContainsKey(characterSettingsItemSetting.Id))
                     {
                         listItem[characterSettingsItemSetting.Id].Add(characterSettingsItemSetting);
@@ -58,11 +85,16 @@ namespace WowAI
                 foreach (var characterSettingsItemSetting in CharacterSettings.ItemSettings)
                 {
                     if (Me.Level < characterSettingsItemSetting.MeLevel)
+                    {
                         continue;
+                    }
+
                     if (characterSettingsItemSetting.BuyPricePerOne != 0)
                     {
                         if (Me.Money < characterSettingsItemSetting.BuyPricePerOne * characterSettingsItemSetting.MinCount)
+                        {
                             continue;
+                        }
                     }
                     if (check)
                     {
@@ -78,8 +110,12 @@ namespace WowAI
                         while (MeGetItemsCount(characterSettingsItemSetting.Id, true, true) < characterSettingsItemSetting.MaxCount && FarmModule.ReadyToActions)
                         {
                             if (!check)
+                            {
                                 if (CharacterSettings.UseStoneForSellAndRepair)
+                                {
                                     MyUseStone();
+                                }
+                            }
 
                             var count = characterSettingsItemSetting.MaxCount - MeGetItemsCount(characterSettingsItemSetting.Id, true, true);
                             log("Надо купить " + characterSettingsItemSetting.Name + " [" + characterSettingsItemSetting.Id + "]" + count + " в наличии " + MeGetItemsCount(characterSettingsItemSetting.Id, true, true));
@@ -102,8 +138,13 @@ namespace WowAI
                                     if (npc == null)
                                     {
                                         if (Me.Distance(itemSettingse.Loc) > 1000)
+                                        {
                                             if (!MyUseTaxi(itemSettingse.AreaId, itemSettingse.Loc))
+                                            {
                                                 return;
+                                            }
+                                        }
+
                                         CommonModule.MoveTo(itemSettingse.Loc, 1);
                                     }
 
@@ -117,8 +158,13 @@ namespace WowAI
                                 if (npc == null)
                                 {
                                     if (Me.Distance(characterSettingsItemSetting.Loc) > 1000)
+                                    {
                                         if (!MyUseTaxi(characterSettingsItemSetting.AreaId, characterSettingsItemSetting.Loc))
+                                        {
                                             return;
+                                        }
+                                    }
+
                                     CommonModule.MoveTo(characterSettingsItemSetting.Loc, 1);
                                 }
 
@@ -128,12 +174,19 @@ namespace WowAI
                             if (npc != null)
                             {
                                 if (Me.Distance(npc) > 3)
+                                {
                                     CommonModule.MoveTo(npc, 1);
+                                }
+
                                 Thread.Sleep(1000);
                                 MyCheckIsMovingIsCasting();
                                 if (CurrentInteractionGuid != npc.Guid)
+                                {
                                     if (!OpenShop(npc as Unit))
+                                    {
                                         log("Не смог открыть диалог с нпс " + npc.Name + "  " + GetLastError(), LogLvl.Error);
+                                    }
+                                }
 
                                 Thread.Sleep(1000);
                                 if (GetVendorItems().Count == 0)
@@ -158,7 +211,9 @@ namespace WowAI
                                         log("Покупаю " + count + "   " + item.StackCount + "  " + GameDB.ItemTemplates[item.ItemId]?.GetMaxStackSize());
                                         var result = item.Buy(item.StackCount);
                                         if (result != EBuyResult.Success)
+                                        {
                                             log("Не удалось купить " + result, LogLvl.Error);
+                                        }
                                         else
                                         {
                                             log("Купил", LogLvl.Ok);

@@ -32,7 +32,9 @@ namespace WowAI.Module
             try
             {
                 if (Task != null)
+                {
                     Task.CancelSync();
+                }
             }
             catch (Exception error)
             {

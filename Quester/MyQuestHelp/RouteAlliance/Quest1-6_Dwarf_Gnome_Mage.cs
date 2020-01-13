@@ -1,0 +1,70 @@
+﻿using System.Collections.Generic;
+using WoWBot.Core;
+
+namespace WowAI
+{
+    internal partial class MyQuestHelpClass
+    {
+        public List<MyQuest> Quest16DwarfGnomeMage = new List<MyQuest>
+        {
+            new MyQuest(179, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(179, QuestAction.Run, ERace.None, EClass.None, 0),
+            new MyQuest(179, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(233, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3106, QuestAction.Apply, ERace.Dwarf, EClass.Warrior),
+            new MyQuest(3112, QuestAction.Apply, ERace.Gnome, EClass.Warrior),
+            new MyQuest(3108, QuestAction.Apply, ERace.Dwarf, EClass.Hunter),
+            new MyQuest(3114, QuestAction.Apply, ERace.Gnome, EClass.Mage),
+            new MyQuest(3109, QuestAction.Apply, ERace.Dwarf, EClass.Rogue),
+            new MyQuest(3113, QuestAction.Apply, ERace.Gnome, EClass.Rogue),
+            new MyQuest(3115, QuestAction.Apply, ERace.Gnome, EClass.Warlock),
+            new MyQuest(3107, QuestAction.Apply, ERace.Dwarf, EClass.Paladin),
+            new MyQuest(3110, QuestAction.Apply, ERace.Dwarf, EClass.Priest),
+            new MyQuest(170, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(170, QuestAction.Run, ERace.None, EClass.None, 0),
+            new MyQuest(170, QuestAction.Run, ERace.None, EClass.None, 1),
+            new MyQuest(170, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(3106, QuestAction.Complete, ERace.Dwarf, EClass.Warrior),
+            new MyQuest(3112, QuestAction.Complete, ERace.Gnome, EClass.Warrior),
+            new MyQuest(3108, QuestAction.Complete, ERace.Dwarf, EClass.Hunter),
+            new MyQuest(3114, QuestAction.Complete, ERace.Gnome, EClass.Mage),
+            new MyQuest(3109, QuestAction.Complete, ERace.Dwarf, EClass.Rogue),
+            new MyQuest(3113, QuestAction.Complete, ERace.Gnome, EClass.Rogue),
+            new MyQuest(3115, QuestAction.Complete, ERace.Gnome, EClass.Warlock),
+            new MyQuest(3107, QuestAction.Complete, ERace.Dwarf, EClass.Paladin),
+            new MyQuest(3110, QuestAction.Complete, ERace.Dwarf, EClass.Priest),
+            new MyQuest(3361, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(233, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(183, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(234, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(183, QuestAction.Run, ERace.None, EClass.None, 0),
+            new MyQuest(183, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(234, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(182, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3361, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3364, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3364, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(3361, QuestAction.Run, ERace.None, EClass.None, 0),
+          
+           // new MyQuest(3365, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3361, QuestAction.Run, ERace.None, EClass.None, 1),
+            new MyQuest(3361, QuestAction.Run, ERace.None, EClass.None, 2),
+            new MyQuest(182, QuestAction.Run, ERace.None, EClass.None, 0),
+            new MyQuest(182, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(218, QuestAction.Apply, ERace.None, EClass.None),
+           // new MyQuest(3365, QuestAction.Run, ERace.None, EClass.None, 0),
+           // new MyQuest(3365, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(218, QuestAction.Run, ERace.None, EClass.None, 0),
+            new MyQuest(218, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(282, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(3361, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(282, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(420, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(2160, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(QuestAction.Grind, 7, new RoundZone(-5855.3, -145.7, 150)),
+            new MyQuest(420, QuestAction.Complete, ERace.None, EClass.None),
+            new MyQuest(384, QuestAction.Apply, ERace.None, EClass.None),
+            new MyQuest(2160, QuestAction.Complete, ERace.None, EClass.None),
+        };
+    }
+}

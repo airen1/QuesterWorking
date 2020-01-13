@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Serialization;
 using WoWBot.Core;
-using WowAI;
 
 namespace WowAI.Module
 {
@@ -20,16 +19,24 @@ namespace WowAI.Module
             try
             {
                 if (Host.CharacterSettings.RunQuestHerbalism)
+                {
                     if (!CheckHerbalism())
+                    {
                         return;
+                    }
+                }
 
                 if (Host.CharacterSettings.PikPocket && Host.CharacterSettings.PikPocketMapId == 189 && Host.MapID == 189)
                 {
 
                     if (Host.Me.Distance(220.64, -303.54, 18.53) < 500)
+                    {
                         Host.FarmModule.IsWing1 = true;
+                    }
                     else
+                    {
                         Host.FarmModule.IsWing1 = false;
+                    }
 
                     if (Host.FarmModule.IsWing1)
                     {
@@ -37,7 +44,9 @@ namespace WowAI.Module
                         Host.log("Применяю скрипт: " + scriptName, LogLvl.Ok);
                         var reader = new XmlSerializer(typeof(DungeonSetting));
                         using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                        {
                             Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                        }
                     }
                     else
                     {
@@ -45,7 +54,9 @@ namespace WowAI.Module
                         Host.log("Применяю скрипт: " + scriptName, LogLvl.Ok);
                         var reader = new XmlSerializer(typeof(DungeonSetting));
                         using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                        {
                             Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                        }
                     }
 
 
@@ -83,11 +94,14 @@ namespace WowAI.Module
                     {
                         if (!DateTime.Now.TimeOfDay.IsBetween(characterSettingsScriptSchedule.ScriptStartTime,
                             characterSettingsScriptSchedule.ScriptStopTime))
+                        {
                             continue;
+                        }
 
                         if (ShedulePlugin == characterSettingsScriptSchedule.ScriptName)
+                        {
                             break;
-
+                        }
 
                         var scriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\" +
                                          characterSettingsScriptSchedule.ScriptName;
@@ -97,10 +111,16 @@ namespace WowAI.Module
 
                         var reader = new XmlSerializer(typeof(DungeonSetting));
                         using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                        {
                             Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                        }
+
                         ShedulePlugin = characterSettingsScriptSchedule.ScriptName;
                         if (characterSettingsScriptSchedule.Reverse)
+                        {
                             reverse = true;
+                        }
+
                         break;
                     }
 
@@ -110,13 +130,19 @@ namespace WowAI.Module
                 var scriptActionList = Host.DungeonSettings.DungeonCoordSettings;
 
                 if (Host.CharacterSettings.ScriptReverse || reverse)
+                {
                     scriptActionList.Reverse();
+                }
 
                 if (!Host.CharacterSettings.RunScriptFromBegin)
+                {
                     foreach (var dungeonSettingsScriptCoordSetting in scriptActionList)
                     {
                         if (dungeonSettingsScriptCoordSetting.Action != "Бежать на точку")
+                        {
                             continue;
+                        }
+
                         if (checkPoint == null)
                         {
                             checkPoint = dungeonSettingsScriptCoordSetting;
@@ -124,9 +150,14 @@ namespace WowAI.Module
 
                         lastPoint = dungeonSettingsScriptCoordSetting;
                         if (dungeonSettingsScriptCoordSetting.AreaId != Host.Area.Id)
+                        {
                             continue;
+                        }
+
                         if (dungeonSettingsScriptCoordSetting.MapId != Host.MapID)
+                        {
                             continue;
+                        }
 
                         if (Host.Me.Distance(dungeonSettingsScriptCoordSetting.Loc) < bestPoint)
                         {
@@ -134,7 +165,7 @@ namespace WowAI.Module
                             bestpoint = dungeonSettingsScriptCoordSetting;
                         }
                     }
-
+                }
 
                 if (bestpoint == lastPoint) // если лучшая точка последняя, то начать сначала
                 {
@@ -149,52 +180,86 @@ namespace WowAI.Module
                 }
 
                 if (Host.CharacterSettings.LogScriptAction)
+                {
                     Host.log("Начал выполение скрипта " + Host.Me.Name + "  " + ScriptStopwatch.ElapsedMilliseconds,
                         LogLvl.Ok);
+                }
 
                 for (var index = 0; index < scriptActionList.Count; index++)
                 {
                     while (Host.GameState != EGameState.Ingame)
                     {
                         if (Host.GameState == EGameState.Offline)
+                        {
                             return;
+                        }
+
                         if (!Host.MainForm.On)
+                        {
                             return;
+                        }
+
                         Thread.Sleep(100);
                     }
 
                     while (!Host.CheckCanUseGameActions())
                     {
                         if (Host.GameState == EGameState.Offline)
+                        {
                             return;
+                        }
+
                         if (!Host.MainForm.On)
+                        {
                             return;
+                        }
+
                         Thread.Sleep(100);
                     }
 
                     while (Host.CommonModule.IsMoveSuspended())
                     {
                         if (Host.GameState == EGameState.Offline)
+                        {
                             return;
+                        }
+
                         if (!Host.MainForm.On)
+                        {
                             return;
+                        }
+
                         Thread.Sleep(100);
                     }
+
+
 
                     if (Host.CharacterSettings.CheckSellAndRepairScript)
                     {
                         if (Host.GetAgroCreatures().Count == 0)
+                        {
                             if (NeedActionNpcSell || NeedActionNpcRepair || Host.IsNeedAuk() || Host.MyIsNeedSell() ||
                                 Host.MyIsNeedRepair())
+                            {
                                 break;
+                            }
+                        }
                     }
 
                     if (!Host.MainForm.On)
+                    {
                         break;
+                    }
+
                     if (!Host.IsAlive(Host.Me))
+                    {
                         break;
+                    }
+
                     if (Host.Me.IsDeadGhost)
+                    {
                         break;
+                    }
 
                     if (Host.CharacterSettings.SendMail && !Send &&
                         Host.MapID == Host.CharacterSettings.SendMailLocMapId &&
@@ -205,16 +270,24 @@ namespace WowAI.Module
                         {
                             Thread.Sleep(1000);
                             if (!Host.MainForm.On)
+                            {
                                 return;
+                            }
+
                             if (!Host.CommonModule.MoveTo(Host.CharacterSettings.SendMailLocX,
                                 Host.CharacterSettings.SendMailLocY, Host.CharacterSettings.SendMailLocZ, 10))
+                            {
                                 continue;
+                            }
 
                             GameObject mailBox = null;
                             foreach (var gameObject in Host.GetEntities<GameObject>().OrderBy(i => Host.Me.Distance(i)))
                             {
                                 if (gameObject.GameObjectType != EGameObjectType.Mailbox)
+                                {
                                     continue;
+                                }
+
                                 mailBox = gameObject;
                                 break;
                             }
@@ -224,7 +297,9 @@ namespace WowAI.Module
                             {
                                 result = Host.Me.Money - 5000000;
                                 if (result < 0)
+                                {
                                     result = 0;
+                                }
                             }
 
                             var itemList = new List<Item>();
@@ -233,7 +308,10 @@ namespace WowAI.Module
                             foreach (var item in Host.ItemManager.GetItems())
                             {
                                 if (itemList.Count >= 12)
+                                {
                                     break;
+                                }
+
                                 if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
                                     item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
                                     item.Place == EItemPlace.InventoryItem)
@@ -255,20 +333,30 @@ namespace WowAI.Module
                             {
                                 var next = false;
                                 if (itemList.Count > 0)
+                                {
                                     next = true;
+                                }
+
                                 Host.ForceComeTo(mailBox, 2);
                                 Host.MyCheckIsMovingIsCasting();
                                 Thread.Sleep(1000);
                                 if (!Host.OpenMailbox(mailBox))
+                                {
                                     Host.log("Не удалось открыть ящик " + Host.GetLastError(), LogLvl.Error);
+                                }
                                 else
+                                {
                                     Host.log("Открыл ящик", LogLvl.Ok);
+                                }
+
                                 Thread.Sleep(2000);
                                 if (!Host.SendMail(Host.CharacterSettings.SendMailName, "123", "",
                                     Convert.ToInt64(result), itemList))
+                                {
                                     Host.log(
                                         "Не смог отправить письмо " + Convert.ToInt64(result) + "   " +
                                         Host.GetLastError(), LogLvl.Error);
+                                }
                                 else
                                 {
                                     Host.log("Отправил письмо " + Convert.ToInt64(result), LogLvl.Ok);
@@ -291,11 +379,19 @@ namespace WowAI.Module
                         foreach (var dungeonSettingsScriptCoordSetting in scriptActionList)
                         {
                             if (dungeonSettingsScriptCoordSetting.Action != "Бежать на точку")
+                            {
                                 continue;
+                            }
+
                             if (dungeonSettingsScriptCoordSetting.AreaId != Host.Area.Id)
+                            {
                                 continue;
+                            }
+
                             if (dungeonSettingsScriptCoordSetting.MapId != Host.MapID)
+                            {
                                 continue;
+                            }
 
                             if (Host.Me.Distance(dungeonSettingsScriptCoordSetting.Loc.X,
                                     dungeonSettingsScriptCoordSetting.Loc.Y, dungeonSettingsScriptCoordSetting.Loc.Z)
@@ -325,21 +421,462 @@ namespace WowAI.Module
                     }
 
                     if (!Host.MyOpenTaxyRoute())
+                    {
                         continue;
+                    }
 
                     if (Host.CharacterSettings.LogScriptAction)
+                    {
                         Host.log(dungeon.Id + ")Выполняю действие: " + dungeon.Action + " координаты:" + dungeon.Loc + "  Attack:" + dungeon.Attack + " дист:" + Host.Me.Distance(dungeon.Loc), LogLvl.Important);
+                    }
 
                     if (Host.CharacterSettings.PikPocket)
                     {
                         if (!Host.MyOpenLockedChest())
+                        {
                             return;
+                        }
+
                         Host.AdvancedInvisible();
                     }
 
 
                     switch (dungeon.Action)
                     {
+                        case "Прокачать инженера":
+                            {
+                                const ushort engeneringId = 202;
+                                if (!LearnEnginering())
+                                {
+                                    index--;
+                                    continue;
+                                }
+
+
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 0 && Host.Me.GetSkillValue(engeneringId) < 30 || Host.MeGetItemsCount(2835) > 0)
+                                {
+                                    var count = 60 - (Host.MeGetItemsCount(4357) + Host.MeGetItemsCount(2835));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2835, count);//Rough Stone Грубый камень
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2835) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3918);
+                                    }
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 30 && Host.Me.GetSkillValue(engeneringId) < 50)
+                                {
+                                    if (Host.SpellManager.GetSpell(3922) == null)
+                                    {
+                                        if (!LearnEngineringSpell(3984))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    var count = 30 - (Host.MeGetItemsCount(4359) + Host.MeGetItemsCount(2840));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2840, count);//Медный слиток
+
+                                    if (Host.MeGetItemsCount(5956) == 0)
+                                    {
+                                        if (!Host.CommonModule.MoveTo(2038.13, -4740.68, 29.16))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+
+                                        var npc = Host.GetNpcById(3413);
+                                        if (npc != null)
+                                        {
+                                            if (!Host.MyOpenDialog(npc))
+                                            {
+                                                index--;
+                                                continue;
+                                            }
+
+                                            Thread.Sleep(1000);
+                                            foreach (var d in Host.GetNpcDialogs())
+                                            {
+                                                if (d.OptionNPC != EGossipOptionIcon.Vendor)
+                                                {
+                                                    continue;
+                                                }
+
+                                                Host.SelectNpcDialog(d);
+                                                break;
+                                            }
+
+                                            Thread.Sleep(1000);
+                                            foreach (var item in Host.GetVendorItems())
+                                            {
+                                                Host.log(item.ItemId + " " + Host.GameDB.ItemTemplates[item.ItemId].GetNameRu());
+                                                if (item.ItemId == 5956)
+                                                {
+                                                    var res = item.Buy(1);
+                                                    Thread.Sleep(3000);
+                                                    if (res != EBuyResult.Success)
+                                                    {
+                                                        Host.log("не удалось купить " + res);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (Host.MeGetItemsCount(5956) == 0)
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+
+                                    }
+
+                                    if (!Host.CommonModule.MoveTo(2059.48, -4800.38, 22.39))
+                                    {
+                                        index--;
+                                        continue;
+                                    }
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2840) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3922);
+                                    }
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 50 && Host.SpellManager.GetSpell(4037) == null && Host.Me.GetSkillValue(engeneringId) < 100)
+                                {
+                                    LearnEngenering50();
+                                    index--;
+                                    continue;
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 50 && Host.Me.GetSkillValue(engeneringId) < 75)
+                                {
+                                    if (Host.SpellManager.GetSpell(3923) == null)
+                                    {
+                                        if (!LearnEngineringSpell(3985))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    var count = 30 - (Host.MeGetItemsCount(2589) + Host.MeGetItemsCount(3923));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2589, count);//Linen Cloth
+
+                                    count = 30 - (Host.MeGetItemsCount(2840) + Host.MeGetItemsCount(3923));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2840, count);//Copper Bar
+
+
+                                    if (!Host.CommonModule.MoveTo(2059.48, -4800.38, 22.39))
+                                    {
+                                        index--;
+                                        continue;
+                                    }
+
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2840) == 0 || Host.MeGetItemsCount(4359) == 0 || Host.MeGetItemsCount(4357) < 2 || Host.MeGetItemsCount(2589) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3923);
+                                    }
+
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 75 && Host.Me.GetSkillValue(engeneringId) < 90)
+                                {
+                                    if (Host.SpellManager.GetSpell(3929) == null)
+                                    {
+                                        if (!LearnEngineringSpell(3992))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    var count = 60 - (Host.MeGetItemsCount(2836) + Host.MeGetItemsCount(4364));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2836, count);//Coarse Stone Необработанный камень
+
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2836) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3929);
+                                    }
+
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 90 && Host.Me.GetSkillValue(engeneringId) < 100)
+                                {
+                                    if (Host.SpellManager.GetSpell(3931) == null)
+                                    {
+                                        if (!LearnEngineringSpell(3994))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    var count = 20 - (Host.MeGetItemsCount(2589) + Host.MeGetItemsCount(4365));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2589, count);//Coarse Stone Необработанный камень
+
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2589) == 0 || Host.MeGetItemsCount(4364) < 3)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3931);
+                                    }
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 100 && Host.Me.GetSkillValue(engeneringId) < 105)
+                                {
+                                    if (Host.SpellManager.GetSpell(3973) == null)
+                                    {
+                                        if (!LearnEngineringSpell2(3990))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+                                    var count = 5 - (Host.MeGetItemsCount(2842) + Host.MeGetItemsCount(4404));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2842, count);//Silver Bar
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2842) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3973);
+                                    }
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 105 && Host.Me.GetSkillValue(engeneringId) < 125)
+                                {
+                                    if (Host.SpellManager.GetSpell(3938) == null)
+                                    {
+                                        if (!LearnEngineringSpell2(4000))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    if (Host.MeGetItemsCount(2880) + Host.MeGetItemsCount(4371) < 25)
+                                    {
+                                        if (!Host.CommonModule.MoveTo(2038.13, -4740.68, 29.16))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+
+                                        var npc = Host.GetNpcById(3413);
+                                        if (npc != null)
+                                        {
+                                            if (!Host.MyOpenDialog(npc))
+                                            {
+                                                index--;
+                                                continue;
+                                            }
+
+                                            Thread.Sleep(1000);
+                                            foreach (var d in Host.GetNpcDialogs())
+                                            {
+                                                if (d.OptionNPC != EGossipOptionIcon.Vendor)
+                                                {
+                                                    continue;
+                                                }
+
+                                                Host.SelectNpcDialog(d);
+                                                break;
+                                            }
+
+                                            Thread.Sleep(1000);
+                                            foreach (var item in Host.GetVendorItems())
+                                            {
+                                                Host.log(item.ItemId + " " + Host.GameDB.ItemTemplates[item.ItemId].GetNameRu());
+                                                if (item.ItemId == 2880)
+                                                {
+                                                    while (Host.MainForm.On)
+                                                    {
+                                                        Thread.Sleep(1000);
+                                                        var countbuy = 25 - (Host.MeGetItemsCount(2880) + Host.MeGetItemsCount(4371));
+                                                        if (countbuy == 0)
+                                                            break;
+                                                        Host.log("Надо купить " + countbuy);
+                                                        var res = item.Buy(1);
+                                                        if (res != EBuyResult.Success)
+                                                        {
+                                                            Host.log("не удалось купить " + res);
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        }
+
+                                        if (Host.MeGetItemsCount(2880) + Host.MeGetItemsCount(4371) < 25)
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+
+                                    var count = 50 - (Host.MeGetItemsCount(2841) + (Host.MeGetItemsCount(4371) * 2));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2841, count);//Bronze Bar
+
+                                    if (!Host.CommonModule.MoveTo(2059.48, -4800.38, 22.39))
+                                    {
+                                        index--;
+                                        continue;
+                                    }
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2841) < 2 || Host.MeGetItemsCount(2880) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3938);
+                                    }
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 125 && Host.SpellManager.GetSpell(4038) == null)
+                                {
+                                    LearnEngenering125();
+                                    index--;
+                                    continue;
+                                }
+
+                                if (Host.Me.GetSkillValue(engeneringId) > 125 && Host.Me.GetSkillValue(engeneringId) < 150)
+                                {
+                                    //часть 1
+                                    if (Host.SpellManager.GetSpell(3945) == null)
+                                    {
+                                        if (!LearnEngineringSpell2(4006))
+                                        {
+                                            index--;
+                                            continue;
+                                        }
+                                    }
+
+                                    var count = 30 - (Host.MeGetItemsCount(2838) + (Host.MeGetItemsCount(4377)));
+                                    Host.log("Необходимо купить " + count);
+                                    if (count > 0)
+                                        BuyAuction(2838, count);//Bronze Bar
+
+                                    while (Host.MainForm.On)
+                                    {
+                                        Thread.Sleep(1000);
+                                        if (Host.MeGetItemsCount(2838) == 0)
+                                        {
+                                            index--;
+                                            Host.log("Нет предмета для крафта");
+                                            break;
+                                        }
+                                        MyCraft(3945);
+                                    }
+
+                                }
+
+                                /*BuyAuction(2589, 50);//Linen Cloth Льняной материал
+                                  BuyAuction(2840, 66);//Copper Bar Медный слиток
+                                  BuyAuction(2880, 25);//Weak Flux Слабый плавень
+                                  BuyAuction(2836, 60);//Coarse Stone Необработанный камень
+                                  BuyAuction(2842, 5);//Silver Bar Серебряный слиток
+                                  BuyAuction(2841, 110);//Bronze Bar
+                                  BuyAuction(2319, 15);//Medium Leather
+                                  BuyAuction(2592, 60);//Wool Cloth
+                                  BuyAuction(2838, 30);//Heavy Stone
+
+                                  BuyAuction(3859, 4);//Steel Bar
+                                  BuyAuction(7912, 120);//Solid Stone
+                                  BuyAuction(3860, 170);//Mithril Bar
+                                  BuyAuction(4338, 20);//Mageweave Cloth
+
+                                  BuyAuction(12365, 60);//Dense Stone
+                                  BuyAuction(12359, 225);//Thorium Bar
+                                  BuyAuction(14047, 35);//Runecloth*/
+
+                                Host.log("Всего  " + allBuy);
+                                Thread.Sleep(10000);
+                            }
+                            break;
+
+                        case "Реген":
+                            {
+                                while (Host.MyIsNeedRegen())
+                                {
+                                    if (Host.GameState == EGameState.Offline)
+                                    {
+                                        return;
+                                    }
+
+                                    if (!Host.MainForm.On)
+                                    {
+                                        return;
+                                    }
+
+                                    Thread.Sleep(100);
+                                }
+                            }
+                            break;
+
                         case "Загрузить профиль":
                             {
                                 Host.LoadSettingsForQp(dungeon.Com);
@@ -347,21 +884,29 @@ namespace WowAI.Module
                                 return;
                             }
 
-
                         case "Использовать портал":
                             {
                                 foreach (var entity in Host.GetEntities<Unit>().OrderBy(i => Host.Me.Distance(i)))
                                 {
                                     if (!entity.IsSpellClick)
+                                    {
                                         continue;
+                                    }
+
                                     if (Host.Me.Distance(entity) > 3)
+                                    {
                                         Host.CommonModule.MoveTo(entity, 2);
+                                    }
+
                                     Host.MyUseSpellClick(entity.Id);
                                     Thread.Sleep(1000);
                                     while (Host.GameState != EGameState.Ingame)
                                     {
                                         if (!Host.MainForm.On)
+                                        {
                                             return;
+                                        }
+
                                         Thread.Sleep(500);
                                     }
 
@@ -377,7 +922,10 @@ namespace WowAI.Module
                                     while (Host.Me.Distance(-1075, 780, 435) > 20)
                                     {
                                         if (!Host.MainForm.On)
+                                        {
                                             return;
+                                        }
+
                                         Host.CommonModule.MoveTo(-1075, 780, 435, 3);
                                         Thread.Sleep(1000);
                                     }
@@ -388,13 +936,19 @@ namespace WowAI.Module
                                         Host.CommonModule.MoveTo(npc, 3);
                                         Thread.Sleep(2000);
                                         if (!Host.OpenShop(npc as Unit))
+                                        {
                                             Host.log("Не смог открыть диалог " + npc.Name + " " + Host.GetLastError(),
                                                 LogLvl.Error);
+                                        }
+
                                         Thread.Sleep(2000);
                                         foreach (var item in Host.GetVendorItems())
                                         {
                                             if (item.ItemId != 159959)
+                                            {
                                                 continue;
+                                            }
+
                                             if (!Host.GameDB.ItemTemplates.ContainsKey(item.ItemId))
                                             {
                                                 Host.log("Не нашел в базе" + item.ItemId);
@@ -430,7 +984,10 @@ namespace WowAI.Module
 
                                                 Thread.Sleep(100);
                                                 if (!Host.MainForm.On)
+                                                {
                                                     return;
+                                                }
+
                                                 var buyCount = Math.Min(Convert.ToInt32(needcount),
                                                     Convert.ToInt32(itemTemplate.GetMaxStackSize()));
                                                 var res = item.Buy(buyCount);
@@ -500,13 +1057,19 @@ namespace WowAI.Module
                                     Host.log("Можно скрафтить " + craftSpell.Name + "[" + craftSpell.Id + "] " + count +
                                              " шт.");
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
+
                                     if (Host.Me.Team == ETeam.Horde)
                                     {
                                         while (Host.Me.Distance(-891.93, 975.31, 321.12) > 20)
                                         {
                                             if (!Host.MainForm.On)
+                                            {
                                                 return;
+                                            }
+
                                             Host.CommonModule.MoveTo(-891.93, 975.31, 321.12);
                                             Thread.Sleep(1000);
                                         }
@@ -519,11 +1082,17 @@ namespace WowAI.Module
                                             {
                                                 Host.CommonModule.MoveTo(npc, 3);
                                                 if (!Host.OpenShop(npc as Unit))
+                                                {
                                                     Host.log("Не смог открыть диалог " + npc.Name);
+                                                }
+
                                                 foreach (var item in Host.GetVendorItems())
                                                 {
                                                     if (item.ItemId != craft.CraftIngridients[1].Id)
+                                                    {
                                                         continue;
+                                                    }
+
                                                     if (!Host.GameDB.ItemTemplates.ContainsKey(item.ItemId))
                                                     {
                                                         Host.log("Не нашел в базе" + item.ItemId);
@@ -562,7 +1131,10 @@ namespace WowAI.Module
 
                                                         Thread.Sleep(100);
                                                         if (!Host.MainForm.On)
+                                                        {
                                                             return;
+                                                        }
+
                                                         var buyCount = Math.Min(Convert.ToInt32(needcount),
                                                             Convert.ToInt32(itemTemplate.GetMaxStackSize()));
                                                         var res = item.Buy(buyCount);
@@ -595,7 +1167,9 @@ namespace WowAI.Module
                                             }
 
                                             while (Host.SpellManager.IsCasting)
+                                            {
                                                 Thread.Sleep(100);
+                                            }
                                             // крафт
                                         }
                                     }
@@ -616,20 +1190,24 @@ namespace WowAI.Module
                                 {
                                     Host.MyUseStone(true);
                                     if (Host.Me.Team == ETeam.Horde)
+                                    {
                                         if (Host.Area.Id != 1637)
                                         {
                                             Host.log("Нахожусь не в оргримаре " + Host.Area.Id + " " + Host.Area.ZoneName);
                                             Thread.Sleep(5000);
                                             continue;
                                         }
+                                    }
 
                                     if (Host.Me.Team == ETeam.Alliance)
+                                    {
                                         if (Host.Area.Id != 1519)
                                         {
                                             Host.log("Нахожусь не в штормвинде " + Host.Area.Id + " " + Host.Area.ZoneName);
                                             Thread.Sleep(5000);
                                             continue;
                                         }
+                                    }
                                 }
 
                                 Host.MyMoveToRepair();
@@ -639,20 +1217,24 @@ namespace WowAI.Module
                             {
                                 Host.MyUseStone(true);
                                 if (Host.Me.Team == ETeam.Horde)
+                                {
                                     if (Host.Area.Id != 1637)
                                     {
                                         Host.log("Нахожусь не в оргримаре " + Host.Area.Id + " " + Host.Area.ZoneName);
                                         Thread.Sleep(5000);
                                         continue;
                                     }
+                                }
 
                                 if (Host.Me.Team == ETeam.Alliance)
+                                {
                                     if (Host.Area.Id != 1519)
                                     {
                                         Host.log("Нахожусь не в штормвинде " + Host.Area.Id + " " + Host.Area.ZoneName);
                                         Thread.Sleep(5000);
                                         continue;
                                     }
+                                }
 
                                 Host.MyMail();
                             }
@@ -661,21 +1243,24 @@ namespace WowAI.Module
                             {
                                 Host.MyUseStone(true);
                                 if (Host.Me.Team == ETeam.Horde)
+                                {
                                     if (Host.Area.Id != 1637)
                                     {
                                         Host.log("Нахожусь не в оргримаре " + Host.Area.Id + " " + Host.Area.ZoneName);
                                         Thread.Sleep(5000);
                                         continue;
                                     }
+                                }
 
                                 if (Host.Me.Team == ETeam.Alliance)
+                                {
                                     if (Host.Area.Id != 1519)
                                     {
                                         Host.log("Нахожусь не в штормвинде " + Host.Area.Id + " " + Host.Area.ZoneName);
                                         Thread.Sleep(5000);
                                         continue;
                                     }
-
+                                }
 
                                 Host.Auk();
                             }
@@ -732,38 +1317,74 @@ namespace WowAI.Module
                                     }
 
                                     if (!Host.MainForm.On)
+                                    {
                                         break;
+                                    }
+
                                     Host.CanselForm();
                                     StartWait = true;
                                     if (isTimer)
                                     {
                                         if (timer.Elapsed.TotalSeconds > dungeon.Pause)
+                                        {
                                             break;
+                                        }
                                     }
 
                                     Host.MyCheckIsMovingIsCasting();
-                                    var result = Host.SpellManager.CastSpell(131474);
+                                    uint spellFish = 131474;
+                                    if (Host.ClientType == EWoWClient.Classic)
+                                    {
+                                        //ushort skillFishing = 356;
+                                        foreach (var spell in Host.SpellManager.GetSpells())
+                                        {
+                                            if (spell.IsPassive())
+                                                continue;
+                                            if (spell.Name == "Fishing")
+                                                spellFish = spell.Id;
+                                        }
+
+                                        /* if(Host.Me.GetSkillValue(skillFishing) <= 75)
+                                               spellFish = 7620;//Ученик
+                                           if(Host.Me.GetSkillValue(skillFishing) > 75 && Host.Me.GetSkillValue(skillFishing) <= 150)
+                                               spellFish = 7731;//Подмастерье
+                                           if(Host.Me.GetSkillValue(skillFishing) > 75 && Host.Me.GetSkillValue(skillFishing) <= 150)
+                                               spellFish = 7732;//Умелец
+                                           if(Host.Me.GetSkillValue(skillFishing) > 75 && Host.Me.GetSkillValue(skillFishing) <= 150)
+                                               spellFish = 18248;//Мастеровой*/
+
+                                    }
+
+                                    var result = Host.SpellManager.CastSpell(spellFish);
                                     if (result != ESpellCastError.SUCCESS)
                                     {
                                         Host.log("Не удалось закинуть удочку" + result, LogLvl.Error);
                                         break;
                                     }
-
                                     else
                                     {
                                         for (var i = 0; i < 220; i++)
                                         {
                                             if (!Host.MainForm.On)
+                                            {
                                                 break;
+                                            }
+
                                             if (!StartWait)
+                                            {
                                                 break;
+                                            }
+
                                             Thread.Sleep(100);
                                         }
                                     }
 
                                     Thread.Sleep(Host.RandGenerator.Next(500, 1000));
                                     if (Host.CanPickupLoot())
+                                    {
                                         Host.PickupLoot();
+                                    }
+
                                     Thread.Sleep(Host.RandGenerator.Next(100, 500));
 
                                     if (Host.CharacterSettings.ScriptScheduleEnable)
@@ -774,11 +1395,14 @@ namespace WowAI.Module
                                             if (!DateTime.Now.TimeOfDay.IsBetween(
                                                 characterSettingsScriptSchedule.ScriptStartTime,
                                                 characterSettingsScriptSchedule.ScriptStopTime))
+                                            {
                                                 continue;
+                                            }
 
                                             if (ShedulePlugin == characterSettingsScriptSchedule.ScriptName)
+                                            {
                                                 break;
-
+                                            }
 
                                             return;
                                         }
@@ -807,7 +1431,9 @@ namespace WowAI.Module
                                     Thread.Sleep(1000);
                                     Host.log("Ожидаю выполения плагина " + dungeon.PluginPath);
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
                                 }
                                 Host.log("Плагин завершил работу, продолжаю выполнение");
                             }
@@ -832,6 +1458,57 @@ namespace WowAI.Module
 
                         case "Выбрать диалог":
                             {
+                                if (Host.MapID == 209)
+                                {
+                                    var npc = Host.GetNpcById(3850);
+                                    if (npc != null)
+                                    {
+                                        Host.CommonModule.ForceMoveTo(npc.Location);
+                                        Thread.Sleep(500);
+
+                                        if (!Host.OpenDialog(npc))
+                                        {
+                                            Host.log(
+                                                "Не смог начать диалог для выбора диалога с " + npc.Name + "[" + npc.Id +
+                                                "] " + Host.GetLastError(), LogLvl.Error);
+                                            if (Host.GetLastError() == ELastError.ActionNotAllowed)
+                                            {
+                                                Host.MySendKeyEsc();
+                                            }
+                                        }
+
+                                        Thread.Sleep(500);
+                                        var isFindDialog = false;
+                                        foreach (var gossipOptionsData in Host.GetNpcDialogs())
+                                        {
+                                            if (gossipOptionsData.Text.Contains("Нужен ру перевод") ||
+                                                gossipOptionsData.Text.Contains("unlock"))
+                                            {
+                                                isFindDialog = true;
+                                                if (!Host.SelectNpcDialog(gossipOptionsData))
+                                                {
+                                                    Host.log("Не смог выбрать диалог " + Host.GetLastError(),
+                                                        LogLvl.Error);
+                                                }
+                                            }
+
+                                            Host.log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " +
+                                                     gossipOptionsData.ClientOption + "  ");
+                                        }
+
+                                        if (!isFindDialog)
+                                        {
+                                            Host.log("Необходим диалог ");
+                                            Thread.Sleep(5000);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Host.log("Не найден НПС ", LogLvl.Error);
+                                    }
+                                }
+
+
                                 if (Host.MapID == 43 && Host.Area.Id == 718)
                                 {
                                     var npc = Host.GetNpcById(3678);
@@ -860,8 +1537,10 @@ namespace WowAI.Module
                                             {
                                                 isFindDialog = true;
                                                 if (!Host.SelectNpcDialog(gossipOptionsData))
+                                                {
                                                     Host.log("Не смог выбрать диалог " + Host.GetLastError(),
                                                         LogLvl.Error);
+                                                }
                                             }
 
                                             Host.log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " +
@@ -879,24 +1558,18 @@ namespace WowAI.Module
                                         Host.log("Не найден НПС ", LogLvl.Error);
                                     }
                                 }
-                                else
-                                {
-                                    Host.log("Выбрать диалог, находимся не в той зоне " + Host.MapID + " " + Host.Area.Id,
-                                        LogLvl.Error);
-                                }
+
                             }
                             break;
 
 
                         case "Использовать скилл":
                             {
-                                if (!dungeon.Attack)
-                                    Host.FarmModule.FarmState = FarmState.Disabled;
-                                else
-                                    Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
+                                Host.FarmModule.FarmState = dungeon.Attack ? FarmState.AttackOnlyAgro : FarmState.Disabled;
 
                                 var skill = Host.SpellManager.GetSpell(dungeon.SkillId);
-                                if (skill.Name == "Stealth")
+
+                                if (skill?.Name == "Stealth")
                                 {
                                     var next = false;
                                     foreach (var aura in Host.Me.GetAuras())
@@ -909,7 +1582,9 @@ namespace WowAI.Module
                                     }
 
                                     if (next)
+                                    {
                                         continue;
+                                    }
                                 }
 
 
@@ -919,7 +1594,9 @@ namespace WowAI.Module
                                     if (skill.Id == 5215)
                                     {
                                         if (Host.MyGetAura(skill.Id) != null)
+                                        {
                                             continue;
+                                        }
                                     }
 
 
@@ -947,7 +1624,9 @@ namespace WowAI.Module
                                     }
 
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
 
                                     if (skill.Id == 18960 && Host.MapID == 1 && Host.Area.Id == 493)
                                     {
@@ -956,7 +1635,10 @@ namespace WowAI.Module
 
                                     var isNeedWaitKd = false;
                                     if (skill.Id == 193753)
+                                    {
                                         isNeedWaitKd = true;
+                                    }
+
                                     if (skill.Id == 193753 && Host.MapID == 1540 && Host.Area.Id == 7979)
                                     {
                                         isMoon = true;
@@ -965,9 +1647,11 @@ namespace WowAI.Module
 
                                     Host.MyCheckIsMovingIsCasting();
                                     while (Host.SpellManager.IsChanneling)
+                                    {
                                         Thread.Sleep(50);
+                                    }
                                     /* while (!Host.CheckCanUseGameActions() && Host.Me.IsAlive)
-                                             Thread.Sleep(50);*/
+        Thread.Sleep(50);*/
                                     //   Host.IsRegen = true;
                                     if (isNeedWaitKd)
                                     {
@@ -989,13 +1673,18 @@ namespace WowAI.Module
 
                                     var result2 = Host.SpellManager.CastSpell(dungeon.SkillId);
                                     if (result2 != ESpellCastError.SUCCESS)
+                                    {
                                         Host.log(
                                             "Не удалось использовать скилл из скрипта " + skill.Name + "  " + result2 +
                                             "   " + Host.GetLastError(), LogLvl.Error);
+                                    }
                                     else
                                     {
                                         if (Host.CharacterSettings.LogScriptAction)
+                                        {
                                             Host.log("Использовал скилл из скрипта " + skill.Name, LogLvl.Ok);
+                                        }
+
                                         Thread.Sleep(200);
                                     }
 
@@ -1009,13 +1698,19 @@ namespace WowAI.Module
 
 
                                     if (skill.Id == 18960)
+                                    {
                                         Thread.Sleep(5000);
+                                    }
 
                                     if (skill.Id == 193753)
+                                    {
                                         Thread.Sleep(5000);
+                                    }
 
                                     while (Host.GameState != EGameState.Ingame)
+                                    {
                                         Thread.Sleep(200);
+                                    }
 
                                     if (isMoon)
                                     {
@@ -1046,7 +1741,10 @@ namespace WowAI.Module
 
                                                     Host.MyCheckIsMovingIsCasting();
                                                     while (Host.SpellManager.IsChanneling)
+                                                    {
                                                         Thread.Sleep(50);
+                                                    }
+
                                                     Thread.Sleep(5000);
                                                     while (Host.GameState != EGameState.Ingame)
                                                     {
@@ -1064,7 +1762,7 @@ namespace WowAI.Module
                                 }
                                 else
                                 {
-                                    Host.log("Скилл не найден на панели", LogLvl.Error);
+                                    Host.log("Скилл не найден " + dungeon.SkillId, LogLvl.Error);
                                 }
                             }
                             break;
@@ -1074,7 +1772,10 @@ namespace WowAI.Module
                                 while (true)
                                 {
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
+
                                     Host.log("Пытаюсь сбросить данж");
                                     if (!Host.ResetInstances())
                                     {
@@ -1101,9 +1802,14 @@ namespace WowAI.Module
                         case "Пауза":
                             {
                                 if (!dungeon.Attack)
+                                {
                                     Host.FarmModule.FarmState = FarmState.Disabled;
+                                }
                                 else
+                                {
                                     Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
+                                }
+
                                 var delay = dungeon.Pause;
 
                                 Thread.Sleep(delay);
@@ -1120,7 +1826,9 @@ namespace WowAI.Module
                                 {
                                     Thread.Sleep(1000);
                                     if (Continue)
+                                    {
                                         break;
+                                    }
                                 }
 
                                 WaitTeleport = false;
@@ -1189,9 +1897,8 @@ namespace WowAI.Module
 
                                           host.FarmModule.farmState = FarmState.AttackOnlyAgro;*/
                             }
-
-
                             break;
+
                         case "Вход в данж":
                             {
                                 var mapid = Host.MapID;
@@ -1199,12 +1906,18 @@ namespace WowAI.Module
                                 {
                                     Thread.Sleep(100);
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
+
                                     foreach (var gameObject in Host.GetEntities<GameObject>()
                                         .OrderBy(i => Host.Me.Distance(i)))
                                     {
                                         if (gameObject.GameObjectType != EGameObjectType.DungeonDifficulty)
+                                        {
                                             continue;
+                                        }
+
                                         Host.log("Бегу к входу " + gameObject.Name + " " + gameObject.GameObjectType);
                                         Host.CommonModule.MoveTo(gameObject, 0);
                                         Thread.Sleep(1000);
@@ -1216,7 +1929,10 @@ namespace WowAI.Module
                                         while (Host.GameState != EGameState.Ingame)
                                         {
                                             if (!Host.MainForm.On)
+                                            {
                                                 return;
+                                            }
+
                                             Thread.Sleep(1000);
                                         }
 
@@ -1226,6 +1942,7 @@ namespace WowAI.Module
                                 }
                             }
                             break;
+
                         case "Выход из данжа":
                             {
                                 var mapid = Host.MapID;
@@ -1233,12 +1950,18 @@ namespace WowAI.Module
                                 {
                                     Thread.Sleep(100);
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
+
                                     foreach (var gameObject in Host.GetEntities<GameObject>()
                                         .OrderBy(i => Host.Me.Distance(i)))
                                     {
                                         if (gameObject.GameObjectType != EGameObjectType.DungeonDifficulty)
+                                        {
                                             continue;
+                                        }
+
                                         Host.log("Бегу к выходу " + gameObject.Name + " " + gameObject.GameObjectType);
                                         Host.CommonModule.MoveTo(gameObject, 0);
                                         Thread.Sleep(1000);
@@ -1250,7 +1973,10 @@ namespace WowAI.Module
                                         while (Host.GameState != EGameState.Ingame)
                                         {
                                             if (!Host.MainForm.On)
+                                            {
                                                 return;
+                                            }
+
                                             Thread.Sleep(1000);
                                         }
 
@@ -1265,30 +1991,42 @@ namespace WowAI.Module
                             {
                                 if (dungeon.MapId != Host.MapID)
                                 {
-                                    Host.log("Точка на другом континенете " + dungeon.MapId + "  " + Host.MapID,
-                                        LogLvl.Error);
+                                    Host.log("Точка на другом континенете " + dungeon.MapId + "  " + Host.MapID, LogLvl.Error);
                                     Thread.Sleep(1000);
                                     Host.FarmModule.FarmState = FarmState.Disabled;
+
+
                                     if (dungeon.MapId == 209 && Host.MapID == 0)
                                     {
                                         if (Host.Me.Distance(-3893.50, -603.81, 5.39) > 300)
+                                        {
                                             if (!Host.MyUseTaxi(11, new Vector3F(-3893.50, -603.81, 5.39)))
+                                            {
                                                 return;
+                                            }
+                                        }
 
                                         if (Host.Me.Distance(-3893.50, -603.81, 5.39) > 5)
+                                        {
                                             if (!Host.CommonModule.MoveTo(-3893.50, -603.81, 5.39))
+                                            {
                                                 return;
+                                            }
+                                        }
 
                                         var transport = Host.MyGetTransportById(176231);
                                         if (transport != null && !transport.IsMoving && Host.Me.Distance(transport) < 50)
                                         {
                                             Host.CommonModule.ForceMoveTo2(transport.Location, 8);
-                                            Host.CommonModule.ForceMoveTo2(new Vector3F(-3899.22, -580.95, 6.10), 1);
+                                            Host.CommonModule.ForceMoveTo2(new Vector3F(-3899.22, -580.95, 6.10));
                                             while (Host.MapID == 0)
                                             {
                                                 Host.log("Плыву " + Host.MapID);
                                                 if (!Host.MainForm.On)
+                                                {
                                                     return;
+                                                }
+
                                                 Thread.Sleep(1000);
                                             }
 
@@ -1296,18 +2034,23 @@ namespace WowAI.Module
                                             {
                                                 Thread.Sleep(1000);
                                                 if (!Host.MainForm.On)
+                                                {
                                                     return;
+                                                }
                                             }
                                             transport = Host.MyGetTransportById(176231);
                                             while (transport.IsMoving)
                                             {
                                                 Host.log("Плыву " + transport.IsMoving);
                                                 if (!Host.MainForm.On)
+                                                {
                                                     return;
+                                                }
+
                                                 Thread.Sleep(1000);
                                             }
                                             Host.log("Доплыл");
-                                            Host.CommonModule.ForceMoveTo2(new Vector3F(-4005.96, -4726.72, 5.09), 1);
+                                            Host.CommonModule.ForceMoveTo2(new Vector3F(-4005.96, -4726.72, 5.09));
                                         }
                                         else
                                         {
@@ -1320,10 +2063,18 @@ namespace WowAI.Module
                                     if (dungeon.MapId == 209 && Host.MapID == 1)
                                     {
                                         if (Host.Me.Distance(-6793.53, -2891.10, 8.88) > 300)
+                                        {
                                             if (!Host.MyUseTaxi(440, new Vector3F(-6793.53, -2891.10, 8.88)))
+                                            {
                                                 return;
+                                            }
+                                        }
+
                                         if (!Host.CommonModule.MoveTo(-6793.53, -2891.10, 8.88))
+                                        {
                                             return;
+                                        }
+
                                         Host.MyMoveForvard(2000);
                                         return;
                                     }
@@ -1332,38 +2083,57 @@ namespace WowAI.Module
                                     if (dungeon.MapId == 189 && Host.MapID == 0)
                                     {
                                         if (Host.CharacterSettings.PikPocket)
+                                        {
                                             if (Host.Me.IsAlive)
                                             {
                                                 if (!Host.CommonModule.MoveTo(new Vector3F(2866.74, -821.74, 160.33), 0))
+                                                {
                                                     return;
+                                                }
+
                                                 var scriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\wing1.xml";
                                                 Host.log("Применяю скрипт: " + scriptName, LogLvl.Ok);
                                                 var reader = new XmlSerializer(typeof(DungeonSetting));
-                                                using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)) Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                                                {
+                                                    Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                }
                                             }
                                             else
                                             {
                                                 if (Host.FarmModule.IsWing1)
                                                 {
                                                     if (!Host.CommonModule.MoveTo(new Vector3F(2866.74, -821.74, 160.33), 0)) // 2884.65, -836.56, 160.33 данж 2
+                                                    {
                                                         return;
+                                                    }
+
                                                     var scriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\wing1.xml";
                                                     Host.log("Применяю скрипт: " + scriptName, LogLvl.Ok);
                                                     var reader = new XmlSerializer(typeof(DungeonSetting));
-                                                    using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)) Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                    using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                                                    {
+                                                        Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     if (!Host.CommonModule.MoveTo(new Vector3F(2884.65, -836.56, 160.33),
                                                         0)) //  данж 2
+                                                    {
                                                         return;
+                                                    }
+
                                                     var scriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\wing2.xml";
                                                     Host.log("Применяю скрипт: " + scriptName, LogLvl.Ok);
                                                     var reader = new XmlSerializer(typeof(DungeonSetting));
-                                                    using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)) Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                    using (var fs = File.Open(scriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                                                    {
+                                                        Host.DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                                                    }
                                                 }
                                             }
-
+                                        }
 
                                         Host.MyMoveForvard(2000);
                                         return;
@@ -1382,7 +2152,10 @@ namespace WowAI.Module
                                         foreach (var gameObject in Host.GetEntities<GameObject>())
                                         {
                                             if (gameObject.Id != 323845)
+                                            {
                                                 continue;
+                                            }
+
                                             Host.CommonModule.MoveTo(gameObject, 1);
                                             Host.CommonModule.MyUnmount();
                                             Host.CanselForm();
@@ -1400,7 +2173,10 @@ namespace WowAI.Module
                                         if (String.Compare(Host.GetBotLogin(), "zawww", StringComparison.OrdinalIgnoreCase) == 0)
                                         {
                                             if (index != 0)
+                                            {
                                                 index -= 1;
+                                            }
+
                                             continue;
                                         }
 
@@ -1410,7 +2186,9 @@ namespace WowAI.Module
                                     if (dungeon.MapId == 1643 && Host.MapID == 1642)
                                     {
                                         if (Host.Me.Distance(-2174.64, 766.01, 20.92) > 20)
+                                        {
                                             Host.CommonModule.MoveTo(-2138.24, 797.57, 5.93);
+                                        }
 
                                         Host.CommonModule.MyUnmount();
                                         Host.CommonModule.MoveTo(new Vector3F(-2174.64, 766.01, 20.92), 1, false);
@@ -1450,15 +2228,17 @@ namespace WowAI.Module
                                         if (String.Compare(Host.GetBotLogin(), "zawww", StringComparison.OrdinalIgnoreCase) == 0)
                                         {
                                             if (index != 0)
+                                            {
                                                 index -= 1;
+                                            }
+
                                             continue;
                                         }
 
                                         return;
                                     }
 
-                                    if ((dungeon.MapId == 1642 || dungeon.MapId == 1643 || dungeon.MapId == 1718) &&
-                                        Host.MapID == 1)
+                                    if ((dungeon.MapId == 1642 || dungeon.MapId == 1643 || dungeon.MapId == 1718) && Host.MapID == 1)
                                     {
                                         var path = Host.CommonModule.GpsBase.GetPath(new Vector3F(1432.93, -4518.37, 18.40),
                                             Host.Me.Location);
@@ -1472,7 +2252,10 @@ namespace WowAI.Module
                                         foreach (var gameObject in Host.GetEntities<GameObject>())
                                         {
                                             if (gameObject.Id != 323855)
+                                            {
                                                 continue;
+                                            }
+
                                             Host.CommonModule.MoveTo(gameObject, 1);
                                             Host.CommonModule.MyUnmount();
                                             Host.CanselForm();
@@ -1491,7 +2274,10 @@ namespace WowAI.Module
                                         {
                                             Host.log("Повторяю действие");
                                             if (index != 0)
+                                            {
                                                 index -= 1;
+                                            }
+
                                             continue;
                                         }
 
@@ -1501,11 +2287,17 @@ namespace WowAI.Module
                                     if (dungeon.MapId == 1718 && Host.MapID == 1642)
                                     {
                                         if (!Host.CommonModule.MoveTo(-1132.67, 772.36, 433.32))
+                                        {
                                             return;
+                                        }
+
                                         foreach (var gameObject in Host.GetEntities<GameObject>())
                                         {
                                             if (gameObject.Id != 327526)
+                                            {
                                                 continue;
+                                            }
+
                                             Host.CommonModule.MoveTo(gameObject, 1);
                                             Host.CommonModule.MyUnmount();
                                             Host.CanselForm();
@@ -1521,13 +2313,23 @@ namespace WowAI.Module
                                         }
                                     }
 
-
+                                    if (!Host.CommonModule.MoveToCheckMap(dungeon.Loc, 1, true, dungeon.MapId))
+                                    {
+                                        if (index != 0)
+                                        {
+                                            index -= 1;
+                                        }
+                                        continue;
+                                    }
+                                   
                                     if (index != 0)
+                                    {
                                         index -= 1;
+                                    }
+
                                 }
 
-                                if (dungeon.AreaId != Host.Area.Id ||
-                                    (Host.Me.Distance(dungeon.Loc) > 600 && Host.ClientType == EWoWClient.Retail))
+                                if (dungeon.AreaId != Host.Area.Id || (Host.Me.Distance(dungeon.Loc) > 600 && Host.ClientType == EWoWClient.Retail))
                                 {
                                     if (Host.Me.Distance(dungeon.Loc) < 200)
                                     {
@@ -1538,6 +2340,7 @@ namespace WowAI.Module
                                         {
                                             case 8721:
                                                 {
+
                                                 }
                                                 break;
                                             default:
@@ -1550,11 +2353,17 @@ namespace WowAI.Module
                                                         return;
                                                     }
 
+                                                    if (!Host.MyUseTaxi(dungeon.AreaId, dungeon.Loc))
+                                                    {
+                                                        index -= 1;
+                                                    }
                                                     Host.MyUseTaxi(dungeon.AreaId, dungeon.Loc);
-                                                    Host.MyUseTaxi(dungeon.AreaId, dungeon.Loc);
-                                                    if (Host.GetBotLogin() != "deathstar")
-                                                        if (index != 0)
-                                                            index -= 1;
+
+                                                    if (index != 0)
+                                                    {
+                                                        index -= 1;
+                                                    }
+
                                                 }
                                                 break;
                                         }
@@ -1569,22 +2378,34 @@ namespace WowAI.Module
                                      }*/
 
                                 if (!dungeon.Attack)
+                                {
                                     Host.FarmModule.FarmState = FarmState.Disabled;
+                                }
                                 else
+                                {
                                     Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
+                                }
 
                                 if (Host.Me.Distance(dungeon.Loc) > 150)
+                                {
                                     Host.FarmModule.FarmState = FarmState.Disabled;
+                                }
                                 //  Host.log("Бегу на точку " + dungeon.Loc + "  " + "  " + dungeon.Attack + " дист:" + Host.Me.Distance(dungeon.Loc));
                                 while (Host.Me.Distance2D(dungeon.Loc) > 3 && Host.IsAlive(Host.Me) && Host.MainForm.On && !Host.Me.IsDeadGhost)
                                 {
-                                    Host.log("Бегу на точку  2     " + dungeon.Loc + "  " + "  " + dungeon.Attack +
-                                             " дист:" + Host.Me.Distance(dungeon.Loc) + Host.IsAlive(Host.Me) + " " +
-                                             Host.Me.IsDeadGhost);
+                                    // Host.log("Бегу на точку  2     " + dungeon.Loc + "  " + "  " + dungeon.Attack + " дист:" + Host.Me.Distance(dungeon.Loc) + Host.IsAlive(Host.Me) + " " + Host.Me.IsDeadGhost);
                                     Thread.Sleep(10);
                                     Host.AdvancedInvisible();
                                     if (!Host.MainForm.On)
+                                    {
                                         break;
+                                    }
+
+                                    if (!Host.CheckCooldownInbisible())
+                                    {
+                                        Thread.Sleep(1000);
+                                        continue;
+                                    }
                                     if (!Host.CheckCanUseGameActions())
                                     {
                                         Thread.Sleep(100);
@@ -1598,24 +2419,44 @@ namespace WowAI.Module
                                     }
 
                                     while (Host.FarmModule.BestMob != null || Host.FarmModule.BestProp != null)
+                                    {
                                         Thread.Sleep(100);
+                                    }
 
                                     while (Host.SpellManager.IsCasting)
+                                    {
                                         Thread.Sleep(100);
+                                    }
 
                                     if (dungeon.Attack)
                                     {
                                         while (Host.CommonModule.IsMoveSuspended())
+                                        {
                                             Thread.Sleep(100);
+                                        }
                                     }
                                     else
                                     {
                                         if (Host.FarmModule.FarmState != FarmState.Disabled)
                                         {
                                             while (Host.CommonModule.IsMoveSuspended())
+                                            {
                                                 Thread.Sleep(100);
+                                            }
+
                                             if (Host.GetAgroCreatures().Count == 0)
+                                            {
                                                 Host.FarmModule.FarmState = FarmState.Disabled;
+                                            }
+                                            if (Host.CommonModule.IsMoveSuspended())
+                                            {
+                                                continue;
+                                            }
+
+                                            if (Host.NeedWaitAfterCombat)
+                                                continue;
+
+
                                         }
                                     }
 
@@ -1624,7 +2465,9 @@ namespace WowAI.Module
                                         Host.AdvancedInvisible();
                                         //  Host.log("Жду");
                                         while (Host.CommonModule.IsMoveSuspended())
+                                        {
                                             Thread.Sleep(100);
+                                        }
                                         // Host.log("Жду2");
                                         Thread.Sleep(500);
                                         Host.AdvancedInvisible();
@@ -1641,11 +2484,28 @@ namespace WowAI.Module
                                         break;
                                     }
 
-                                    if (Host.CommonModule.IsMoveSuspended())
-                                        continue;
+                                    /*  if (Host.FarmModule.FarmState == FarmState.Disabled)
+                                      {
+                                          if (Host.FarmModule.MobsWithDropCount() > 0)
+                                          {
+                                              if (Host.CharacterSettings.PikPocket)
+                                              {
+
+                                              }
+                                              else
+                                              {
+                                                  continue; 
+                                              }
+                                          }
+                                      }*/
+
+
+
+
+
                                     if (Host.CharacterSettings.ForceMoveScriptEnable)
                                     {
-                                        if (Host.Me.Distance(dungeon.Loc) < Host.CharacterSettings.ForceMoveScriptDist)
+                                        if (Host.Me.Distance2D(dungeon.Loc) < Host.CharacterSettings.ForceMoveScriptDist)
                                         {
                                             Host.CommonModule.MySitMount(dungeon.Loc);
                                             Host.log("Вошел в ForceComeTo");
@@ -1664,14 +2524,16 @@ namespace WowAI.Module
                                             }
 
                                             Host.log("Вышел из ForceComeTo");
-                                            if (Host.Me.Distance2D(dungeon.Loc) > 4 && Host.MainForm.On &&
-                                                !Host.CommonModule.IsMoveSuspended())
+                                            if (Host.Me.Distance2D(dungeon.Loc) > 4 && Host.MainForm.On && !Host.CommonModule.IsMoveSuspended())
                                             {
                                                 Host.CommonModule.MoveTo(dungeon.Loc, 1);
                                             }
 
                                             if (Host.CommonModule.MoveFailCount > 1)
+                                            {
                                                 break;
+                                            }
+
                                             continue;
                                         }
                                     }
@@ -1687,7 +2549,9 @@ namespace WowAI.Module
                                         }
 
                                         if (Host.CommonModule.MoveTo(dungeon.Loc, 1))
+                                        {
                                             break;
+                                        }
                                     }
 
                                     if (Host.CharacterSettings.PikPocket)
@@ -1703,11 +2567,15 @@ namespace WowAI.Module
                                         if (Host.CommonModule.MoveFailCount > 1)
                                         {
                                             if (Host.Me.Distance(dungeon.Loc) < 20)
+                                            {
                                                 break;
+                                            }
                                         }
 
                                         if (Host.CommonModule.MoveFailCount > 20)
+                                        {
                                             break;
+                                        }
                                     }
                                 }
                             }
@@ -1733,7 +2601,9 @@ namespace WowAI.Module
 
                                 Host.FarmModule.BestMob = null;
                                 if (Host.CharacterSettings.LogScriptAction)
+                                {
                                     Host.log("Отбился от мобов");
+                                }
                                 //   timerfix = 0;
                                 while (Host.CommonModule.IsMoveSuspended() && Host.IsAlive(Host.Me))
                                 {
@@ -1745,10 +2615,14 @@ namespace WowAI.Module
 
                                 Host.CommonModule.ResumeMove();
                                 if (Host.CharacterSettings.LogScriptAction)
+                                {
                                     Host.log("Собрал лут");
+                                }
 
                                 if (Host.CharacterSettings.FindBestPoint)
+                                {
                                     Host.AutoQuests.NeedFindBestPoint = true;
+                                }
                             }
                             break;
                         case "Остановить скрипт":
@@ -1774,170 +2648,66 @@ namespace WowAI.Module
                                 {
                                     Thread.Sleep(100); //213032
                                     if (!Host.CommonModule.InFight())
+                                    {
                                         if (!Host.IsPropExitis(dungeon.PropId))
+                                        {
                                             Host.FarmModule.StopFarm();
+                                        }
+                                    }
+                                    if (Host.CharacterSettings.CheckSellAndRepairScript)
+                                    {
+                                        if (Host.GetAgroCreatures().Count == 0)
+                                        {
+                                            if (NeedActionNpcSell || NeedActionNpcRepair || Host.IsNeedAuk() || Host.MyIsNeedSell() ||
+                                                Host.MyIsNeedRepair())
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
                                 }
 
                                 Host.FarmModule.StopFarm();
                                 Host.CommonModule.SuspendMove();
                                 Thread.Sleep(100);
                                 while (Host.CommonModule.IsMoveSuspended() && Host.IsAlive(Host.Me))
+                                {
                                     Thread.Sleep(100);
+                                }
+
                                 Host.log("Пропов с Id " + dungeon.PropId + " нет");
                             }
                             break;
 
                         case "Фарм мобов":
                             {
-                                /*  if (host.WorldMapType == EWorldMapType.Dungeon && host.Me.Pet == null)
-                                          host.CommonModule.SummonPet();
-                                      host.log("Фарм мобов до смерти " + dungeon.MobId);
-                                      host.CommonModule.MoveTo(dungeon.Loc);
-                                      var zone = new RoundZone(dungeon.Loc.X, dungeon.Loc.Y, 40);
-                                      var farmmoblist = new List<int> { dungeon.MobId };
-                                      host.FarmModule.SetFarmMobs(zone, farmmoblist);
-                                      while (host.MainForm.On
-                                             && host.IsAlive(host.Me)
-                                             && host.CharacterSettings.Mode == "Данж.(п)"
-                                             && host.FarmModule.readyToActions
-                                             && host.FarmModule.farmState == FarmState.FarmMobs)
-                                      {
-                                          Thread.Sleep(100);
-                                          if (!host.CommonModule.InFight())
-                                              if (!host.IsBossAlive(dungeon.MobId))
-                                                  host.FarmModule.StopFarm();
-                                      }
+                                Host.log("Фарм мобов до смерти " + dungeon.MobId);
+                                var zone = new RoundZone(dungeon.Loc.X, dungeon.Loc.Y, 240);
+                                var farmmoblist = new List<uint> { dungeon.MobId };
+                                Host.FarmModule.SetFarmMobs(zone, farmmoblist);
+                                while (Host.MainForm.On
+                                       && Host.IsAlive(Host.Me)
+                                       && Host.CharacterSettings.Mode == Mode.Script
+                                       && Host.FarmModule.ReadyToActions
+                                       && Host.FarmModule.FarmState == FarmState.FarmMobs)
+                                {
+                                    Thread.Sleep(100);
+                                    if (!Host.CommonModule.InFight())
+                                        if (!Host.IsBossAlive(dungeon.MobId))
+                                            Host.FarmModule.StopFarm();
+                                }
 
-                                      host.FarmModule.StopFarm();
-                                      host.CommonModule.SuspendMove();
-                                      Thread.Sleep(100);
-                                      while (host.CommonModule.IsMoveSuspended() && host.IsAlive(host.Me))
-                                          Thread.Sleep(100);
-                                      host.log("Убил " + dungeon.MobId);*/
+                                Host.FarmModule.StopFarm();
+                                Host.CommonModule.SuspendMove();
+                                Thread.Sleep(100);
+                                /*    while (Host.CommonModule.IsMoveSuspended() && Host.IsAlive(Host.Me) && Host.FarmModule.FarmState != FarmState.Disabled)
+                                        Thread.Sleep(100);*/
+                                Host.log("Убил " + dungeon.MobId);
                             }
                             break;
                         case "Эквип на ауке":
                             {
-                                var npc = Host.MyMoveToAuction();
-                                if (npc == null)
-                                {
-                                    Host.log("Нет НПС для аука", LogLvl.Error);
-                                    Thread.Sleep(5000);
-                                    return;
-                                }
-
-                                Host.MyCheckIsMovingIsCasting();
-                                if (!Host.OpenAuction(npc))
-                                    Host.log("Не смог открыть диалог для аука " + Host.GetLastError(), LogLvl.Error);
-                                else
-                                {
-                                    Host.log("Открыл диалог для аука", LogLvl.Ok);
-                                }
-
-                                Thread.Sleep(3000);
-                                foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
-                                {
-                                    if (IsFindItem(characterSettingsEquipAuc.Name, characterSettingsEquipAuc.Stat1,
-                                        characterSettingsEquipAuc.Stat2))
-                                    {
-                                        Host.log("Нашел в инвентаре " + characterSettingsEquipAuc.Name + " " +
-                                                 characterSettingsEquipAuc.Slot);
-                                        _equipCells.Add(characterSettingsEquipAuc.Slot);
-                                    }
-                                }
-
-                                foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
-                                {
-                                    if (_equipCells.Contains(characterSettingsEquipAuc.Slot))
-                                        continue;
-                                    var req = new AuctionSearchRequest
-                                    {
-                                        MaxReturnItems = 50,
-                                        SearchText = characterSettingsEquipAuc.Name,
-                                        ExactMatch = true,
-                                        SortType = EAuctionSortType.PriceAsc
-                                    };
-                                    Host.log("Ищу на ауке " + characterSettingsEquipAuc.Name + " " +
-                                             characterSettingsEquipAuc.Slot);
-                                    var aucItems = Host.GetAuctionBuyList(req);
-                                    if (aucItems == null || aucItems.Count == 0)
-                                    {
-                                        Host.log("Ничего не нашел");
-                                        continue;
-                                    }
-
-                                    foreach (var aucItem in aucItems)
-                                    {
-                                        if (aucItem.BuyoutPrice == 0)
-                                            continue;
-                                        if (aucItem.BuyoutPrice > characterSettingsEquipAuc.MaxPrice)
-                                        {
-                                            Host.log("Цена1: " + aucItem.ItemId + " " + aucItem.BuyoutPrice);
-                                            Host.log("Цена2: " + aucItem.ItemId + " " + characterSettingsEquipAuc.MaxPrice);
-                                            continue;
-                                        }
-
-                                        if (characterSettingsEquipAuc.Level != 0)
-                                            if (characterSettingsEquipAuc.Level != aucItem.ItemLevel)
-                                            {
-                                                Host.log("Не подходит уровень");
-                                                continue;
-                                            }
-
-
-                                        if (characterSettingsEquipAuc.Stat1 != 0)
-                                        {
-                                            if (aucItem.ItemStatType == null || aucItem.ItemStatType.Count == 0)
-                                            {
-                                                Host.log("Нет Информации о стате " + aucItem.ItemStatType?.Count);
-                                                continue;
-                                            }
-
-                                            if (!aucItem.ItemStatType.Contains(
-                                                (EItemModType)characterSettingsEquipAuc.Stat1))
-                                            {
-                                                Host.log("Нет стата " + characterSettingsEquipAuc.Stat1);
-                                                continue;
-                                            }
-                                        }
-
-                                        if (characterSettingsEquipAuc.Stat2 != 0)
-                                        {
-                                            if (aucItem.ItemStatType == null || aucItem.ItemStatType.Count == 0)
-                                            {
-                                                Host.log("Нет Информации о стате " + aucItem.ItemStatType?.Count);
-                                                continue;
-                                            }
-
-                                            if (!aucItem.ItemStatType.Contains(
-                                                (EItemModType)characterSettingsEquipAuc.Stat2))
-                                            {
-                                                Host.log("Нет стата " + characterSettingsEquipAuc.Stat2);
-                                                continue;
-                                            }
-                                        }
-
-                                        Host.log("Покупаю " + characterSettingsEquipAuc.Name + "[" + aucItem.ItemId +
-                                                 "]   " + "  " + aucItem.BuyoutPrice + " " + aucItem.ItemLevel);
-                                        _equipCells.Add(characterSettingsEquipAuc.Slot);
-                                        Thread.Sleep(2000);
-                                        var result = aucItem.MakeBuyout();
-                                        if (result == EAuctionHouseError.Ok)
-                                        {
-                                            Host.log("Выкупил ");
-                                            _equipCells.Add(characterSettingsEquipAuc.Slot);
-                                            Thread.Sleep(5000);
-                                        }
-                                        else
-                                        {
-                                            Host.log("Не смог выкупить " + result + " " + Host.GetLastError(),
-                                                LogLvl.Error);
-                                            Thread.Sleep(10000);
-                                        }
-
-                                        break;
-                                    }
-                                }
+                                MyScriptEquipAuction();
 
                                 Host.log("Все покупки завершены ");
                                 Host.MainForm.On = false;
@@ -1949,11 +2719,15 @@ namespace WowAI.Module
                                 if (Host.MyGetItem(122284) != null)
                                 {
                                     if (!Host.ActivateWowTokenToBalance())
+                                    {
                                         Host.log(
                                             "Не смог активировать токен на баланс " + Host.GetLastError(),
                                             LogLvl.Error);
+                                    }
                                     else
+                                    {
                                         Host.log("Активировал токен на баланс ", LogLvl.Ok);
+                                    }
 
                                     Thread.Sleep(10000);
                                     return;
@@ -1971,24 +2745,29 @@ namespace WowAI.Module
                                 if (balance < 930000) //если баланс близард <90$ <Core.GetBattleNetBalance()> (в центах)
                                 {
                                     if (Host.Me.Team == ETeam.Horde)
+                                    {
                                         if (Host.Area.Id != 1637)
                                         {
                                             Host.log("Нахожусь не в оргримаре " + Host.Area.Id + " " + Host.Area.ZoneName);
                                             Thread.Sleep(5000);
                                             continue;
                                         }
+                                    }
 
                                     if (Host.Me.Team == ETeam.Alliance)
+                                    {
                                         if (Host.Area.Id != 1519)
                                         {
                                             Host.log("Нахожусь не в штормвинде " + Host.Area.Id + " " + Host.Area.ZoneName);
                                             Thread.Sleep(5000);
                                             continue;
                                         }
+                                    }
 
                                     var path = Host.CommonModule.GpsBase.GetPath(new Vector3F(1635, -4445, 17),
                                         Host.Me.Location);
                                     if (Host.Me.Team == ETeam.Horde)
+                                    {
                                         if (Host.Me.Distance(1654.84, -4350.49, 26.35) < 50 ||
                                             Host.Me.Distance(1573.36, -4437.08, 16.05) < 50)
                                         {
@@ -2004,6 +2783,7 @@ namespace WowAI.Module
                                                 Host.CommonModule.ForceMoveTo2(vector3F, 1, false);
                                             }
                                         }
+                                    }
 
                                     if (Host.Me.Team == ETeam.Alliance)
                                     {
@@ -2021,17 +2801,34 @@ namespace WowAI.Module
                                     foreach (var entity in Host.GetEntities<Unit>())
                                     {
                                         if (!entity.IsAuctioner)
+                                        {
                                             continue;
+                                        }
+
                                         if (entity.Id == 44868)
+                                        {
                                             continue;
+                                        }
+
                                         if (entity.Id == 44865)
+                                        {
                                             continue;
+                                        }
+
                                         if (entity.Id == 44866)
+                                        {
                                             npc = entity;
+                                        }
+
                                         if (entity.Id == 8719)
+                                        {
                                             npc = entity;
+                                        }
+
                                         if (entity.Id == 46640)
+                                        {
                                             npc = entity;
+                                        }
                                     }
 
                                     if (npc == null)
@@ -2045,8 +2842,10 @@ namespace WowAI.Module
                                     Host.CommonModule.MoveTo(npc, 3);
                                     Host.MyCheckIsMovingIsCasting();
                                     if (!Host.OpenAuction(npc))
+                                    {
                                         Host.log("Не смог открыть диалог для аука " + Host.GetLastError(),
                                             LogLvl.Error);
+                                    }
                                     else
                                     {
                                         Host.log("Открыл диалог для аука", LogLvl.Ok);
@@ -2067,34 +2866,41 @@ namespace WowAI.Module
                                         }
                                         else
                                         {
-                                            Thread.Sleep(
-                                                60000); //подождать минуту (токен бывает идет долго и не сразу появляется на почте)
+                                            Thread.Sleep(60000); //подождать минуту (токен бывает идет долго и не сразу появляется на почте)
                                             Host.MyMail();
 
 
                                             if (Host.MyGetItem(122284) != null)
                                             {
-                                                var time = Host.GetCurrentAccount().Premium.ToUniversalTime() -
-                                                           DateTime.UtcNow;
+                                                var time = Host.GetCurrentAccount().Premium.ToUniversalTime() - DateTime.UtcNow;
                                                 Host.log("Осталось " + time.Days + " дней " + time.Hours + " часов");
                                                 if (time.Days < 2 && !_buySubs)
                                                 {
                                                     if (!Host.ActivateWowTokenToSubscription())
+                                                    {
                                                         Host.log(
                                                             "Не смог активировать токен на подписку " + Host.GetLastError(),
                                                             LogLvl.Error);
+                                                    }
                                                     else
+                                                    {
                                                         Host.log("Активировал токен на подписку ", LogLvl.Ok);
+                                                    }
+
                                                     _buySubs = true;
                                                 }
                                                 else
                                                 {
                                                     if (!Host.ActivateWowTokenToBalance())
+                                                    {
                                                         Host.log(
                                                             "Не смог активировать токен на баланс " + Host.GetLastError(),
                                                             LogLvl.Error);
+                                                    }
                                                     else
+                                                    {
                                                         Host.log("Активировал токен на баланс ", LogLvl.Ok);
+                                                    }
                                                 }
 
 
@@ -2130,9 +2936,10 @@ namespace WowAI.Module
                         case "Приручить питомца":
                             {
                                 if (!RecivePet())
+                                {
                                     // if (index != 0)
                                     index -= 1;
-
+                                }
                             }
                             break;
 
@@ -2142,12 +2949,16 @@ namespace WowAI.Module
                                 {
                                     Thread.Sleep(100);
                                     if (!Host.MainForm.On)
+                                    {
                                         return;
+                                    }
 
-                                    var listQuest = new MyQuestHelpClass.MyQuest(dungeon.QuestId, dungeon.QuestAction);
+                                    var listQuest = new MyQuestHelpClass.MyQuest(dungeon.QuestId, dungeon.QuestAction, ERace.None, EClass.None, dungeon.Index);
                                     Host.log(listQuest.Id + " " + listQuest.QuestAction);
                                     if (Host.CheckQuestCompleted(listQuest.Id))
+                                    {
                                         break;
+                                    }
 
                                     /*  if (!listQuest.Race.Contains(ERace.None))
                                               if (!listQuest.Race.Contains(Host.Me.Race))
@@ -2158,15 +2969,16 @@ namespace WowAI.Module
                                                   continue;*/
 
                                     if (listQuest.QuestAction == QuestAction.Apply && Host.GetQuest(listQuest.Id) != null)
+                                    {
                                         break;
+                                    }
 
 
-                                    var quest = Host.GetQuest(listQuest.Id);
-                                    if (listQuest.QuestAction == QuestAction.Run && GetQuestIndex(quest) == -1)
+                                    //var quest = Host.GetQuest(listQuest.Id);
+                                    if (listQuest.QuestAction == QuestAction.Run && IsQuestCompliteClassic(dungeon.QuestId, dungeon.Index))
+                                    {
                                         break;
-
-                                    if (listQuest.QuestAction == QuestAction.Complete && GetQuestIndex(quest) != -1)
-                                        break;
+                                    }
 
                                     Host.log(listQuest.Id + " " + listQuest.QuestAction);
                                     if (listQuest.QuestAction == QuestAction.Apply)
@@ -2196,17 +3008,26 @@ namespace WowAI.Module
                                 foreach (var entity in Host.GetEntities<Unit>().OrderBy(i => Host.Me.Distance(i)))
                                 {
                                     if (!entity.IsBanker)
+                                    {
                                         continue;
+                                    }
+
                                     Host.CommonModule.MoveTo(entity, 4);
                                     Host.MyCheckIsMovingIsCasting();
                                     Thread.Sleep(2000);
                                     if (!Host.OpenBank(entity))
+                                    {
                                         Host.log("Не смог открыть банк " + Host.GetLastError(), LogLvl.Error);
+                                    }
+
                                     Thread.Sleep(2000);
                                     foreach (var item in Host.ItemManager.GetItems())
                                     {
                                         if (item.Id != 159959)
+                                        {
                                             continue;
+                                        }
+
                                         if (item.MoveToBank())
                                         {
                                             Host.log("Положил в банк", LogLvl.Ok);
@@ -2260,6 +3081,7 @@ namespace WowAI.Module
                 // Host.log("Тест " + scriptStopwatch.Elapsed.Minutes + " " + scriptStopwatch.Elapsed.Seconds);
 
                 if (Host.CharacterSettings.WaitSixMin)
+                {
                     if (ScriptStopwatch.Elapsed.Minutes > 2 && ScriptStopwatch.Elapsed.Minutes < 7)
                     {
                         while (ScriptStopwatch.Elapsed.Minutes < 7 && Host.MainForm.On)
@@ -2269,7 +3091,7 @@ namespace WowAI.Module
                                      ScriptStopwatch.Elapsed.Seconds + " " + ScriptStopwatch.Elapsed.TotalSeconds);
                         }
                     }
-
+                }
 
                 Host.log(
                     "Скрипт выполнен за " + formattedTimeSpan + ". Мобов убито: " + (Host.KillMobsCount - mobsStart) +
@@ -2295,9 +3117,710 @@ namespace WowAI.Module
             }
         }
 
+
+
+        private bool MyCraft(uint id)
+        {
+
+
+            while (Host.SpellManager.IsCasting)
+            {
+                Thread.Sleep(100);
+            }
+
+            if (Host.SpellManager.GetSpell(id) == null)
+            {
+                Host.log("Нет скила с айди " + id);
+                return false;
+            }
+            var res = Host.SpellManager.CastSpell(id);
+            if (res != ESpellCastError.SUCCESS)
+            {
+                Host.log("Не удалось скрафтить " + id + " " + res + " " + Host.GetLastError(), LogLvl.Error);
+                Thread.Sleep(5000);
+                return false;
+            }
+
+            while (Host.SpellManager.IsCasting)
+            {
+                Thread.Sleep(100);
+            }
+
+            return true;
+        }
+
+        public ulong allBuy = 0;
+        private bool BuyAuction(uint id, int count)
+        {
+            if (Host.IsNewMailsAvailable)
+            {
+                Host.log("Надо принять почту " + Host.IsNewMailsAvailable);
+                Host.MyMail();
+                return false;
+            }
+
+            //Host.log("Бегу на аук");
+            Unit npc = null;
+            if (Host.Me.Team == ETeam.Horde)
+            {
+                if (Host.Area.Id == 1497)
+                {
+                    if (Host.Me.Distance(1647.97, 256.77, -56.87) > 1)
+                        if (!Host.CommonModule.MoveTo(1647.97, 256.77, -56.87))
+                        {
+                            return false;
+                        }
+
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (!entity.IsAuctioner)
+                        {
+                            continue;
+                        }
+
+                        if (entity.Id == 15683)
+                        {
+                            npc = entity;
+                        }
+                    }
+                }
+
+                if (Host.Area.Id == 1637)
+                {
+                    if (Host.Me.Distance(1668.77, -4459.48, 18.84) > 1)
+                        if (!Host.CommonModule.MoveTo(1668.77, -4459.48, 18.84))
+                        {
+                            return false;
+                        }
+
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (!entity.IsAuctioner)
+                        {
+                            continue;
+                        }
+
+                        if (entity.Id == 8724)
+                        {
+                            npc = entity;
+                        }
+                    }
+                }
+
+                if (Host.Area.Id == 1638)
+                {
+                    if (!Host.CommonModule.MoveTo(-1201.17, 110.89, 134.80))
+                    {
+                        return false;
+                    }
+
+                    foreach (var entity in Host.GetEntities<Unit>())
+                    {
+                        if (!entity.IsAuctioner)
+                        {
+                            continue;
+                        }
+
+                        if (entity.Id == 8722)
+                        {
+                            npc = entity;
+                        }
+                    }
+                }
+
+            }
+
+            if (Host.Me.Team == ETeam.Alliance)
+            {
+                if (!Host.CommonModule.MoveTo(-8813.21, 662.48, 95.42))
+                {
+                    return false;
+                }
+
+                foreach (var entity in Host.GetEntities<Unit>())
+                {
+                    if (!entity.IsAuctioner)
+                    {
+                        continue;
+                    }
+
+                    if (entity.Id == 15659)
+                    {
+                        npc = entity;
+                    }
+                }
+            }
+
+            if (npc == null)
+            {
+                Host.log("Нет НПС для аука", LogLvl.Error);
+                Thread.Sleep(5000);
+                return true;
+            }
+
+            // Host.log("Выбран " + npc.Name + " " + npc.Id);
+            if (Host.ClientType == EWoWClient.Classic)
+            {
+                if (Host.Me.Distance(npc) > 4)
+                    Host.CommonModule.MoveTo(npc, 4);
+            }
+
+            Host.MyCheckIsMovingIsCasting();
+            if (Host.CurrentInteractionGuid != npc.Guid)
+            {
+                if (!Host.OpenAuction(npc))
+                {
+                    Host.log("Не смог открыть диалог для аука " + Host.GetLastError(), LogLvl.Error);
+                }
+                else
+                {
+                    // Host.log("Открыл диалог для аука", LogLvl.Ok);
+                }
+            }
+
+
+            Thread.Sleep(3000);
+
+            if (!Host.GameDB.ItemTemplates.ContainsKey(id))
+            {
+                Host.log("Не нашел предмет с айди " + id);
+                return false;
+            }
+
+            var itemTemplate = Host.GameDB.ItemTemplates[id];
+            var name = itemTemplate.GetName();
+            if (Host.GetCurrentAccount().ServerName == "Хроми")
+                name = itemTemplate.GetNameRu();
+
+            var req = new AuctionSearchRequest
+            {
+                MaxReturnItems = 50,
+                SearchText = name,
+                ExactMatch = true,
+                SortType = EAuctionSortType.PriceAsc
+            };
+            // Host.log("Ищу на ауке " + name);
+            var aucItems = Host.GetAuctionBuyList(req);
+            if (aucItems == null || aucItems.Count == 0)
+            {
+                Host.log("Ничего не нашел " + name);
+                return false;
+            }
+
+            var buyCount = Host.MeGetItemsCount(id);
+            ulong allPrice = 0;
+            foreach (var aucItem in aucItems)
+            {
+                if (aucItem.BuyoutPrice == 0)
+                {
+                    continue;
+                }
+                if (buyCount > count)
+                    break;
+                if (Host.Me.Money < aucItem.BuyoutPrice)
+                {
+                    Host.log("Не хватает голды, отключаюсь ");
+                    Host.MainForm.On = false;
+                    continue;
+                }
+
+                buyCount = buyCount + aucItem.Count;
+                allPrice = allPrice + aucItem.BuyoutPrice;
+                var priceperOne = aucItem.BuyoutPrice / Convert.ToUInt64(aucItem.Count);
+                // Host.log(aucItem.BuyoutPrice + " " + aucItem.Count + "  " + priceperOne);
+                var result = aucItem.MakeBuyout();
+                if (result == EAuctionHouseError.Ok)
+                {
+                    Host.log("Выкупил ", LogLvl.Ok);
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    Host.log("Не смог выкупить " + result + " " + Host.GetLastError(), LogLvl.Error);
+                    Thread.Sleep(10000);
+                }
+            }
+            Host.log("Купил " + name + " " + buyCount + "/" + count + " шт, за " + allPrice);
+            allBuy = allBuy + allPrice;
+            Thread.Sleep(2000);
+
+            if (Host.IsNewMailsAvailable)
+            {
+                Host.log("Надо принять почту " + Host.IsNewMailsAvailable);
+                Host.MyMail();
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool LearnEngineringSpell2(uint id)
+        {
+            if (Host.Me.GetSkillValue(202) != 0)
+            {
+                Host.log("Бегу учить " + id);
+
+                if (!Host.CommonModule.MoveTo(2038.30, -4744.59, 29.16))
+                {
+                    return false;
+                }
+
+                var npc = Host.GetNpcById(3412);
+                if (npc != null)
+                {
+                    if (!Host.MyOpenDialog(npc))
+                    {
+                        return false;
+                    }
+
+                    Thread.Sleep(1000);
+                    foreach (var d in Host.GetNpcDialogs())
+                    {
+                        if (d.OptionNPC != EGossipOptionIcon.Trainer)
+                        {
+                            continue;
+                        }
+
+                        Host.SelectNpcDialog(d);
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                    // }
+
+
+                    foreach (var trainerSpell in Host.GetTrainerSpells())
+                    {
+                        if (!trainerSpell.CanLearn())
+                            continue;
+                        Host.log(trainerSpell.Id + " " + trainerSpell.Spell.Name);
+                        if (trainerSpell.Id == id)
+                        {
+                            if (!Host.LearnTrainerSpell(trainerSpell))
+                            {
+                                Host.log("Не удалось выучить инженерный скилл " + id + "  " + Host.GetLastError(), LogLvl.Error);
+                                Thread.Sleep(5000);
+                                return false;
+                            }
+                            else
+                            {
+                                Thread.Sleep(5000);
+                                return true;
+                            }
+                        }
+
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+
+        public bool LearnEngineringSpell(uint id)
+        {
+            if (Host.Me.GetSkillValue(202) != 0)
+            {
+                Host.log("Бегу учить " + id);
+                if (!Host.CommonModule.MoveTo(2046.42, -4745.10, 29.16))
+                {
+                    return false;
+                }
+
+                var npc = Host.GetNpcById(2857);
+                if (npc != null)
+                {
+                    if (!Host.MyOpenDialog(npc))
+                    {
+                        return false;
+                    }
+
+                    Thread.Sleep(1000);
+                    foreach (var d in Host.GetNpcDialogs())
+                    {
+                        if (d.OptionNPC != EGossipOptionIcon.Trainer)
+                        {
+                            continue;
+                        }
+
+                        Host.SelectNpcDialog(d);
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                    // }
+
+
+                    foreach (var trainerSpell in Host.GetTrainerSpells())
+                    {
+                        if (!trainerSpell.CanLearn())
+                            continue;
+                        Host.log(trainerSpell.Id + " " + trainerSpell.Spell.Name);
+                        if (trainerSpell.Id == id)
+                        {
+                            if (!Host.LearnTrainerSpell(trainerSpell))
+                            {
+                                Host.log("Не удалось выучить инженерный скилл " + id + "  " + Host.GetLastError(), LogLvl.Error);
+                                Thread.Sleep(5000);
+                                return false;
+                            }
+                            else
+                            {
+                                Thread.Sleep(5000);
+                                return true;
+                            }
+                        }
+
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+
+        public bool LearnEngenering125()
+        {
+            Host.log("Бегу учить 125");
+            if (!Host.CommonModule.MoveTo(2040.51, -4747.42, 29.16))
+            {
+                return false;
+            }
+
+            var npc = Host.GetNpcById(11017);
+            if (npc != null)
+            {
+                if (!Host.MyOpenDialog(npc))
+                {
+                    return false;
+                }
+
+                Thread.Sleep(1000);
+                foreach (var d in Host.GetNpcDialogs())
+                {
+                    if (d.OptionNPC != EGossipOptionIcon.Trainer)
+                    {
+                        continue;
+                    }
+
+                    Host.SelectNpcDialog(d);
+                    break;
+                }
+                Thread.Sleep(1000);
+                // }
+
+
+                foreach (var trainerSpell in Host.GetTrainerSpells())
+                {
+                    if (!trainerSpell.CanLearn())
+                        continue;
+                    Host.log(trainerSpell.Id + " " + trainerSpell.Spell.Name);
+                    if (trainerSpell.Id == 4041)
+                    {
+                        if (!Host.LearnTrainerSpell(trainerSpell))
+                        {
+                            Host.log("Не удалось выучить инженерное дело " + Host.GetLastError(), LogLvl.Error);
+                            Thread.Sleep(5000);
+                            return false;
+                        }
+                        else
+                        {
+                            Thread.Sleep(5000);
+                            return true;
+                        }
+                    }
+
+                }
+            }
+
+            return true;
+        }
+
+
+        public bool LearnEngenering50()
+        {
+            Host.log("Бегу учить ");
+            if (!Host.CommonModule.MoveTo(2038.13, -4744.60, 29.16))
+            {
+                return false;
+            }
+
+            var npc = Host.GetNpcById(3412);
+            if (npc != null)
+            {
+                if (!Host.MyOpenDialog(npc))
+                {
+                    return false;
+                }
+
+                Thread.Sleep(1000);
+                foreach (var d in Host.GetNpcDialogs())
+                {
+                    if (d.OptionNPC != EGossipOptionIcon.Trainer)
+                    {
+                        continue;
+                    }
+
+                    Host.SelectNpcDialog(d);
+                    break;
+                }
+                Thread.Sleep(1000);
+                // }
+
+
+                foreach (var trainerSpell in Host.GetTrainerSpells())
+                {
+                    if (!trainerSpell.CanLearn())
+                        continue;
+                    Host.log(trainerSpell.Id + " " + trainerSpell.Spell.Name);
+                    if (trainerSpell.Id == 4040)
+                    {
+                        if (!Host.LearnTrainerSpell(trainerSpell))
+                        {
+                            Host.log("Не удалось выучить инженерное дело " + Host.GetLastError(), LogLvl.Error);
+                            Thread.Sleep(5000);
+                            return false;
+                        }
+                        else
+                        {
+                            Thread.Sleep(5000);
+                            return true;
+                        }
+                    }
+
+                }
+            }
+
+            return true;
+        }
+
+        public bool LearnEnginering()
+        {
+            if (Host.Me.GetSkillValue(202) == 0)
+            {
+                Host.log("Бегу учить ");
+                if (!Host.CommonModule.MoveTo(2046.42, -4745.10, 29.16))
+                {
+                    return false;
+                }
+
+                var npc = Host.GetNpcById(2857);
+                if (npc != null)
+                {
+                    if (!Host.MyOpenDialog(npc))
+                    {
+                        return false;
+                    }
+
+                    Thread.Sleep(1000);
+                    foreach (var d in Host.GetNpcDialogs())
+                    {
+                        if (d.OptionNPC != EGossipOptionIcon.Trainer)
+                        {
+                            continue;
+                        }
+
+                        Host.SelectNpcDialog(d);
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                    // }
+
+
+                    foreach (var trainerSpell in Host.GetTrainerSpells())
+                    {
+                        if (!trainerSpell.CanLearn())
+                            continue;
+                        Host.log(trainerSpell.Id + " " + trainerSpell.Spell.Name);
+                        if (trainerSpell.Id == 4039)
+                        {
+                            if (!Host.LearnTrainerSpell(trainerSpell))
+                            {
+                                Host.log("Не удалось выучить инженерное дело " + Host.GetLastError(), LogLvl.Error);
+                                Thread.Sleep(5000);
+                                return false;
+                            }
+                            else
+                            {
+                                Thread.Sleep(5000);
+                                return true;
+                            }
+                        }
+
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+
+        public void MyScriptEquipAuction()
+        {
+            var needBuy = false;
+            foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
+            {
+                if (IsFindItem(characterSettingsEquipAuc.Name, characterSettingsEquipAuc.Stat1, characterSettingsEquipAuc.Stat2))
+                {
+                    Host.log("Нашел в инвентаре " + characterSettingsEquipAuc.Name + " " + characterSettingsEquipAuc.Slot);
+                    _equipCells.Add(characterSettingsEquipAuc.Slot);
+                    continue;
+                }
+
+                if (characterSettingsEquipAuc.MeLevel != 0)
+                {
+                    if (characterSettingsEquipAuc.MeLevel == Host.Me.Level)
+                    {
+                        Host.log("Нужно купить  " + characterSettingsEquipAuc.Name + " " + characterSettingsEquipAuc.Slot);
+                        needBuy = true;
+                    }
+                }
+            }
+
+            if (!needBuy)
+            {
+                return;
+            }
+
+            var npc = Host.MyMoveToAuction();
+            if (npc == null)
+            {
+                Host.log("Нет НПС для аука", LogLvl.Error);
+                Thread.Sleep(5000);
+                return;
+            }
+
+            Host.MyCheckIsMovingIsCasting();
+            if (!Host.OpenAuction(npc))
+            {
+                Host.log("Не смог открыть диалог для аука " + Host.GetLastError(), LogLvl.Error);
+            }
+            else
+            {
+                Host.log("Открыл диалог для аука", LogLvl.Ok);
+            }
+
+            Thread.Sleep(3000);
+
+
+            foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
+            {
+                if (_equipCells.Contains(characterSettingsEquipAuc.Slot))
+                {
+                    continue;
+                }
+
+                var req = new AuctionSearchRequest
+                {
+                    MaxReturnItems = 50,
+                    SearchText = characterSettingsEquipAuc.Name,
+                    ExactMatch = true,
+                    SortType = EAuctionSortType.PriceAsc
+                };
+                Host.log("Ищу на ауке " + characterSettingsEquipAuc.Name + " " + characterSettingsEquipAuc.Slot);
+                var aucItems = Host.GetAuctionBuyList(req);
+                if (aucItems == null || aucItems.Count == 0)
+                {
+                    Host.log("Ничего не нашел");
+                    continue;
+                }
+
+                foreach (var aucItem in aucItems)
+                {
+                    if (aucItem.BuyoutPrice == 0)
+                    {
+                        continue;
+                    }
+
+                    if (aucItem.BuyoutPrice > characterSettingsEquipAuc.MaxPrice)
+                    {
+                        Host.log("Цена1: " + aucItem.ItemId + " " + aucItem.BuyoutPrice);
+                        Host.log("Цена2: " + aucItem.ItemId + " " + characterSettingsEquipAuc.MaxPrice);
+                        continue;
+                    }
+
+                    if (characterSettingsEquipAuc.Level != 0)
+                    {
+                        if (characterSettingsEquipAuc.Level != aucItem.ItemLevel)
+                        {
+                            Host.log("Не подходит уровень");
+                            continue;
+                        }
+                    }
+
+                    if (characterSettingsEquipAuc.Stat1 != 0)
+                    {
+                        if (aucItem.ItemStatType == null || aucItem.ItemStatType.Count == 0)
+                        {
+                            Host.log("Нет Информации о стате " + aucItem.ItemStatType?.Count);
+                            continue;
+                        }
+
+                        if (!aucItem.ItemStatType.Contains(
+                            (EItemModType)characterSettingsEquipAuc.Stat1))
+                        {
+                            Host.log("Нет стата " + characterSettingsEquipAuc.Stat1);
+                            continue;
+                        }
+                    }
+
+                    if (characterSettingsEquipAuc.Stat2 != 0)
+                    {
+                        if (aucItem.ItemStatType == null || aucItem.ItemStatType.Count == 0)
+                        {
+                            Host.log("Нет Информации о стате " + aucItem.ItemStatType?.Count);
+                            continue;
+                        }
+
+                        if (!aucItem.ItemStatType.Contains(
+                            (EItemModType)characterSettingsEquipAuc.Stat2))
+                        {
+                            Host.log("Нет стата " + characterSettingsEquipAuc.Stat2);
+                            continue;
+                        }
+                    }
+
+                    Host.log("Покупаю " + characterSettingsEquipAuc.Name + "[" + aucItem.ItemId + "]   " + "  " + aucItem.BuyoutPrice + " " + aucItem.ItemLevel);
+                    _equipCells.Add(characterSettingsEquipAuc.Slot);
+                    Thread.Sleep(2000);
+                    var result = aucItem.MakeBuyout();
+                    if (result == EAuctionHouseError.Ok)
+                    {
+                        Host.log("Выкупил ");
+                        _equipCells.Add(characterSettingsEquipAuc.Slot);
+                        Thread.Sleep(5000);
+                    }
+                    else
+                    {
+                        Host.log("Не смог выкупить " + result + " " + Host.GetLastError(),
+                            LogLvl.Error);
+                        Thread.Sleep(10000);
+                    }
+
+                    break;
+                }
+            }
+        }
+
         public void CheckGo(GameObject go, int anim)
         {
             if (go.OwnerGuid == Host.Me.Guid && go.Name == "Fishing Bobber")
+            {
+                Thread.Sleep(Host.RandGenerator.Next(100, 300));
+                go.Use();
+                StartWait = false;
+            }
+            if (go.OwnerGuid == Host.Me.Guid && go.Name == "Поплавок")
             {
                 Thread.Sleep(Host.RandGenerator.Next(100, 300));
                 go.Use();

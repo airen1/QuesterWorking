@@ -18,7 +18,11 @@ namespace WowAI
             get => _eStatType;
             set
             {
-                if (_eStatType == value) return;
+                if (_eStatType == value)
+                {
+                    return;
+                }
+
                 _eStatType = value;
                 NotifyPropertyChanged();
             }

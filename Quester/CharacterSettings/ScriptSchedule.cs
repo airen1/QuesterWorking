@@ -18,7 +18,11 @@ namespace WowAI
             get => _scriptStartTime;
             set
             {
-                if (_scriptStartTime == value) return;
+                if (_scriptStartTime == value)
+                {
+                    return;
+                }
+
                 _scriptStartTime = value;
                 NotifyPropertyChanged();
             }
@@ -30,7 +34,11 @@ namespace WowAI
             get => _scriptStopTime;
             set
             {
-                if (_scriptStopTime == value) return;
+                if (_scriptStopTime == value)
+                {
+                    return;
+                }
+
                 _scriptStopTime = value;
                 NotifyPropertyChanged();
             }
@@ -42,7 +50,11 @@ namespace WowAI
             get => _scriptName;
             set
             {
-                if (_scriptName == value) return;
+                if (_scriptName == value)
+                {
+                    return;
+                }
+
                 _scriptName = value;
                 NotifyPropertyChanged();
             }
@@ -53,7 +65,11 @@ namespace WowAI
             get => _reverse;
             set
             {
-                if (_reverse == value) return;
+                if (_reverse == value)
+                {
+                    return;
+                }
+
                 _reverse = value;
                 NotifyPropertyChanged();
             }

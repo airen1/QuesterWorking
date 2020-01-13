@@ -17,7 +17,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -29,7 +33,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -41,7 +49,11 @@ namespace WowAI
             get => _type;
             set
             {
-                if (_type == value) return;
+                if (_type == value)
+                {
+                    return;
+                }
+
                 _type = value;
                 NotifyPropertyChanged();
             }
@@ -55,7 +67,10 @@ namespace WowAI
             set
             {
                 if (_mountType == value)
+                {
                     return;
+                }
+
                 _mountType = value;
                 NotifyPropertyChanged();
             }

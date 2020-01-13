@@ -24,7 +24,10 @@ namespace WowAI.Module
             get
             {
                 if (!Host.MainForm.On)
+                {
                     return false;
+                }
+
                 if (Host.IsAlive(Host.Me) && !Host.Me.IsDeadGhost && !Host.Me.IsInFlight)
                 {
                     return true;
@@ -48,7 +51,10 @@ namespace WowAI.Module
             get
             {
                 if (!Host.IsExists(_bestMob))
+                {
                     _bestMob = null;
+                }
+
                 return _bestMob;
             }
             set
@@ -84,7 +90,10 @@ namespace WowAI.Module
             get
             {
                 if (!Host.IsExists(_bestProp))
+                {
                     _bestProp = null;
+                }
+
                 return _bestProp;
             }
             set
@@ -140,9 +149,15 @@ namespace WowAI.Module
             base.Start(host);
             FarmState = FarmState.Disabled;
             if (host.CharacterSettings.Mode == Mode.Questing)
+            {
                 FarmState = FarmState.AttackOnlyAgro;
+            }
+
             if (host.ClientType == EWoWClient.Classic)
+            {
                 FarmState = FarmState.AttackOnlyAgro;
+            }
+
             LoadSkill();
         }
 
@@ -154,7 +169,9 @@ namespace WowAI.Module
                 { return ss1.Priority.CompareTo(ss2.Priority); });
             copySkillSettings.Reverse();
             foreach (var i in copySkillSettings)
+            {
                 _deckSkills.Add(i);
+            }
         }
 
         public override void Stop()
@@ -175,7 +192,9 @@ namespace WowAI.Module
                     {
                         PrepareForFight();
                         if (ReadyToActions)
+                        {
                             Fight();
+                        }
                     }
                 }
             }
@@ -191,7 +210,9 @@ namespace WowAI.Module
             {
                 TickTime = Host.GetUnixTime();
                 if (!Host.IsExists(Host.FarmModule.BestMob))
+                {
                     Host.FarmModule.BestMob = null;
+                }
 
                 switch (FarmState)
                 {
@@ -224,35 +245,43 @@ namespace WowAI.Module
         {
             GlobalCheckBestMob();
             if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && ((Host.Me.HpPercents > 75) || (Host.GetAgroCreatures().Count > 0)))
+            {
                 Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+            }
 
             if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0 && MobsWithSkinCount() == 0)
+            {
                 Host.CommonModule.ResumeMove();
+            }
 
             if (Host.FarmModule.BestMob == null)
             {
                 for (var i = 0; i < FarmPropIds.Count; i++)
                 {
-                    if (Host.MyIsNeedRegen())
+                    if (Host.MyIsNeedRegen() || Host.FarmModule.BestMob != null || Host.CommonModule.IsMoveSuspended())
+                    {
                         break;
-
-                    if (Host.FarmModule.BestMob != null || Host.CommonModule.IsMoveSuspended())
-                        break;
+                    }
 
                     Host.FarmModule.BestProp = Host.FarmModule.GetNearestPropInZone(FarmPropIds[i], true);
-
 
                     if (Host.FarmModule.BestProp == null && Host.CharacterSettings.Mode == Mode.FarmResource)//"Сбор ресурсов")
                     {
                         Host.FarmModule.BestProp = Host.FarmModule.GetNearestPropInZone(FarmPropIds[i], false);
                         if (Host.FarmModule.BestProp == null)
+                        {
                             Host.log("bestprop = null");
+                        }
                         else
+                        {
                             Host.log(Host.FarmModule.BestProp.Id + "");
+                        }
                     }
 
                     if (Host.FarmModule.BestProp == null)
+                    {
                         continue;
+                    }
 
                     Host.CommonModule.MoveTo(Host.FarmModule.BestProp.Location, 3);
 
@@ -265,7 +294,9 @@ namespace WowAI.Module
                         }
                         Host.FarmModule.InteractWithProp(Host.FarmModule.BestProp);
                         if (needWait)
+                        {
                             Thread.Sleep(3000);
+                        }
                     }
 
                     Thread.Sleep(100);
@@ -273,31 +304,26 @@ namespace WowAI.Module
 
                     if (SpecialItems != null && Host.GetAgroCreatures().Count == 0)
                     {
-
                         for (var j = 0; j < SpecialItems.Length; j++)
                         {
-                            // host.log("teldjf + " + SpecialItems.Length);
                             foreach (var item in Host.ItemManager.GetItems())
                             {
-                                if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
-                                    item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
-                                    item.Place == EItemPlace.InventoryItem)
-                                    if (item.Id == SpecialItems[j])
-                                    {
-
-                                        Host.log("Использую спец итем " + item.Name + " " + item.Place + "  на " + Host.FarmModule.BestProp.Guid);
-                                        Host.MyUseItemAndWait(item, Host.FarmModule.BestProp);
-                                        Host.FarmModule.SetBadProp(Host.FarmModule.BestProp, 60000);
-                                        /*    var result = host.SpellManager.UseItem(item, host.FarmModule.bestProp);
-                                            if (result != EInventoryResult.OK)
-                                            {
-                                                host.log("Не смог использовать спец итем " + item.Name + "  " + result, Host.LogLvl.Error);
-                                                Thread.Sleep(5000);
-                                            }*/
-
-                                    }
+                                switch (item.Place)
+                                {
+                                    case EItemPlace.Bag1:
+                                    case EItemPlace.Bag2:
+                                    case EItemPlace.Bag3:
+                                    case EItemPlace.Bag4:
+                                    case EItemPlace.InventoryItem:
+                                        if (item.Id == SpecialItems[j])
+                                        {
+                                            Host.log("Использую спец итем " + item.Name + " " + item.Place + "  на " + Host.FarmModule.BestProp.Guid);
+                                            Host.MyUseItemAndWait(item, Host.FarmModule.BestProp);
+                                            Host.FarmModule.SetBadProp(Host.FarmModule.BestProp, 60000);
+                                        }
+                                        break;
+                                }
                             }
-                            //todo
                         }
                     }
                 }
@@ -315,8 +341,9 @@ namespace WowAI.Module
                 && Host.FarmModule.GetBestAgroMob() == null
                 && MobsWithDropCount() == 0
                 && MobsWithSkinCount() == 0)
+            {
                 Host.CommonModule.ResumeMove();
-
+            }
 
             if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob))
                 && (!Host.MyIsNeedRegen() || Host.GetAgroCreatures().Count > 0)
@@ -326,9 +353,11 @@ namespace WowAI.Module
                 {
                     Host.FarmModule.BestMob = Host.FarmModule.GetBestMob(true);
                     if (Host.FarmModule.BestMob == null)
+                    {
                         Host.FarmModule.BestMob = Host.FarmModule.GetBestMob();
+                    }
                     /*  if (host.FarmModule.bestMob == null)
-                          host.log("null");*/
+     host.log("null");*/
                 }
 
             }
@@ -339,9 +368,15 @@ namespace WowAI.Module
         {
             Host.CallPet();
             if (Host.CharacterSettings.Mode == Mode.Questing)
+            {
                 return;
+            }
+
             if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
+            {
                 return;
+            }
+
             if (Host.CharacterSettings.DebuffDeath)
             {
                 var debuf = Host.MyGetAura(15007);
@@ -357,16 +392,19 @@ namespace WowAI.Module
             if (Host.IsAlive() && !Host.Me.IsDeadGhost)
             {
                 if (Host.CharacterSettings.FightIfHPLess)
+                {
                     if (Host.Me.HpPercents < Host.CharacterSettings.FightIfHPLessCount)
                     {
                         Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
                         if (Host.GetAgroCreatures().Count > 0)
                         {
                             if (Host.Me.MountId != 0)
+                            {
                                 Host.CommonModule.MyUnmount();
+                            }
                         }
                     }
-
+                }
 
                 GlobalCheckBestMob();
 
@@ -376,12 +414,18 @@ namespace WowAI.Module
                     {
                         Host.FarmModule.BestProp = Host.FarmModule.GetBestPropInZone(false);
                         if (Host.FarmModule.BestProp != null && Host.IsExists(Host.FarmModule.BestProp))
+                        {
                             Host.CommonModule.SuspendMove();
+                        }
+
                         if (Host.FarmModule.BestMob == null && Host.FarmModule.BestProp != null)
                         {
                             Host.log("Нашел ресурс " + Host.FarmModule.BestProp.Name + "  дист " + Host.Me.Distance(Host.FarmModule.BestProp));
                             if (Host.CharacterSettings.FindBestPoint)
+                            {
                                 Host.AutoQuests.NeedFindBestPoint = true;
+                            }
+
                             Host.CancelMoveTo();
                             Thread.Sleep(100);
                             Host.CommonModule.ForceMoveTo(Host.FarmModule.BestProp, 3);
@@ -393,9 +437,9 @@ namespace WowAI.Module
                     }
 
                     if (Host.CommonModule.IsMoveSuspended() /*&& (host.FarmModule.bestMob == null || !host.IsAlive(host.FarmModule.bestMob)) */&& Host.FarmModule.BestProp == null /*&& !host.CommonModule.InFight() && host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0*/)
+                    {
                         Host.CommonModule.ResumeMove();
-
-
+                    }
                 }
 
 
@@ -429,16 +473,26 @@ namespace WowAI.Module
                             foreach (var entity in Host.GetEntities<Unit>())
                             {
                                 if (entity == Host.FarmModule.BestMob)
+                                {
                                     continue;
+                                }
+
                                 if (entity == Host.Me)
+                                {
                                     continue;
+                                }
 
                                 if (entity.Distance(x1, y1, z1) < 3)
+                                {
                                     next = true;
+                                }
                             }
 
                             if (next)
+                            {
                                 continue;
+                            }
+
                             if (Host.IsInsideNavMesh(new Vector3F(x1, y1, z1)))
                             {
                                 var vector = new Vector3F(x1, y1, z1);
@@ -457,12 +511,16 @@ namespace WowAI.Module
                             // var bestPoint = safePoint[host.RandGenerator.Next(safePoint.Count)];
                             Host.log("Бегу в " + bestPoint + " " + Host.IsInsideNavMesh(bestPoint));
                             if (!Host.CommonModule.ForceMoveTo(bestPoint))
+                            {
                                 return;
+                            }
                         }
                         else
                         {
                             if (!Host.CommonModule.ForceMoveTo(Host.FarmModule.BestMob, 4.5))
+                            {
                                 return;
+                            }
                         }
 
 
@@ -475,11 +533,16 @@ namespace WowAI.Module
                             if (res == ESpellCastError.OUT_OF_RANGE)
                             {
                                 if (!Host.CommonModule.ForceMoveTo(Host.FarmModule.BestMob, 4.2))
+                                {
                                     return;
+                                }
+
                                 Host.MyCheckIsMovingIsCasting();
                                 res = Host.SpellManager.CastSpell(921, Host.FarmModule.BestMob);
                                 if (res != ESpellCastError.SUCCESS)
+                                {
                                     Host.log("Не удалось обокрасть 2 " + res + " " + Host.GetLastError(), LogLvl.Error);
+                                }
                             }
                         }
                         var waitTill = DateTime.UtcNow.AddSeconds(1);
@@ -487,12 +550,19 @@ namespace WowAI.Module
                         {
                             Thread.Sleep(100);
                             if (!Host.MainForm.On)
+                            {
                                 return;
+                            }
+
                             if (Host.CanPickupLoot())
+                            {
                                 break;
+                            }
                         }
                         if (Host.CanPickupLoot())
+                        {
                             Host.PickupLoot();
+                        }
                         // host.FarmModule.SetBadTarget(host.FarmModule.BestMob, 360000);
                         if (Host.ListGuidPic.ContainsKey(Host.FarmModule.BestMob.Guid))
                         {
@@ -523,9 +593,14 @@ namespace WowAI.Module
             }
 
             if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && Host.FarmModule.BestProp == null /*&& !host.CommonModule.InFight() && host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0*/)
+            {
                 Host.CommonModule.ResumeMove();
+            }
+
             if (Host.ClientType == EWoWClient.Retail)
+            {
                 FarmRoute();
+            }
         }
 
         private void FightAttackOnlyAgroTick()
@@ -538,16 +613,22 @@ namespace WowAI.Module
                 if (Host.Me.MountId == 0)
                 {
                     if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
+                    {
                         Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+                    }
                 }
                 else
                 {
                     if (Host.GetAgroCreatures().Count > 0)
                     {
                         if (Host.Me.IsMoving)
+                        {
                             IsNeedFight = 0;
+                        }
                         else
+                        {
                             IsNeedFight++;
+                        }
 
                         if (IsNeedFight > 50)
                         {
@@ -564,43 +645,58 @@ namespace WowAI.Module
             else
             {
                 if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
-                    Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+                {
+                   Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+                }
             }
 
 
 
             if (Host.FarmModule.BestMob != null && Host.IsExists(Host.FarmModule.BestMob) && Host.IsAlive(Host.FarmModule.BestMob))
+            {
                 Host.CommonModule.SuspendMove();
+            }
 
             if (Host.CharacterSettings.GatherResouceScript && Host.CharacterSettings.Mode == Mode.Script && Host.AutoQuests.EnableFarmProp)
             {
                 Host.FarmModule.BestProp = Host.FarmModule.GetBestPropInZone(false);
 
                 if (Host.FarmModule.BestProp != null && Host.IsExists(Host.FarmModule.BestProp))
+                {
                     Host.CommonModule.SuspendMove();
+                }
 
                 if (Host.FarmModule.BestMob == null && Host.FarmModule.BestProp != null)
                 {
                     Host.log("Нашел ресурс " + Host.FarmModule.BestProp.Name + "  дист " + Host.Me.Distance(Host.FarmModule.BestProp));
                     if (Host.CharacterSettings.FindBestPoint)
+                    {
                         Host.AutoQuests.NeedFindBestPoint = true;
+                    }
+
                     Host.CancelMoveTo();
                     Thread.Sleep(100);
                     Host.CommonModule.ForceMoveTo(Host.FarmModule.BestProp, 3);
                     if ((Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && (!Host.MyIsNeedRegen() || (Host.GetAgroCreatures().Count > 0)))
+                    {
                         Host.FarmModule.BestMob = Host.FarmModule.GetBestAgroMob();
+                    }
 
                     Host.FarmModule.InteractWithProp(Host.FarmModule.BestProp);
                 }
 
                 if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null
                                                             || !Host.IsAlive(Host.FarmModule.BestMob)) && Host.FarmModule.BestProp == null && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0)
+                {
                     Host.CommonModule.ResumeMove();
-
+                }
             }
 
             if (Host.CommonModule.IsMoveSuspended() && (Host.FarmModule.BestMob == null || !Host.IsAlive(Host.FarmModule.BestMob)) && !Host.CommonModule.InFight() && Host.FarmModule.GetBestAgroMob() == null && MobsWithDropCount() == 0 && MobsWithSkinCount() == 0)
+            {
                 Host.CommonModule.ResumeMove();
+            }
+
             FarmRoute();
         }
 
@@ -617,7 +713,10 @@ namespace WowAI.Module
                         foreach (var myNpcLoc in Host.MyNpcLocss.NpcLocs)
                         {
                             if (!myNpcLoc.IsTaxy && !myNpcLoc.IsArmorer)
+                            {
                                 continue;
+                            }
+
                             foreach (var vector3F in myNpcLoc.ListLoc)
                             {
                                 if (Host.Me.Distance(vector3F) < bestDist)
@@ -635,6 +734,7 @@ namespace WowAI.Module
                             Host.FarmModule.FarmState = FarmState.Disabled;
                             Host.RunRun = true;
                             Host.CommonModule.ForceMoveTo(bestPoint);
+                            Host.Evade = false;
                             Host.FarmModule.FarmState = FarmState.AttackOnlyAgro;
                             return;
                         }
@@ -648,14 +748,25 @@ namespace WowAI.Module
                     while (waitTill > DateTime.UtcNow)
                     {
                         Thread.Sleep(100);
-                        Host.log("Ожидаю после боя " + MobsWithDropCount() + " " + Host.GetAgroCreatures().Count, LogLvl.Important);
+
                         if (!Host.MainForm.On)
+                        {
                             return;
+                        }
+                        Host.log("Ожидаю после боя " + MobsWithDropCount() + " " + Host.GetAgroCreatures().Count, LogLvl.Important);
                         if (MobsWithDropCount() > 0)
+                        {
                             break;
+                        }
+
                         if (Host.GetAgroCreatures().Count > 0)
+                        {
                             break;
+                        }
+
+                      
                     }
+                    Thread.Sleep(100);
                     Host.NeedWaitAfterCombat = false;
                 }
 
@@ -665,6 +776,11 @@ namespace WowAI.Module
                 PickupSkinRoute();
                 MyUsePossion();
                 UseBuffItems();
+                if (!Host.Me.IsInCombat && Host.CommonModule != null && ReadyToActions)
+                {
+                    Host.CommonModule.MyUseItemFromSettings();
+
+                }
 
 
 
@@ -678,38 +794,80 @@ namespace WowAI.Module
             }
         }
 
-        private Item MyGetPossionItem()
+        private Item MyGetPossionItem(Item weapon = null)
         {
             foreach (var item in Host.ItemManager.GetItems())
             {
                 if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 || item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 || item.Place == EItemPlace.InventoryItem)
                 {
                     if (item.Id == 6947 || item.Id == 6949 || item.Id == 6950 || item.Id == 8926 || item.Id == 8927 || item.Id == 8928)
+                    {
                         return item;
+                    }
+
+                    if (item.Id == 2862 || item.Id == 2863 || item.Id == 2871 || item.Id == 7964 || item.Id == 12404) //точило
+                    {
+                        if (weapon != null)
+                        {
+                            if ((EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.AXE
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.AXE2
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.SWORD
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.SWORD2
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.POLEARM
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.SPEAR
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.DAGGER)
+                            {
+                                return item;
+                            }
+                        }
+                    }
+
+                    if (item.Id == 3239 || item.Id == 3240 || item.Id == 3241 || item.Id == 7965 || item.Id == 12643) //грузило
+                    {
+                        if (weapon != null)
+                        {
+                            if ((EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.MACE
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.MACE2
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.FIST_WEAPON
+                                || (EItemSubclassWeapon)weapon.ItemSubClass == EItemSubclassWeapon.STAFF
+                                )
+                            {
+                                return item;
+                            }
+                        }
+                    }
+
                 }
 
             }
             return null;
-            // return Host.ItemManager.GetItems().FirstOrDefault(item => item.Id == 6947 && item.Place >= EItemPlace.InventoryItem && item.Place <= EItemPlace.Bag4);
         }
 
         public void MyUsePossion()
         {
 
             if (Host.Me.IsInCombat)
+            {
                 return;
+            }
+
             if (Host.Me.Class != EClass.Rogue)
+            {
                 return;
+            }
+
             var weaponMainHand = Host.ItemManager.GetItems().FirstOrDefault(item => item.Place == EItemPlace.Equipment && item.Cell == (byte)EEquipmentSlot.MainHand);
             var weaponOffHand = Host.ItemManager.GetItems().FirstOrDefault(item => item.Place == EItemPlace.Equipment && item.Cell == (byte)EEquipmentSlot.OffHand);
             if (weaponMainHand != null)
             {
                 var enchId = weaponMainHand.GetEnchantmentId(EEnchantmentSlot.Temp);
-                var enchCharges = weaponMainHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
+                //var enchCharges = weaponMainHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
                 if (enchId != 0)
+                {
                     return;
+                }
 
-                var itemToCast = MyGetPossionItem();
+                var itemToCast = MyGetPossionItem(weaponMainHand);
                 if (itemToCast != null)
                 {
                     Host.CommonModule.SuspendMove();
@@ -721,7 +879,7 @@ namespace WowAI.Module
                     }
                     if (res != EInventoryResult.OK)
                     {
-                        Host.log("Не удалось использовать яд " + itemToCast.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
+                        Host.log("Не удалось использовать усиление " + itemToCast.Name + " на оружие " + weaponMainHand.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
                     }
                     Host.CommonModule.ResumeMove();
                 }
@@ -730,11 +888,13 @@ namespace WowAI.Module
             if (weaponOffHand != null)
             {
                 var enchId = weaponOffHand.GetEnchantmentId(EEnchantmentSlot.Temp);
-                var enchCharges = weaponOffHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
+                //var enchCharges = weaponOffHand.GetEnchantmentCharges(EEnchantmentSlot.Temp);
                 if (enchId != 0)
+                {
                     return;
+                }
 
-                var itemToCast = MyGetPossionItem();
+                var itemToCast = MyGetPossionItem(weaponOffHand);
                 if (itemToCast != null)
                 {
                     Host.CommonModule.SuspendMove();
@@ -746,7 +906,7 @@ namespace WowAI.Module
                     }
                     if (res != EInventoryResult.OK)
                     {
-                        Host.log("Не удалось использовать яд " + itemToCast.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
+                        Host.log("Не удалось использовать усиление " + itemToCast.Name + " на оружие " + weaponOffHand.Name + " " + res + " " + Host.GetLastError(), LogLvl.Error);
                     }
                     Host.CommonModule.ResumeMove();
                 }
@@ -761,11 +921,19 @@ namespace WowAI.Module
             try
             {
                 if (!Host.IsExists(Host.FarmModule.BestMob))
+                {
                     Host.FarmModule.BestMob = null;
+                }
+
                 if (Host.FarmModule.BestMob != null && !Host.IsAlive(Host.FarmModule.BestMob))
+                {
                     Host.FarmModule.BestMob = null;
+                }
+
                 if (Host.FarmModule.BestMob != null && !Host.CanAttack(Host.FarmModule.BestMob, Host.CanSpellAttack))
+                {
                     Host.FarmModule.BestMob = null;
+                }
             }
             catch (ThreadAbortException) { }
             catch (Exception e)
@@ -780,7 +948,10 @@ namespace WowAI.Module
             {
                 Host.CommonModule.SuspendMove();
                 if (Host.SpellManager.CheckCanCast(regenSpel.Id, Host.Me) != ESpellCastError.SUCCESS)
+                {
                     return;
+                }
+
                 try
                 {
 
@@ -796,7 +967,9 @@ namespace WowAI.Module
 
                     }
                     while (Host.SpellManager.IsCasting)
+                    {
                         Thread.Sleep(200);
+                    }
                 }
                 finally
                 {
@@ -810,18 +983,49 @@ namespace WowAI.Module
             try
             {
                 if (!Host.Me.IsAlive)
+                {
                     return;
+                }
+
                 if (Host.Me.IsDeadGhost)
+                {
                     return;
+                }
+
                 if (Host.CheckUnderWather())
+                {
                     return;
+                }
+
                 if (Host.MyGetAura(269824) != null)//стан
+                {
                     return;
+                }
+
+                if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
+                {
+                    var item = Host.MyGetItem(8049);
+                    var item2 = Host.MyGetItem(8050);
+                    if (item != null && item2 == null) 
+                        Host.MyUseItemAndWait(item);
+                }
 
                 foreach (var regenItemse in Host.CharacterSettings.RegenItemses)
                 {
-                    if (Host.Me.IsInCombat && !regenItemse.InFight)
+                    if (!regenItemse.Checked)
                         continue;
+                    if (Host.Me.IsInCombat && !regenItemse.InFight)
+                    {
+                        continue;
+                    }
+
+                    if (!regenItemse.InFight)
+                    {
+                        if (Host.Me.MovementFlags == EMovementFlag.Swimming)
+                        {
+                            continue;
+                        }
+                    }
 
                     if (Host.MeMpPercent() <= regenItemse.MeMinMp || Host.MeMpPercent() > regenItemse.MeMaxMp)
                     {
@@ -839,8 +1043,12 @@ namespace WowAI.Module
                     if (regenItemse.NotMeEffect != 0)
                     {
                         foreach (var abnormalStatuse in Host.Me.GetAuras())
+                        {
                             if (abnormalStatuse.SpellId == regenItemse.NotMeEffect)
+                            {
                                 findEffect = true;
+                            }
+                        }
 
                         if (findEffect)
                         {
@@ -853,11 +1061,13 @@ namespace WowAI.Module
                     if (regenItemse.IsMeEffect != 0)
                     {
                         foreach (var abnormalStatuse in Host.Me.GetAuras())
+                        {
                             if (abnormalStatuse.SpellId == regenItemse.IsMeEffect)
                             {
                                 findEffect = true;
                                 //  Host.log("нашел ", Host.LogLvl.Ok);
                             }
+                        }
 
                         if (!findEffect)
                         {
@@ -869,14 +1079,22 @@ namespace WowAI.Module
 
                     var aura = Host.MyGetAura(regenItemse.SpellId);
                     if (aura != null && aura.Remaining >= 60000)
+                    {
                         continue;
+                    }
 
                     var buffItem = Host.MyGetItem(regenItemse.ItemId);
 
                     if (buffItem == null)
+                    {
                         continue;
+                    }
+
                     if (Host.SpellManager.GetItemCooldown(buffItem.Id) > 0)
+                    {
                         continue;
+                    }
+
                     Host.CommonModule.SuspendMove();
                     Host.MyUseItemAndWait(buffItem, Host.Me);
                     aura = Host.MyGetAura(regenItemse.SpellId);
@@ -886,10 +1104,15 @@ namespace WowAI.Module
                         {
                             Thread.Sleep(1000);
                             if (!Host.MainForm.On)
+                            {
                                 break;
+                            }
+
                             aura = Host.MyGetAura(regenItemse.SpellId);
                             if (aura == null)
+                            {
                                 break;
+                            }
                         }
                     }
 
@@ -929,10 +1152,14 @@ namespace WowAI.Module
                             var isNeedUnmount = true;
 
                             if (buffItem.Id == 152813)
+                            {
                                 isNeedUnmount = false;
+                            }
 
                             if (isNeedUnmount)
+                            {
                                 Host.CommonModule.MyUnmount();
+                            }
 
                             var result = Host.SpellManager.UseItem(buffItem);
                             if (result != EInventoryResult.OK)
@@ -940,7 +1167,10 @@ namespace WowAI.Module
                                 Host.log("Не смог использовать итем для регена " + buffItem.Name + "  " + result, LogLvl.Error);
                             }
                             while (Host.SpellManager.IsCasting)
+                            {
                                 Thread.Sleep(100);
+                            }
+
                             Host.CommonModule.ResumeMove();
                         }
                     }
@@ -949,7 +1179,35 @@ namespace WowAI.Module
 
                 if (!Host.Me.IsInCombat)
                 {
-                    if (Host.Me.Class == EClass.Mage && Host.CharacterSettings.CraftConjured)
+                    if (Host.Me.Class == EClass.Warlock && Host.MeGetItemsCount(6265) > 0 && Host.CharacterSettings.CraftConjured )
+                    {
+                        var listFood = new Dictionary<uint, uint>
+                        {
+                            {11730, 9421},
+                            {11729, 5510},
+                            {5699, 5509},
+                            {6202, 5511},
+                            {6201, 5512},
+
+                        };
+
+                        foreach (var u in listFood)
+                        {
+                            if (Host.SpellManager.GetSpell(u.Key) == null)
+                                continue;
+                            if (Host.MyGetItem(u.Value) == null)
+                            {
+                                Host.CommonModule.SuspendMove();
+                                Host.FarmModule.UseSkillAndWait(u.Key);
+                                Thread.Sleep(3000);
+                                Host.CommonModule.ResumeMove();
+                            }
+                            break;
+                        }
+
+                    }
+
+                    if (Host.Me.Class == EClass.Mage && Host.CharacterSettings.CraftConjured && Host.Me.MovementFlags != EMovementFlag.Swimming)
                     {
                         var listFood = new Dictionary<uint, uint>
                         {
@@ -975,7 +1233,10 @@ namespace WowAI.Module
                             foreach (var u in listWater)
                             {
                                 if (Host.SpellManager.GetSpell(u.Key) == null)
+                                {
                                     continue;
+                                }
+
                                 Host.CommonModule.SuspendMove();
                                 try
                                 {
@@ -988,13 +1249,18 @@ namespace WowAI.Module
                                     if (item != null)
                                     {
                                         Host.MyUseItemAndWait(item);
-                                        while (Host.MeMpPercent() < 90)
+                                        while (Host.MeMpPercent() < Host.CharacterSettings.MpRegen)
                                         {
                                             Thread.Sleep(100);
                                             if (!Host.MainForm.On)
+                                            {
                                                 return;
+                                            }
+
                                             if (Host.Me.IsInCombat)
+                                            {
                                                 return;
+                                            }
                                         }
                                         if (Host.Me.StandState == EStandState.Sit)
                                         {
@@ -1016,7 +1282,10 @@ namespace WowAI.Module
                             foreach (var u in listFood)
                             {
                                 if (Host.SpellManager.GetSpell(u.Key) == null)
+                                {
                                     continue;
+                                }
+
                                 Host.CommonModule.SuspendMove();
                                 try
                                 {
@@ -1030,13 +1299,18 @@ namespace WowAI.Module
                                     if (item != null)
                                     {
                                         Host.MyUseItemAndWait(item);
-                                        while (Host.Me.HpPercents < 90)
+                                        while (Host.Me.HpPercents < Host.CharacterSettings.HpRegen)
                                         {
                                             Thread.Sleep(100);
                                             if (!Host.MainForm.On)
+                                            {
                                                 return;
+                                            }
+
                                             if (Host.Me.IsInCombat)
+                                            {
                                                 return;
+                                            }
                                         }
                                         if (Host.Me.StandState == EStandState.Sit)
                                         {
@@ -1057,13 +1331,19 @@ namespace WowAI.Module
 
 
                 if (Host.ClientType == EWoWClient.Classic)
+                {
                     return;
+                }
 
                 if (!Host.Me.IsInCombat && Host.Me.HpPercents < 80)
+                {
                     UseRegenSpell(Host.SpellManager.GetSpell(8004));
+                }
 
                 if (Host.Me.GetThreats().Count == 0 && Host.Me.HpPercents < 50)
+                {
                     UseRegenSpell(Host.SpellManager.GetSpell(18562));
+                }
 
                 if (Host.Me.GetThreats().Count == 0 && Host.Me.HpPercents < 80)
                 {
@@ -1071,7 +1351,10 @@ namespace WowAI.Module
                     if (regenSpel != null)
                     {
                         if (Host.SpellManager.CheckCanCast(regenSpel.Id, Host.Me) != ESpellCastError.SUCCESS)
+                        {
                             return;
+                        }
+
                         Host.CommonModule.SuspendMove();
                         try
                         {
@@ -1079,10 +1362,15 @@ namespace WowAI.Module
                             foreach (var i in Host.Me.GetAuras())
                             {
                                 if (i.SpellId == 24858)//Облик лунного совуха    
+                                {
                                     needChangeForm = false;
+                                }
                             }
                             if (needChangeForm)
+                            {
                                 Host.CanselForm();
+                            }
+
                             Host.MyCheckIsMovingIsCasting();
                             var result = Host.SpellManager.CastSpell(regenSpel.Id, Host.Me);
                             if (result != ESpellCastError.SUCCESS)
@@ -1092,7 +1380,9 @@ namespace WowAI.Module
 
                             }
                             while (Host.SpellManager.IsCasting)
+                            {
                                 Thread.Sleep(200);
+                            }
                         }
                         finally
                         {
@@ -1151,7 +1441,9 @@ namespace WowAI.Module
                 SpecialSkills = null;
                 SpecialItems = null;
                 if (Host.FarmModule.FarmState != FarmState.Disabled)
+                {
                     FarmState = FarmState.AttackOnlyAgro;
+                }
             }
             catch (Exception e)
             {
@@ -1165,14 +1457,23 @@ namespace WowAI.Module
             try
             {
                 if (!Host.IsAlive())
+                {
                     return;
+                }
+
                 SpecialSkills = null;
                 SpecialItems = null;
                 BestMob = null;
                 lock (FarmMobsIds)
+                {
                     FarmMobsIds = new List<uint>(ids);
+                }
+
                 lock (FarmZone)
+                {
                     FarmZone = zone;
+                }
+
                 Host.DrawZones(new List<Zone> { zone });
                 if (useSpecialItem > 0)
                 {
@@ -1181,7 +1482,10 @@ namespace WowAI.Module
                 }
 
                 else
+                {
                     SpecialItems = null;
+                }
+
                 FarmState = FarmState.FarmMobs;
             }
             catch (Exception e)
@@ -1195,19 +1499,33 @@ namespace WowAI.Module
             try
             {
                 if (!Host.IsAlive())
+                {
                     return;
+                }
+
                 SpecialSkills = null;
                 SpecialItems = null;
                 BestProp = null;
                 lock (FarmPropIds)
+                {
                     FarmPropIds = new List<uint>(ids);
+                }
+
                 lock (FarmZone)
+                {
                     FarmZone = zone;
+                }
+
                 Host.DrawZones(new List<Zone> { zone });
                 if (useSpecialItem > 0)
+                {
                     SpecialItems = new[] { useSpecialItem };
+                }
                 else
+                {
                     SpecialItems = null;
+                }
+
                 FarmState = FarmState.FarmProps;
             }
             catch (Exception e)
@@ -1221,11 +1539,11 @@ namespace WowAI.Module
         {
             try
             {
-                Host.log("GameObject:" + prop.Name + " " + prop.GameObjectType);
-                foreach (var @ushort in prop.RequiredGatheringSkill)
-                {
-                    Host.log("Скилы для сбора " + @ushort);
-                }
+                //Host.log("GameObject:" + prop.Name + " " + prop.GameObjectType);
+                /* foreach (var @ushort in prop.RequiredGatheringSkill)
+                 {
+                     //Host.log("Скилы для сбора " + @ushort);
+                 }*/
                 Host.MyCheckIsMovingIsCasting();
 
 
@@ -1275,7 +1593,10 @@ namespace WowAI.Module
 
 
                     while (Host.SpellManager.IsCasting)
+                    {
                         Thread.Sleep(100);
+                    }
+
                     Thread.Sleep(1000);
                     if (Host.CanPickupLoot())
                     {
@@ -1294,16 +1615,24 @@ namespace WowAI.Module
                             SetBadProp(prop, 60000);
                             _gatherCount = 0;
                             if (Host.FarmModule.MobsWithDropCount() < 2)
+                            {
                                 Thread.Sleep(500);
+                            }
                         }
                     }
                     else
                     {
                         Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
                         if (Host.CharacterSettings.FightIfMobs && FarmState == FarmState.Disabled)
+                        {
                             FarmState = FarmState.AttackOnlyAgro;
+                        }
+
                         if (Host.GetAgroCreatures().Count == 0)
+                        {
                             SetBadProp(prop, 60000);
+                        }
+
                         _gatherCount++;
                     }
                     return true;
@@ -1314,12 +1643,16 @@ namespace WowAI.Module
                 if (skillGather == null)
                 {
                     Host.log("Нет скила для сбора " + prop.Name + " " + prop.Id + " " + prop.RequiredGatheringSkill, LogLvl.Error);
-                    SetBadProp(prop, 60000);
-                    return false;
+                    if (Host.CharacterSettings.Mode != Mode.QuestingClassic)
+                    {
+                        SetBadProp(prop, 60000);
+                        return false;
+                    }
+
                 }
                 else
                 {
-                    Host.log("Скилл для сбора " + skillGather.Id + "  " + skillGather.Name);
+                    // Host.log("Скилл для сбора " + skillGather.Id + "  " + skillGather.Name);
                 }
 
 
@@ -1329,38 +1662,61 @@ namespace WowAI.Module
                 foreach (var aura in Host.Me.GetAuras())
                 {
                     if (aura.SpellId == 209563)
+                    {
                         isNeedUnmount = false;
+                    }
+
                     if (aura.SpellId == 267560)
+                    {
                         isNeedUnmount = false;
-                    if (aura.SpellId == 134359 && skillGather.Id == 265835)
+                    }
+
+                    if (aura.SpellId == 134359 && skillGather?.Id == 265835)
+                    {
                         isNeedUnmount = false;
-                    if (aura.SpellId == 134359 && skillGather.Id == 265831)
+                    }
+
+                    if (aura.SpellId == 134359 && skillGather?.Id == 265831)
+                    {
                         isNeedUnmount = false;
+                    }
                 }
 
 
 
                 if (isNeedUnmount)
+                {
                     if (Host.Me.MountId != 0)
                     {
                         Host.log("Отзываю маунта для сбора");
                         Host.CommonModule.MyUnmount();
                     }
+                }
 
                 var isNeedChangeForm = true;
                 foreach (var i in Host.Me.GetAuras())
                 {
-                    if (i.SpellId == 783 && skillGather.Id == 265835) //Походный облик
+                    if (i.SpellId == 783 && skillGather?.Id == 265835) //Походный облик
+                    {
                         isNeedChangeForm = false;
-                    if (i.SpellId == 783 && skillGather.Id == 265831) //Походный облик
+                    }
+
+                    if (i.SpellId == 783 && skillGather?.Id == 265831) //Походный облик
+                    {
                         isNeedChangeForm = false;
-                    if (i.SpellId == 783 && skillGather.Id == 2366) //Походный облик
+                    }
+
+                    if (i.SpellId == 783 && skillGather?.Id == 2366) //Походный облик
+                    {
                         isNeedChangeForm = false;
+                    }
                 }
 
 
                 if (isNeedChangeForm)
+                {
                     Host.CanselForm();
+                }
 
                 Host.MyCheckIsMovingIsCasting();
 
@@ -1368,13 +1724,13 @@ namespace WowAI.Module
                 {
                     if (!prop.Use())
                     {
-                        Host.log("Не смог собрать скилом " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
+                        Host.log("Не смог собрать скилом " + skillGather?.Name + "  [" + skillGather?.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
                         Thread.Sleep(1000);
                         if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) == 0)
                         {
                             if (!prop.Use())
                             {
-                                Host.log("Не смог собрать скилом 2 " + skillGather.Name + "  [" + skillGather.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
+                                Host.log("Не смог собрать скилом 2 " + skillGather?.Name + "  [" + skillGather?.Id + "] " + Host.Me.Distance(prop) + "  " + prop.Id + "   " + Host.GetLastError() + "  ", LogLvl.Error);
 
                             }
                         }
@@ -1383,7 +1739,10 @@ namespace WowAI.Module
                 }
 
                 while (Host.SpellManager.IsCasting)
+                {
                     Thread.Sleep(100);
+                }
+
                 Thread.Sleep(500);
 
 
@@ -1400,16 +1759,24 @@ namespace WowAI.Module
                         SetBadProp(prop, 60000);
                         _gatherCount = 0;
                         if (Host.FarmModule.MobsWithDropCount() < 2)
+                        {
                             Thread.Sleep(500);
+                        }
                     }
                 }
                 else
                 {
                     Host.log("Окно лута не открыто " + Host.Me.Distance(prop) + "  " + prop.Name + "   " + Host.GetLastError(), LogLvl.Error);
                     if (Host.CharacterSettings.FightIfMobs && FarmState == FarmState.Disabled)
+                    {
                         FarmState = FarmState.AttackOnlyAgro;
+                    }
+
                     if (_gatherCount > 1)
+                    {
                         SetBadProp(prop, 60000);
+                    }
+
                     _gatherCount++;
                 }
 
@@ -1431,11 +1798,20 @@ namespace WowAI.Module
                 foreach (var creature in Host.GetAgroCreatures())
                 {
                     if (creature == null)
+                    {
                         continue;
+                    }
+
                     if (!Host.IsAlive(creature))
+                    {
                         continue;
+                    }
+
                     if (target.Distance(creature) > range)
+                    {
                         continue;
+                    }
+
                     i++;
                 }
             }
@@ -1451,7 +1827,10 @@ namespace WowAI.Module
         {
             var spell = Host.SpellManager.GetSpell(id);
             if (spell == null)
+            {
                 return true;
+            }
+
             return spell.CastTime == 0;
         }
 
@@ -1473,20 +1852,40 @@ namespace WowAI.Module
         public bool IsBadTarget(Unit bestMob)
         {
             if (bestMob.Target == Host.Me)
+            {
                 return false;
+            }
+
             if (bestMob.Target == Host.Me.GetPet())
+            {
                 return false;
+            }
+
             if (bestMob.Target == null)
+            {
                 return false;
+            }
+            else
+            {
+                if (bestMob.Target.Type == EBotTypes.Unit)
+                    return false;
+            }
+            
+
             foreach (var groupMember in Host.Group.GetMembers())
             {
                 if (bestMob.Target.Name == groupMember.Name)
+                {
                     return false;
+                }
             }
             BestMob = null;
             Host.CancelMoveTo();
             if (Host.SpellManager.CurrentAutoRepeatSpellId != 0)
+            {
                 Host.SpellManager.CancelAutoRepeatSpell();
+            }
+
             return true;
         }
 
@@ -1495,40 +1894,65 @@ namespace WowAI.Module
             if (Host.GetBotLogin() == "deathstar")
             {
                 if (Host.Me.GetThreats().Count > 1)
+                {
                     return null;
+                }
             }
+
+            
+
 
             foreach (var unit in Host.GetAgroCreatures())
             {
                 var zRange = Math.Abs(Host.Me.Location.Z - unit.Location.Z);
 
                 if (zRange > Host.CharacterSettings.Zrange)
+                {
                     continue;
+                }
 
                 if (!Host.IsAlive(unit))
+                {
                     continue;
+                }
+
                 if (Host.FarmModule.IsBadTarget(unit, Host.FarmModule.TickTime))
+                {
                     continue;
+                }
+
                 if (Host.FarmModule.IsImmuneTarget(unit))
+                {
                     continue;
+                }
 
                 if (Host.FarmModule.SpecialItems != null)
                 {
                     if (Host.FarmModule.SpecialItems.Length == 0)
+                    {
                         if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                        {
                             continue;
+                        }
+                    }
                 }
                 else
                 {
                     if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                    {
                         continue;
+                    }
                 }
 
                 foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                 {
-                    if (unit.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                    if (unit.Id == characterSettingsMobsSetting.Id)
+                    {
                         if (characterSettingsMobsSetting.Priority == Priority.VeryHight)
+                        {
                             return unit;
+                        }
+                    }
                 }
             }
 
@@ -1537,32 +1961,52 @@ namespace WowAI.Module
                 var zRange = Math.Abs(Host.Me.Location.Z - unit.Location.Z);
 
                 if (zRange > Host.CharacterSettings.Zrange)
+                {
                     continue;
+                }
 
                 if (!Host.IsAlive(unit))
+                {
                     continue;
+                }
+
                 if (Host.FarmModule.IsBadTarget(unit, Host.FarmModule.TickTime))
+                {
                     continue;
+                }
+
                 if (Host.FarmModule.IsImmuneTarget(unit))
+                {
                     continue;
+                }
 
                 if (Host.FarmModule.SpecialItems != null)
                 {
                     if (Host.FarmModule.SpecialItems.Length == 0)
+                    {
                         if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                        {
                             continue;
+                        }
+                    }
                 }
                 else
                 {
                     if (!Host.CanAttack(unit, Host.CanSpellAttack))
+                    {
                         continue;
+                    }
                 }
 
                 foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                 {
-                    if (unit.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                    if (unit.Id == characterSettingsMobsSetting.Id)
+                    {
                         if (characterSettingsMobsSetting.Priority == Priority.Hight)
+                        {
                             return unit;
+                        }
+                    }
                 }
             }
             return null;
@@ -1578,19 +2022,39 @@ namespace WowAI.Module
                 {
 
                     if (!Host.IsExists(prop))
+                    {
                         continue;
+                    }
+
                     if (IsBadProp(prop, Host.FarmModule.TickTime))
+                    {
                         continue;
+                    }
+
                     if (prop.Id != id)
+                    {
                         continue;
+                    }
+
                     if (prop.Distance(-349.34, -3545.83, 31.01) < 10)
+                    {
                         continue;
+                    }
+
                     if (prop.Distance(-345.80, -3562.13, 31.24) < 10)
+                    {
                         continue;
+                    }
+
                     if (prop.Distance(-236.23, -5084.25, 25.78) < 10)
+                    {
                         continue;
+                    }
+
                     if (prop.Distance(-269.50, -5095.31, 25.24) < 10)
+                    {
                         continue;
+                    }
 
                     if (prop.Id == 194107)
                     {
@@ -1601,7 +2065,9 @@ namespace WowAI.Module
                     if (prop.Id == 194107)
                     {
                         if (prop.Location.Z < -5)
+                        {
                             continue;
+                        }
                     }
 
                     /* if (prop.Distance(-349.00, -3546.00, 31.17) < 10)
@@ -1623,21 +2089,23 @@ namespace WowAI.Module
                     if (!mobInsideMesh)
                     {
                         if (minDist < Host.Me.Distance(prop))
+                        {
                             continue;
+                        }
                     }
                     else
                     {
                         if (minDist < GetDistToMobFromMech(prop.Location))
+                        {
                             continue;
+                        }
                     }
 
 
                     if (!FarmZone.ObjInZone(prop))
+                    {
                         continue;
-
-
-
-
+                    }
 
                     minDist = Host.Me.Distance(prop);
                     bestProp = prop;
@@ -1660,7 +2128,9 @@ namespace WowAI.Module
                 foreach (var dungeonSettingsDungeonCoordSetting in Host.DungeonSettings.DungeonCoordSettings)
                 {
                     if (prop.Distance(dungeonSettingsDungeonCoordSetting.Loc) < bestDist)
+                    {
                         bestDist = prop.Distance(dungeonSettingsDungeonCoordSetting.Loc);
+                    }
                 }
 
 
@@ -1679,7 +2149,9 @@ namespace WowAI.Module
             try
             {
                 if (Host.Me.IsInFlight)
+                {
                     return null;
+                }
                 //  host.log("  GetBestPropInZone");
                 // mobInsideMesh = true;
                 double minDist = 999999;
@@ -1689,30 +2161,49 @@ namespace WowAI.Module
                     /* if (prop.GameObjectType != EGameObjectType.GatheringNode)
                          continue;*/
                     if (!Host.IsExists(prop))
+                    {
                         continue;
+                    }
                     /*    if (!farmPropIds.Contains(prop.Id))
-                            continue;*/
+       continue;*/
                     if (IsBadProp(prop, Host.FarmModule.TickTime))
+                    {
                         continue;
+                    }
+
                     if ((prop.DynamicFlags & EGameObjectDynamicFlags.NO_INTERACT) != 0)
+                    {
                         continue;
+                    }
+
                     if (Host.CharacterSettings.Mode == Mode.Script)
                     {
                         if (Host.Me.Distance(prop) > Host.CharacterSettings.GatherRadiusScript)
+                        {
                             continue;
+                        }
+
                         var bestdist = GetDistancePoint(prop);
                         if (bestdist > Host.CharacterSettings.GatherRadiusScript)
+                        {
                             continue;
+                        }
 
                         var mobsIgnore = false;
                         foreach (var characterSettingsMobsSetting in Host.CharacterSettings.PropssSettings)
                         {
                             if (prop.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                            {
                                 if (characterSettingsMobsSetting.Priority == 0)
+                                {
                                     mobsIgnore = true;
+                                }
+                            }
                         }
                         if (!mobsIgnore)
+                        {
                             continue;
+                        }
 
                         var ignore = false;
                         foreach (var characterSettingsGameObjectIgnore in Host.CharacterSettings.GameObjectIgnores)
@@ -1720,11 +2211,15 @@ namespace WowAI.Module
                             if (characterSettingsGameObjectIgnore.Id == prop.Id &&
                                 characterSettingsGameObjectIgnore.Ignore &&
                                 prop.Distance(characterSettingsGameObjectIgnore.Loc) < 10)
+                            {
                                 ignore = true;
+                            }
                         }
 
                         if (ignore)
+                        {
                             continue;
+                        }
                     }
 
 
@@ -1740,12 +2235,16 @@ namespace WowAI.Module
                     if (!mobInsideMesh)
                     {
                         if (minDist < Host.Me.Distance(prop))
+                        {
                             continue;
+                        }
                     }
                     else
                     {
                         if (minDist < GetDistToMobFromMech(prop.Location))
+                        {
                             continue;
+                        }
                     }
 
                     /*   if (!farmZone.ObjInZone(prop))
@@ -1851,7 +2350,7 @@ namespace WowAI.Module
             }
         }
 
-        internal Unit GetBestAgroMob(bool mobInsideMesh = false)
+        internal Unit GetBestAgroMob()
         {
             try
             {
@@ -1861,25 +2360,45 @@ namespace WowAI.Module
                 foreach (var obj in Host.GetEntities<Unit>())
                 {
                     if (obj == null)
+                    {
                         continue;
+                    }
 
                     if (!Host.CanAttack(obj, Host.CanSpellAttack))
+                    {
                         continue;
+                    }
+
                     if (obj.Type == EBotTypes.Player)
+                    {
                         continue;
+                    }
+
                     if (obj.Type == EBotTypes.Pet)
+                    {
                         continue;
+                    }
+
                     if (!Host.IsAlive(obj))
+                    {
                         continue;
+                    }
 
                     if (!aggroMobs.Contains(obj))
+                    {
                         continue;
+                    }
                     /*  if (IsBadTarget(obj, host.ComboRoute.TickTime))
-                          continue;*/
+     continue;*/
                     if (obj.Id == 27483)//динозавр
+                    {
                         return obj;
+                    }
+
                     if (!(bestDist > Host.Me.Distance(obj)))
+                    {
                         continue;
+                    }
 
                     bestDist = Host.Me.Distance(obj);
                     bestMob = obj;
@@ -1908,8 +2427,11 @@ namespace WowAI.Module
             {
                 double dist = 0;
                 if (i + 1 < test.Path.Count)
+                {
                     dist = Host.MyDistance(test.Path[i].X, test.Path[i].Y, test.Path[i].Z, test.Path[i + 1].X,
                     test.Path[i + 1].Y, test.Path[i + 1].Z);
+                }
+
                 allDist += dist;
             }
             // Host.log(allDist.ToString());
@@ -1926,89 +2448,172 @@ namespace WowAI.Module
                 foreach (var obj in Host.GetEntities<Unit>())
                 {
                     if (obj.Id == 126702 && obj.Location.Z < 28)
+                    {
                         continue;
+                    }
+
                     if (obj.Type == EBotTypes.Player)
+                    {
                         continue;
+                    }
+
                     if (obj.Type == EBotTypes.Pet)
+                    {
                         continue;
+                    }
+
                     if (obj.IsTotem())
+                    {
                         continue;
+                    }
 
                     if (Host.FarmModule.SpecialItems != null)
                     {
                         if (Host.FarmModule.SpecialItems?.Length == 0)
+                        {
                             if (!Host.CanAttack(obj, Host.CanSpellAttack))
+                            {
                                 continue;
+                            }
+                        }
                     }
                     else
                     {
                         if (!Host.CanAttack(obj, Host.CanSpellAttack))
+                        {
                             continue;
+                        }
                     }
 
 
                     if (Host.CharacterSettings.Mode != Mode.Questing)
+                    {
                         if (obj.Victim != null && obj.Victim != Host.Me && obj.Victim != Host.Me.GetPet())
+                        {
                             continue;
+                        }
+                    }
 
                     if (Host.CharacterSettings.Mode == Mode.Questing)
                     {
                         if (obj.Distance(-349.34, -3545.83, 31.01) < 10)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9993.67, 1398.21, 1282.94) < 10)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9894.74, 1554.01, 1278.95) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9882.24, 1526.17, 1275.57) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9874.21, 1514.17, 1257.61) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9892.94, 1483.57, 1277.97) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9883.57, 1580.49, 1285.17) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9844.51, 1555.41, 1290.95) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9872.90, 1459.87, 1276.42) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9862.75, 1580.74, 1287.43) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9844.93, 1590.39, 1310.87) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9815.89, 1565.21, 1294.96) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9851.38, 1522.00, 1258.31) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9873.51, 1492.11, 1258.34) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9860.81, 1504.84, 1270.48) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(9776.68, 1560.15, 1266.34) < 20)
+                        {
                             continue;
+                        }
+
                         if (obj.Distance(776.45, 1654.16, 1.57) < 20)
+                        {
                             continue;
+                        }
 
                         if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                        {
                             continue;
+                        }
                     }
 
                     if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
                     {
                         if (!FarmZone.ObjInZone(obj) && !aggroMobs.Contains(obj))
+                        {
                             continue;
+                        }
+
                         if (FarmMobsIds.Count == 0)
                         {
                             if (!FarmZone.ObjInZone(obj))
+                            {
                                 continue;
+                            }
+
                             var levelRange = Math.Abs(Host.Me.Level - obj.Level);
 
                             if (levelRange > 7)
+                            {
                                 continue;
+                            }
                         }
                         else
                         {
                             if (!CheckFactionId(obj) && !aggroMobs.Contains(obj))
+                            {
                                 continue;
+                            }
                         }
 
                     }
@@ -2016,37 +2621,64 @@ namespace WowAI.Module
 
 
                     if (mobInsideMesh)
+                    {
                         if (!Host.IsInsideNavMesh(obj.Location))
+                        {
                             continue; // в мешах   
-
-
+                        }
+                    }
 
                     var zRange = Math.Abs(Host.Me.Location.Z - obj.Location.Z);
                     if (Host.Me.MovementFlags == EMovementFlag.Swimming)
+                    {
                         zRange = 0;
-                    if (zRange > Host.CharacterSettings.Zrange)
-                        continue;
+                    }
 
+                    if (zRange > Host.CharacterSettings.Zrange)
+                    {
+                        continue;
+                    }
 
                     if (!Host.IsAlive(obj))
+                    {
                         continue;
+                    }
+
                     if (IsBadTarget(obj, Host.FarmModule.TickTime))
+                    {
                         continue;
+                    }
+
                     if (IsImmuneTarget(obj))
+                    {
                         continue;
-                    if (Host.Me.MovementFlags != EMovementFlag.Swimming)
-                        if (!Host.CommonModule.CheckPathForLoc(Host.Me.Location, obj.Location))
-                            continue;
+                    }
+
+                    if (Host.CharacterSettings.Mode != Mode.Questing)
+                    {
+                        if (Host.Me.MovementFlags != EMovementFlag.Swimming)
+                        {
+                            if (!Host.CommonModule.CheckPathForLoc(Host.Me.Location, obj.Location))
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
 
                     if (!mobInsideMesh)
                     {
                         if (bestDist < Host.Me.Distance(obj))
+                        {
                             continue;
+                        }
                     }
                     else
                     {
                         if (bestDist < GetDistToMobFromMech(obj.Location))
+                        {
                             continue;
+                        }
                     }
 
 
@@ -2059,22 +2691,37 @@ namespace WowAI.Module
                             foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                             {
                                 if (obj.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                                {
                                     if (characterSettingsMobsSetting.Priority == Priority.Ignore)
+                                    {
                                         mobsIgnore = true;
+                                    }
+                                }
                             }
                             if (mobsIgnore)
+                            {
                                 continue;
+                            }
 
                             foreach (var characterSettingsMobsSetting in Host.CharacterSettings.MobsSettings)
                             {
                                 if (obj.Guid.GetEntry() == characterSettingsMobsSetting.Id)
+                                {
                                     if (characterSettingsMobsSetting.Priority == Priority.Hight)
+                                    {
                                         return obj;
+                                    }
+                                }
                             }
                             if (Host.FarmModule.FarmState == FarmState.Disabled)
+                            {
                                 return null;
+                            }
+
                             if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                            {
                                 continue;
+                            }
                         }
                         else
                         {
@@ -2083,18 +2730,24 @@ namespace WowAI.Module
                                 if (Host.AutoQuests.BestMultizone.UseFilter)
                                 {
                                     if ((!FarmZone.ObjInZone(obj) || !FarmMobsIds.Contains(obj.Guid.GetEntry())) && !aggroMobs.Contains(obj))
+                                    {
                                         continue;
+                                    }
                                 }
                                 else
                                 {
                                     if (!FarmZone.ObjInZone(obj))
+                                    {
                                         continue;
+                                    }
                                 }
                             }
                             else
                             {
                                 if (!FarmZone.ObjInZone(obj))
+                                {
                                     continue;
+                                }
                             }
 
 
@@ -2106,7 +2759,9 @@ namespace WowAI.Module
                     if (Host.ClientType == EWoWClient.Classic && BestMob != null)
                     {
                         if (IsBadTarget(BestMob))
+                        {
                             continue;
+                        }
                     }
 
 
@@ -2132,11 +2787,20 @@ namespace WowAI.Module
         private bool CheckFactionId(Unit unit)
         {
             if (unit == null)
+            {
                 return false;
+            }
+
             if (FarmMobsIds.Contains(unit.Id))
+            {
                 return true;
+            }
+
             if (FactionIds.Contains(unit.FactionId))
+            {
                 return true;
+            }
+
             return false;
 
         }

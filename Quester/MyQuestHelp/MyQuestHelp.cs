@@ -6,9 +6,10 @@ using System.Threading;
 using Out.Utility;
 using WoWBot.Core;
 
+// ReSharper disable once CheckNamespace
 namespace WowAI
 {
-    internal partial class MyQuestHelpClass 
+    internal partial class MyQuestHelpClass
     {
         public List<MyQuest> ListQuestsDurotarClassic = new List<MyQuest>
         {
@@ -258,6 +259,15 @@ namespace WowAI
                 Index = -2;
             }
 
+            public MyQuest(QuestAction questAction, int level, Vector3F loc)
+            {
+                Race.Add(ERace.None);
+                Class.Add(EClass.None);
+                QuestAction = questAction;
+                Level = level;
+                Loc = loc;
+            }
+
             public MyQuest(QuestAction questAction, int level, Zone grindZone)
             {
                 QuestAction = questAction;
@@ -271,6 +281,8 @@ namespace WowAI
             public MyQuest(uint id, QuestAction questAction, string flyPath, Vector3F loc)
             {
                 Id = id;
+                Race.Add(ERace.None);
+                Class.Add(EClass.None);
                 QuestAction = questAction;
                 FlyPath = flyPath;
                 Loc = loc;
@@ -541,50 +553,84 @@ namespace WowAI
             {
                 Thread.Sleep(100);
                 if (host.MyIsNeedSell())
+                {
                     break;
+                }
+
                 if (host.MyIsNeedRepair())
+                {
                     break;
+                }
+
                 if (host.MyIsNeedBuy())
+                {
                     break;
+                }
 
                 if (host.FarmModule.BestMob == null && !host.MyIsNeedRegen())
+                {
                     badRadius++;
+                }
                 else
+                {
                     badRadius = 0;
+                }
 
                 if (badRadius > 50)
                 {
                     if (zone.ZoneType == EZoneType.Circle)
                     {
                         if ((zone as RoundZone).Radius < 50)
+                        {
                             continue;
+                        }
                     }
                     var loc = Vector3F.Zero;
                     foreach (var myNpcLoc in host.MyNpcLocss.NpcLocs)
                     {
                         if (!farmMobIds.Contains(myNpcLoc.Id))
+                        {
                             continue;
+                        }
 
                         foreach (var vector3F in myNpcLoc.ListLoc.OrderBy(i => host.Me.Distance2D(i)))
                         {
                             if (host.Me.Distance2D(vector3F) < 50)
+                            {
                                 continue;
+                            }
+
                             if (!zone.PointInZone(vector3F.X, vector3F.Y))
+                            {
                                 continue;
+                            }
+
                             var bad = false;
                             foreach (var badVector3F in BadVector3Fs)
                             {
                                 if (vector3F.Distance(badVector3F) < 50)
+                                {
                                     bad = true;
+                                }
                             }
                             if (bad)
+                            {
                                 continue;
+                            }
+
+                            if (!host.CommonModule.CheckPathForLoc(host.Me.Location, vector3F))
+                            {
+                                continue;
+                            }
+
                             loc = vector3F;
                         }
                     }
 
                     if (loc != Vector3F.Zero)
                     {
+
+
                         host.log("Не могу найти Monster 1, подбегаю к  " + host.Me.Distance(loc) + "    " + loc);
                         if (host.CommonModule.MoveTo(loc, 20))
                         {
@@ -596,10 +642,21 @@ namespace WowAI
                     var findPoint = zone.GetRandomPoint();
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (z == 0)
+                    {
                         z = host.Me.Location.Z;
+                    }
+
                     var path = host.GetSmoothPath(host.Me.Location, new Vector3F(findPoint.X, findPoint.Y, z));
                     if (path.Path.Count > 100)
+                    {
                         continue;
+                    }
+
+                    if (!host.CommonModule.CheckPathForLoc(host.Me.Location, new Vector3F(findPoint.X, findPoint.Y, z)))
+                    {
+                        continue;
+                    }
+
                     var vectorPoint = new Vector3F(findPoint.X, findPoint.Y, z);
                     host.log("Не могу найти Monster 2, подбегаю в центр зоны " + host.Me.Distance(vectorPoint) + "    " + vectorPoint);
                     host.CommonModule.MoveTo(vectorPoint, 20);
@@ -609,57 +666,108 @@ namespace WowAI
             host.FarmModule.StopFarm();
             Thread.Sleep(1000);
 
-            if(host.CharacterSettings.Mode != Mode.QuestingClassic)
+            if (host.CharacterSettings.Mode != Mode.QuestingClassic)
+            {
                 return;
-            if(host.FarmModule.FarmState == FarmState.Disabled)
+            }
+
+            if (host.FarmModule.FarmState == FarmState.Disabled)
+            {
                 return;
+            }
+
+            if (quest.Id == 835 || quest.Id == 1525 || quest.Id == 257 || quest.Id ==258 || quest.Id ==2499)
+            {
+                return;
+            }
+
             var sw = new Stopwatch();
+            sw.Start();
             if (zone.ZoneType != EZoneType.Circle)
+            {
                 return;
+            }
+
+            host.MainForm.SetQuestIdText("Grind 20 min");
             zone = new RoundZone((zone as RoundZone).X, (zone as RoundZone).Y, 200);
-            
+
             host.FarmModule.SetFarmMobs(zone, new List<uint>());
             while (sw.ElapsedMilliseconds < 1200000 && host.FarmModule.ReadyToActions && host.FarmModule.FarmState == FarmState.FarmMobs)
             {
                 Thread.Sleep(100);
-                if (host.MyIsNeedSell())
-                    break;
-                if (host.MyIsNeedRepair())
-                    break;
-                if (host.MyIsNeedBuy())
-                    break;
-                if (host.FarmModule.BestMob == null && !host.MyIsNeedRegen())
-                    badRadius++;
-                else
-                    badRadius = 0;
 
+                if (host.MyIsNeedSell())
+                {
+                    break;
+                }
+
+                if (host.MyIsNeedRepair())
+                {
+                    break;
+                }
+
+                if (host.MyIsNeedBuy())
+                {
+                    break;
+                }
+
+                if (host.FarmModule.BestMob == null && !host.MyIsNeedRegen())
+                {
+                    badRadius++;
+                }
+                else
+                {
+                    badRadius = 0;
+                }
+
+                host.MainForm.SetQuestStateText(sw.Elapsed.Minutes + ":" + sw.Elapsed.Seconds);
                 if (badRadius > 50)
                 {
                     if (zone.ZoneType == EZoneType.Circle)
                     {
                         if ((zone as RoundZone).Radius < 50)
+                        {
                             continue;
+                        }
                     }
                     var loc = Vector3F.Zero;
                     foreach (var myNpcLoc in host.MyNpcLocss.NpcLocs)
                     {
                         if (!farmMobIds.Contains(myNpcLoc.Id))
+                        {
                             continue;
+                        }
 
                         foreach (var vector3F in myNpcLoc.ListLoc.OrderBy(i => host.Me.Distance2D(i)))
                         {
                             if (host.Me.Distance2D(vector3F) < 50)
+                            {
                                 continue;
+                            }
+
                             if (!zone.PointInZone(vector3F.X, vector3F.Y))
+                            {
                                 continue;
+                            }
+
+                            if (!host.CommonModule.CheckPathForLoc(host.Me.Location, vector3F))
+                            {
+                                continue;
+                            }
+
                             var bad = false;
                             foreach (var badVector3F in BadVector3Fs)
                             {
                                 if (vector3F.Distance(badVector3F) < 50)
+                                {
                                     bad = true;
+                                }
                             }
                             if (bad)
+                            {
                                 continue;
+                            }
+
                             loc = vector3F;
                         }
                     }
@@ -677,10 +785,21 @@ namespace WowAI
                     var findPoint = zone.GetRandomPoint();
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (z == 0)
+                    {
                         z = host.Me.Location.Z;
+                    }
+
                     var path = host.GetSmoothPath(host.Me.Location, new Vector3F(findPoint.X, findPoint.Y, z));
                     if (path.Path.Count > 100)
+                    {
                         continue;
+                    }
+
+                    if (!host.CommonModule.CheckPathForLoc(host.Me.Location, new Vector3F(findPoint.X, findPoint.Y, z)))
+                    {
+                        continue;
+                    }
+
                     var vectorPoint = new Vector3F(findPoint.X, findPoint.Y, z);
                     host.log("Не могу найти Monster 2, подбегаю в центр зоны " + host.Me.Distance(vectorPoint) + "    " + vectorPoint);
                     host.CommonModule.MoveTo(vectorPoint, 20);
@@ -699,47 +818,84 @@ namespace WowAI
             while (host.MainForm.On && !host.AutoQuests.IsQuestCompliteClassic(quest.Id, objectiveindex) && host.FarmModule.ReadyToActions && host.FarmModule.FarmState == FarmState.FarmProps)
             {
                 if (host.MyIsNeedRepair())
+                {
                     break;
+                }
+
                 if (host.MyIsNeedSell())
+                {
                     break;
+                }
+
                 if (host.MyIsNeedBuy())
+                {
                     break;
+                }
+
                 Thread.Sleep(100);
 
                 if (host.FarmModule.BestProp == null && !host.MyIsNeedRegen())
+                {
                     badRadius++;
+                }
                 else
+                {
                     badRadius = 0;
+                }
+
                 if (host.FarmModule.BestMob != null)
+                {
                     badRadius = 0;
+                }
+
                 if (badRadius > 50)
                 {
                     if (zone.ZoneType == EZoneType.Circle)
                     {
                         if (((RoundZone)zone).Radius < 50)
+                        {
                             continue;
+                        }
                     }
 
                     var loc = Vector3F.Zero;
                     foreach (var myNpcLoc in host.MyGameObjectLocss.GameObjectLocs)
                     {
                         if (!farmMobIds.Contains(myNpcLoc.Id))
+                        {
                             continue;
+                        }
 
                         foreach (var vector3F in myNpcLoc.ListLoc.OrderBy(i => host.Me.Distance2D(i)))
                         {
                             if (host.Me.Distance2D(vector3F) < 50)
+                            {
                                 continue;
+                            }
+
                             if (!zone.PointInZone(vector3F.X, vector3F.Y))
+                            {
                                 continue;
+                            }
+
+                            if (!host.CommonModule.CheckPathForLoc(host.Me.Location, vector3F))
+                            {
+                                continue;
+                            }
+
                             var bad = false;
                             foreach (var badVector3F in BadVector3Fs)
                             {
                                 if (vector3F.Distance(badVector3F) < 50)
+                                {
                                     bad = true;
+                                }
                             }
                             if (bad)
+                            {
                                 continue;
+                            }
+
                             loc = vector3F;
                         }
                     }
@@ -757,11 +913,21 @@ namespace WowAI
                     var findPoint = zone.GetRandomPoint();
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (z == 0)
+                    {
                         z = host.Me.Location.Z;
+                    }
+
                     var path = host.GetSmoothPath(host.Me.Location, new Vector3F(findPoint.X, findPoint.Y, z));
                     if (path.Path.Count > 100)
+                    {
                         continue;
+                    }
+
                     var vectorPoint = new Vector3F(findPoint.X, findPoint.Y, z);
+                    if (!host.CommonModule.CheckPathForLoc(host.Me.Location, vectorPoint))
+                    {
+                        continue;
+                    }
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (host.GetNavMeshHeight(vectorPoint) != 0)
                     {
@@ -786,21 +952,38 @@ namespace WowAI
                    && host.FarmModule.FarmState == FarmState.FarmProps)
             {
                 if (host.MyIsNeedRepair())
+                {
                     break;
+                }
+
                 if (host.MyIsNeedSell())
+                {
                     break;
+                }
+
                 Thread.Sleep(100);
                 if (host.FarmModule.BestProp == null && host.Me.HpPercents > 50)
+                {
                     badRadius++;
+                }
                 else
+                {
                     badRadius = 0;
+                }
+
                 if (host.FarmModule.BestMob != null)
+                {
                     badRadius = 0;
+                }
+
                 if (badRadius > 50)
                 {
                     var findPoint = farmLoc;
                     if (questPoiPoints.Count > 0)
+                    {
                         findPoint = questPoiPoints[host.RandGenerator.Next(0, questPoiPoints.Count)];
+                    }
+
                     host.log("Не могу найти GameObject, подбегаю в центр зоны " + host.Me.Distance(findPoint) + "    " + questPoiPoints.Count);
                     host.CommonModule.MoveTo(findPoint, 20);
                 }
@@ -819,29 +1002,44 @@ namespace WowAI
                 Thread.Sleep(100);
 
                 if (host.FarmModule.BestMob == null && host.Me.HpPercents > 80)
+                {
                     badRadius++;
+                }
                 else
+                {
                     badRadius = 0;
+                }
+
                 if (badRadius > 100)
                 {
                     var loc = Vector3F.Zero;
                     foreach (var myNpcLoc in host.MyNpcLocss.NpcLocs)
                     {
                         if (!farmMobIds.Contains(myNpcLoc.Id))
+                        {
                             continue;
+                        }
 
                         foreach (var vector3F in myNpcLoc.ListLoc.OrderBy(i => host.Me.Distance2D(i)))
                         {
                             if (host.Me.Distance2D(vector3F) < 50)
+                            {
                                 continue;
+                            }
+
                             var bad = false;
                             foreach (var badVector3F in BadVector3Fs)
                             {
                                 if (vector3F.Distance(badVector3F) < 50)
+                                {
                                     bad = true;
+                                }
                             }
                             if (bad)
+                            {
                                 continue;
+                            }
+
                             loc = vector3F;
                         }
 
@@ -859,7 +1057,10 @@ namespace WowAI
 
                     var findPoint = farmLoc;
                     if (questPoiPoints.Count > 0)
+                    {
                         findPoint = questPoiPoints[host.RandGenerator.Next(0, questPoiPoints.Count)];
+                    }
+
                     if (host.Me.Distance(findPoint) > 5)
                     {
                         host.log("Не могу найти мобов, подбегаю в центр зоны " + host.Me.Distance(findPoint));
@@ -884,18 +1085,29 @@ namespace WowAI
 
                 Thread.Sleep(100);
                 if (quest.Id == 49378 && host.MyGetAura(255988) == null)
+                {
                     break;
+                }
+
                 if (host.FarmModule.BestMob == null && host.Me.HpPercents > 80)
+                {
                     badRadius++;
+                }
                 else
+                {
                     badRadius = 0;
+                }
+
                 if (badRadius > 100)
                 {
                     if (quest.Id == 50702)
                     {
                         var npc = host.GetNpcById(134803);
                         if (npc != null)
+                        {
                             host.CommonModule.MoveTo(npc, 20);
+                        }
+
                         badRadius = 0;
                     }
 
@@ -903,20 +1115,30 @@ namespace WowAI
                     foreach (var myNpcLoc in host.MyNpcLocss.NpcLocs)
                     {
                         if (!farmMobIds.Contains(myNpcLoc.Id))
+                        {
                             continue;
+                        }
 
                         foreach (var vector3F in myNpcLoc.ListLoc.OrderBy(i => host.Me.Distance2D(i)))
                         {
                             if (host.Me.Distance2D(vector3F) < 50)
+                            {
                                 continue;
+                            }
+
                             var bad = false;
                             foreach (var badVector3F in BadVector3Fs)
                             {
                                 if (vector3F.Distance(badVector3F) < 50)
+                                {
                                     bad = true;
+                                }
                             }
                             if (bad)
+                            {
                                 continue;
+                            }
+
                             loc = vector3F;
                         }
 
@@ -934,7 +1156,10 @@ namespace WowAI
 
                     var findPoint = farmLoc;
                     if (questPoiPoints.Count > 0)
+                    {
                         findPoint = questPoiPoints[host.RandGenerator.Next(0, questPoiPoints.Count)];
+                    }
+
                     if (host.Me.Distance(findPoint) > 5 && findPoint != Vector3F.Zero)
                     {
 

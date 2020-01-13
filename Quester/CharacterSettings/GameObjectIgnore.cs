@@ -18,7 +18,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -30,7 +34,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -42,7 +50,11 @@ namespace WowAI
             get => _loc;
             set
             {
-                if (_loc == value) return;
+                if (_loc == value)
+                {
+                    return;
+                }
+
                 _loc = value;
                 NotifyPropertyChanged();
             }
@@ -54,7 +66,11 @@ namespace WowAI
             get => _ignore;
             set
             {
-                if (_ignore == value) return;
+                if (_ignore == value)
+                {
+                    return;
+                }
+
                 _ignore = value;
                 NotifyPropertyChanged();
             }

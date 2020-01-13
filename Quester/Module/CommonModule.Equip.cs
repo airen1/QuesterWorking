@@ -109,7 +109,9 @@ namespace WowAI.Module
             foreach (var item in Host.ItemManager.GetItems())
             {
                 if (item.Place == EItemPlace.InventoryBag)
+                {
                     count++;
+                }
             }
 
             return count;
@@ -122,13 +124,39 @@ namespace WowAI.Module
             foreach (var item in Host.ItemManager.GetItems())
             {
                 if (item.InventoryType != EInventoryType.Bag)
+                {
                     continue;
+                }
+
                 if (item.Place != EItemPlace.InventoryBag)
+                {
                     continue;
+                }
+
                 if (item.Type != EBotTypes.Bag)
+                {
                     continue;
+                }
+
+                var equip = true;
+                foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                {
+                    if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                    {
+                        equip = false;
+                    }
+                }
+
+                if (!equip)
+                {
+                    continue;
+                }
+
                 if (item.ItemClass != itemClass)
+                {
                     continue;
+                }
+
                 if (((Bag)item).BagSize < equipItemMinBagCount)
                 {
                     equipItemMinBag = item;
@@ -142,14 +170,40 @@ namespace WowAI.Module
             foreach (var item in Host.ItemManager.GetItems())
             {
                 if (item.InventoryType != EInventoryType.Bag)
+                {
                     continue;
+                }
+
                 if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 && item.Place != EItemPlace.Bag3 &&
                     item.Place != EItemPlace.Bag4 && item.Place != EItemPlace.InventoryItem)
+                {
                     continue;
+                }
+
                 if (item.Type != EBotTypes.Bag)
+                {
                     continue;
+                }
+
                 if (item.ItemClass != itemClass)
+                {
                     continue;
+                }
+
+                var equip = true;
+                foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                {
+                    if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                    {
+                        equip = false;
+                    }
+                }
+
+                if (!equip)
+                {
+                    continue;
+                }
+
                 if (((Bag)item).BagSize > invItemMinBagCount)
                 {
                     invItemMinBag = item;
@@ -162,15 +216,17 @@ namespace WowAI.Module
             {
                 if (invItemMinBagCount > equipItemMinBagCount)
                 {
-                    Host.log(invItemMinBag.Name + "[" + invItemMinBagCount + "]     " + equipItemMinBag.Name + "[" +
-                             equipItemMinBagCount + "]");
+                    Host.log(invItemMinBag.Name + "[" + invItemMinBagCount + "]     " + equipItemMinBag.Name + "[" + equipItemMinBagCount + "]");
                     if (invItemMinBag.Place != EItemPlace.InventoryItem)
                     {
                         Host.log("Необходимо перенести сумку");
                         foreach (var item in Host.ItemManager.GetItems())
                         {
                             if (item.Place != EItemPlace.InventoryItem)
+                            {
                                 continue;
+                            }
+
                             item.SwapItem(invItemMinBag);
                             break;
                         }
@@ -178,14 +234,14 @@ namespace WowAI.Module
                     else
                     {
                         if (invItemMinBag.SwapItem(equipItemMinBag))
-                            Host.log("Одеваю " + invItemMinBag.InventoryType + "  best item = " + invItemMinBag.Name,
-                                LogLvl.Ok);
+                        {
+                            Host.log("Одеваю " + invItemMinBag.InventoryType + "  best item = " + invItemMinBag.Name,LogLvl.Ok);
+                        }
                         else
-                            Host.log(
-                                "Error. Can't equip " + invItemMinBag.InventoryType + "  " + "  best item = " +
-                                invItemMinBag.Name + ". Reason = " + Host.GetLastError(), LogLvl.Error);
+                        {
+                            Host.log("Error. Can't equip " + invItemMinBag.InventoryType + "  " + "  best item = " +invItemMinBag.Name + ". Reason = " + Host.GetLastError(), LogLvl.Error);
+                        }
                     }
-
                     Thread.Sleep(Host.RandGenerator.Next(555, 1555));
                 }
             }
@@ -194,7 +250,10 @@ namespace WowAI.Module
         private void CheckArrow()
         {
             if (!Host.CharacterSettings.UseArrow)
+            {
                 return;
+            }
+
             if (Host.Me.AmmoID != Host.CharacterSettings.UseArrowId)
             {
                 if (Host.MeGetItemsCount(Host.CharacterSettings.UseArrowId) == 0)
@@ -222,17 +281,21 @@ namespace WowAI.Module
                     foreach (var s in item.GetStats())
                     {
                         if (StatCoefs.ContainsKey(s.Key))
+                        {
                             coef += StatCoefs[s.Key] * s.Value;
+                        }
                     }
                 }
 
                 if (item.Template.GetClass() == EItemClass.Armor)
                 {
-                    coef = item.Template.GetArmorDefence();
+                    coef = item.Template.GetArmorDefence() * Host.CharacterSettings.EquipArmorCoef;
                     foreach (var s in item.GetStats())
                     {
                         if (StatCoefs.ContainsKey(s.Key))
+                        {
                             coef += StatCoefs[s.Key] * s.Value;
+                        }
                     }
                 }
             }
@@ -250,24 +313,31 @@ namespace WowAI.Module
             try
             {
                 if (item == null)
+                {
                     return 0;
+                }
+
                 if (item.ItemClass == EItemClass.Weapon)
                 {
                     coef = item.Template.GetDamagePerSecond();
                     foreach (var s in item.GetStats())
                     {
                         if (StatCoefs.ContainsKey(s.Key))
+                        {
                             coef += StatCoefs[s.Key] * s.Value;
+                        }
                     }
                 }
 
                 if (item.ItemClass == EItemClass.Armor)
                 {
-                    coef = item.Template.GetArmorDefence();
+                    coef = item.Template.GetArmorDefence() * Host.CharacterSettings.EquipArmorCoef;
                     foreach (var s in item.GetStats())
                     {
                         if (StatCoefs.ContainsKey(s.Key))
+                        {
                             coef += StatCoefs[s.Key] * s.Value;
+                        }
                     }
                 }
             }
@@ -279,14 +349,70 @@ namespace WowAI.Module
             return coef;
         }
 
+
+        public void GetBestTwoArmor()
+        {
+            if (Host.Me.Class != EClass.Rogue)
+            {
+                return;
+            }
+
+            Item mainHand = null;
+            Item offHand = null;
+            foreach (var item in Host.ItemManager.GetItems())
+            {
+                if (item.Place != EItemPlace.Equipment)
+                {
+                    continue;
+                }
+
+                if (item.Cell == 15)
+                {
+                    mainHand = item;
+                }
+
+                if (item.Cell == 16)
+                {
+                    offHand = item;
+                }
+            }
+            if (mainHand == null || offHand == null)
+            {
+                return;
+            }
+
+            if (offHand.InventoryType == EInventoryType.OffHandWeapon)
+            {
+                return;
+            }
+
+            if (mainHand.InventoryType == EInventoryType.MainHandWeapon)
+            {
+                return;
+            }
+
+            if (mainHand.Template.GetDamagePerSecond() < offHand.Template.GetDamagePerSecond())
+            {
+                if (!mainHand.SwapItem(offHand))
+                {
+                    Host.log("Не удалось поменять местами оружие " + mainHand.Name + " " + offHand.Name, LogLvl.Error);
+                }
+            }
+        }
+
         private void EquipBestArmorAndWeapon()
         {
             try
             {
                 if (!Host.Me.IsAlive)
+                {
                     return;
+                }
+
                 if (Host.Me.IsDeadGhost)
+                {
                     return;
+                }
 
                 var equipCells = new Dictionary<EEquipmentSlot, Item>();
 
@@ -295,8 +421,13 @@ namespace WowAI.Module
                 foreach (EEquipmentSlot value in Enum.GetValues(typeof(EEquipmentSlot)))
                 {
                     if (Host.ClientType == EWoWClient.Retail)
+                    {
                         if (value == EEquipmentSlot.Ranged)
+                        {
                             continue;
+                        }
+                    }
+
                     equipCells.Add(value, null);
                 }
 
@@ -310,17 +441,41 @@ namespace WowAI.Module
                             if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 &&
                                 item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 &&
                                 item.Place != EItemPlace.InventoryItem)
+                            {
                                 continue;
+                            }
+
                             if (item.InventoryType != EInventoryType.Bag || !item.IsBag)
+                            {
                                 continue;
+                            }
+
+                            var equip = true;
+                            foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                            {
+                                if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                                {
+                                    equip = false;
+                                }
+                            }
+
+                            if (!equip)
+                            {
+                                continue;
+                            }
 
                             if (item.Equip())
+                            {
                                 Host.log("Одеваю " + item.InventoryType + "  best item = " + item.Name,
                                     LogLvl.Ok);
+                            }
                             else
+                            {
                                 Host.log(
                                     "Error. Can't equip " + item.InventoryType + "  " + "  best item = " + item.Name +
                                     ". Reason = " + Host.GetLastError(), LogLvl.Error);
+                            }
+
                             Thread.Sleep(Host.RandGenerator.Next(555, 1555));
                             break;
                         }
@@ -328,27 +483,65 @@ namespace WowAI.Module
                     else
                     {
                         if (Host.Me.Class == EClass.Hunter)
+                        {
                             EquipBestBug(EItemClass.Quiver);
+                        }
+
                         EquipBestBug(EItemClass.Container);
                     }
                 }
+
 
 
                 //  Host.log("Тест  EquipBestArmorAndWeapon 2");
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 && item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 && item.Place != EItemPlace.InventoryItem && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
                     if (item.ItemClass != EItemClass.Armor && item.ItemClass != EItemClass.Weapon)
+                    {
                         continue;
+                    }
+
                     if (item.Template == null)
+                    {
                         continue;
+                    }
+
                     if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
                     if (item.RequiredLevel > Host.Me.Level)
+                    {
                         continue;
-                    if (item.ItemQuality > (EItemQuality)Host.CharacterSettings.MaxItemQuality)
+                    }
+
+                    if (item.Place != EItemPlace.Equipment)
+                    {
+                        if (item.ItemQuality > Host.CharacterSettings.MaxItemQuality)
+                        {
+                            continue;
+                        }
+                    }
+
+                    var equip = true;
+                    foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                    {
+                        if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                        {
+                            equip = false;
+                        }
+                    }
+
+                    if (!equip)
+                    {
                         continue;
+                    }
 
                     var itemEquipType = GetItemEPlayerPartsType(item.InventoryType);
 
@@ -362,21 +555,30 @@ namespace WowAI.Module
                             if (item.ItemClass == EItemClass.Weapon)
                             {
                                 if ((Host.GetProficiency(EItemClass.Weapon) & (1 << (int)item.Template.GetSubClass())) == 0)
+                                {
                                     continue;
+                                }
                             }
 
                             if (item.ItemClass == EItemClass.Armor)
                             {
                                 if ((Host.GetProficiency(EItemClass.Armor) & (1 << (int)item.Template.GetSubClass())) == 0)
+                                {
                                     continue;
+                                }
                             }
                         }
 
 
                         if (item.ItemClass == EItemClass.Weapon && !WeaponType.Contains((EItemSubclassWeapon)item.ItemSubClass))
+                        {
                             continue;
+                        }
+
                         if (item.ItemClass == EItemClass.Armor && !ArmorType.Contains((EItemSubclassArmor)item.ItemSubClass))
+                        {
                             continue;
+                        }
                     }
 
 
@@ -387,7 +589,9 @@ namespace WowAI.Module
                             if (Host.CharacterSettings.EquipItemStat != 0)
                             {
                                 if (!item.ItemStatType.Contains((EItemModType)Host.CharacterSettings.EquipItemStat))
+                                {
                                     continue;
+                                }
                             }
                         }
                     }
@@ -396,7 +600,9 @@ namespace WowAI.Module
                     if (!_weaponAndShield)
                     {
                         if (itemEquipType == EEquipmentSlot.OffHand)
+                        {
                             continue;
+                        }
                     }
                     else
                     {
@@ -406,13 +612,20 @@ namespace WowAI.Module
                             foreach (var item1 in Host.ItemManager.GetItems())
                             {
                                 if (item1.Place != EItemPlace.Equipment)
+                                {
                                     continue;
+                                }
+
                                 if (item1.InventoryType == EInventoryType.TwoHandedWeapon)
+                                {
                                     next = true;
+                                }
                             }
 
                             if (next)
+                            {
                                 continue;
+                            }
                         }
                     }
 
@@ -449,21 +662,55 @@ namespace WowAI.Module
                 {
                     if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 &&
                         item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 &&
-                        item.Place != EItemPlace.InventoryItem && item.Place != EItemPlace.Equipment) continue;
-                    if (item.ItemClass != EItemClass.Armor ||
-                        (EItemSubclassArmor)item.ItemSubClass != EItemSubclassArmor.MISCELLANEOUS)
+                        item.Place != EItemPlace.InventoryItem && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
+                    if (item.ItemClass != EItemClass.Armor || (EItemSubclassArmor)item.ItemSubClass != EItemSubclassArmor.MISCELLANEOUS)
+                    {
+                        continue;
+                    }
+
                     if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
+                    var equip = true;
+                    foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                    {
+                        if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                        {
+                            equip = false;
+                        }
+                    }
+
+                    if (!equip)
+                    {
+                        continue;
+                    }
 
                     if (item.RequiredLevel > Host.Me.Level)
+                    {
                         continue;
+                    }
+
                     if (item.InventoryType != EInventoryType.Finger)
+                    {
                         continue;
+                    }
+
                     if (equipCells.ContainsValue(item))
+                    {
                         continue;
-                    if (item.ItemQuality > (EItemQuality)Host.CharacterSettings.MaxItemQuality)
+                    }
+
+                    if (item.ItemQuality > Host.CharacterSettings.MaxItemQuality)
+                    {
                         continue;
+                    }
+
                     if (equipCells[EEquipmentSlot.Finger2] == null)
                     {
                         equipCells[EEquipmentSlot.Finger2] = item;
@@ -496,20 +743,55 @@ namespace WowAI.Module
                     if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 &&
                         item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 &&
                         item.Place != EItemPlace.InventoryItem && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
                     if (item.ItemClass != EItemClass.Armor ||
                         (EItemSubclassArmor)item.ItemSubClass != EItemSubclassArmor.MISCELLANEOUS)
+                    {
                         continue;
+                    }
+
                     if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
                     if (item.RequiredLevel > Host.Me.Level)
+                    {
                         continue;
+                    }
+
                     if (item.InventoryType != EInventoryType.Trinket)
+                    {
                         continue;
+                    }
+
                     if (equipCells.ContainsValue(item))
+                    {
                         continue;
-                    if (item.ItemQuality > (EItemQuality)Host.CharacterSettings.MaxItemQuality)
+                    }
+
+                    if (item.ItemQuality > Host.CharacterSettings.MaxItemQuality)
+                    {
                         continue;
+                    }
+
+                    var equip = true;
+                    foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                    {
+                        if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                        {
+                            equip = false;
+                        }
+                    }
+
+                    if (!equip)
+                    {
+                        continue;
+                    }
+
                     if (equipCells[EEquipmentSlot.Trinket2] == null)
                     {
                         equipCells[EEquipmentSlot.Trinket2] = item;
@@ -538,6 +820,7 @@ namespace WowAI.Module
 
                 //    Host.log("Тест  EquipBestArmorAndWeapon 5");
                 if (_twoWeapon)
+                {
                     if (equipCells[EEquipmentSlot.MainHand]?.InventoryType != EInventoryType.TwoHandedWeapon)
                     {
                         foreach (var item in Host.ItemManager.GetItems())
@@ -545,40 +828,77 @@ namespace WowAI.Module
                             if (item.Place == EItemPlace.Bag1 || item.Place == EItemPlace.Bag2 ||
                                 item.Place == EItemPlace.Bag3 || item.Place == EItemPlace.Bag4 ||
                                 item.Place == EItemPlace.InventoryItem || item.Place == EItemPlace.Equipment)
+                            {
                                 if (item.ItemClass == EItemClass.Armor || item.ItemClass == EItemClass.Weapon)
                                 {
                                     if (!item.CanEquipItem() && item.Place != EItemPlace.Equipment)
+                                    {
                                         continue;
-                                    if (item.ItemQuality > (EItemQuality)Host.CharacterSettings.MaxItemQuality)
-                                        continue;
+                                    }
+
+                                    if (item.Place != EItemPlace.Equipment)
+                                    {
+                                        if (item.ItemQuality > Host.CharacterSettings.MaxItemQuality)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
                                     if (item.RequiredLevel > Host.Me.Level)
+                                    {
                                         continue;
+                                    }
 
                                     var itemEquipType = GetItemEPlayerPartsType(item.InventoryType);
 
                                     if (item.ItemClass != EItemClass.Weapon)
+                                    {
                                         continue;
+                                    }
+
                                     if (item.InventoryType == EInventoryType.TwoHandedWeapon)
+                                    {
                                         continue;
-                                    if (item.ItemClass == EItemClass.Weapon &&
-                                        !WeaponType.Contains((EItemSubclassWeapon)item.ItemSubClass))
+                                    }
+
+                                    if (item.ItemClass == EItemClass.Weapon && !WeaponType.Contains((EItemSubclassWeapon)item.ItemSubClass))
+                                    {
                                         continue;
+                                    }
+
+                                    var equip = true;
+                                    foreach (var characterSettingsItemSetting in Host.CharacterSettings.ItemSettings)
+                                    {
+                                        if (characterSettingsItemSetting.Id == item.Id && characterSettingsItemSetting.Use == EItemUse.NotEquip)
+                                        {
+                                            equip = false;
+                                        }
+                                    }
+
+                                    if (!equip)
+                                    {
+                                        continue;
+                                    }
 
                                     if (Host.ClientType == EWoWClient.Retail)
                                     {
                                         if (itemEquipType != EEquipmentSlot.MainHand)
+                                        {
                                             continue;
+                                        }
                                     }
                                     else
                                     {
-                                        if (item.InventoryType == EInventoryType.Weapon &&
-                                            itemEquipType == EEquipmentSlot.MainHand)
+                                        if (item.InventoryType == EInventoryType.Weapon && itemEquipType == EEquipmentSlot.MainHand)
                                         {
+
                                         }
                                         else
                                         {
                                             if (itemEquipType != EEquipmentSlot.OffHand)
+                                            {
                                                 continue;
+                                            }
                                         }
                                     }
 
@@ -587,15 +907,18 @@ namespace WowAI.Module
                                     {
                                         if (Host.CharacterSettings.EquipItemStat != 0)
                                         {
-                                            if (!item.ItemStatType.Contains(
-                                                (EItemModType)Host.CharacterSettings.EquipItemStat))
+                                            if (!item.ItemStatType.Contains((EItemModType)Host.CharacterSettings.EquipItemStat))
+                                            {
                                                 continue;
+                                            }
                                         }
                                     }
 
 
                                     if (equipCells[EEquipmentSlot.MainHand] == item)
+                                    {
                                         continue;
+                                    }
 
                                     if (equipCells[EEquipmentSlot.OffHand] == null)
                                     {
@@ -620,8 +943,10 @@ namespace WowAI.Module
                                         }
                                     }
                                 }
+                            }
                         }
                     }
+                }
 
 
 
@@ -632,19 +957,18 @@ namespace WowAI.Module
                     {
                         if (equipCells[b].Equip())
                         {
-                            Host.log("Одеваю " + equipCells[b].InventoryType + "  best item = " + equipCells[b].Name,
-                                LogLvl.Ok);
+                            Host.log("Одеваю " + equipCells[b].InventoryType + "  best item = " + equipCells[b].Name, LogLvl.Ok);
                             Thread.Sleep(Host.RandGenerator.Next(555, 1555));
                         }
                         else
                         {
-                            Host.log("Error. Can't equip " + equipCells[b].InventoryType + "  " + b + "  best item = " +
-                                     equipCells[b].Name + ". Reason = " + Host.GetLastError(),
-                                LogLvl.Error);
+                            Host.log("Error. Can't equip " + equipCells[b].InventoryType + "  " + b + "  best item = " + equipCells[b].Name + ". Reason = " + Host.GetLastError(),LogLvl.Error);
                             Thread.Sleep(Host.RandGenerator.Next(555, 1555));
                         }
                     }
                 }
+
+                GetBestTwoArmor();
             }
             catch (ThreadAbortException)
             {
@@ -663,8 +987,7 @@ namespace WowAI.Module
                     break;
                 case EClass.Warrior:
                     {
-                        WeaponType = new List<EItemSubclassWeapon>()
-                        {EItemSubclassWeapon.AXE, EItemSubclassWeapon.SWORD, EItemSubclassWeapon.AXE2};
+                        WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.AXE, EItemSubclassWeapon.SWORD, EItemSubclassWeapon.AXE2 };
                         ArmorType = new List<EItemSubclassArmor>()
                     {
                         EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER,
@@ -687,21 +1010,12 @@ namespace WowAI.Module
                     {
                         if (Host.ClientType == EWoWClient.Classic)
                         {
-                            WeaponType = new List<EItemSubclassWeapon>()
-                            {EItemSubclassWeapon.MACE2, EItemSubclassWeapon.AXE2, EItemSubclassWeapon.SWORD2};
-                            ArmorType = new List<EItemSubclassArmor>()
-                        {
-                            EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER,
-                            EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS
-                        };
+                            /* WeaponType = new List<EItemSubclassWeapon>(){EItemSubclassWeapon.MACE2, EItemSubclassWeapon.AXE2, EItemSubclassWeapon.SWORD2};
+                             ArmorType = new List<EItemSubclassArmor>(){EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER,EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS};*/
                             if (Host.GetBotLogin() == "easymoney")
                             {
                                 WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.MACE };
-                                ArmorType = new List<EItemSubclassArmor>()
-                            {
-                                EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER,
-                                EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS, EItemSubclassArmor.SHIELD
-                            };
+                                ArmorType = new List<EItemSubclassArmor>() { EItemSubclassArmor.PLATE, EItemSubclassArmor.CLOTH, EItemSubclassArmor.LEATHER, EItemSubclassArmor.MAIL, EItemSubclassArmor.MISCELLANEOUS, EItemSubclassArmor.SHIELD };
                                 _weaponAndShield = true;
                             }
                         }
@@ -718,7 +1032,9 @@ namespace WowAI.Module
                             EItemSubclassArmor.MISCELLANEOUS,
                         };
                             if (Host.Me.Race == ERace.Tauren)
+                            {
                                 WeaponType = new List<EItemSubclassWeapon>() { EItemSubclassWeapon.GUN };
+                            }
                         }
                         else
                         {
@@ -837,14 +1153,20 @@ namespace WowAI.Module
                 foreach (var advancedEquipWeapon in Host.CharacterSettings.AdvancedEquipsWeapon)
                 {
                     if (!advancedEquipWeapon.Use)
+                    {
                         continue;
+                    }
+
                     WeaponType.Add(advancedEquipWeapon.WeaponType);
                 }
 
                 foreach (var characterSettingsAdvancedEquipArmor in Host.CharacterSettings.AdvancedEquipArmors)
                 {
                     if (!characterSettingsAdvancedEquipArmor.Use)
+                    {
                         continue;
+                    }
+
                     ArmorType.Add(characterSettingsAdvancedEquipArmor.ArmorType);
                 }
 

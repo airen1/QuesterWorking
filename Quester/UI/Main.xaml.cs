@@ -105,14 +105,26 @@ namespace WowAI.UI
         {
 
             if (!Host.FormInitialized)
+            {
                 return;
+            }
+
             if (Host.CharacterSettings == null)
+            {
                 return;
+            }
+
             if (ComboBoxDungeonScript.SelectedItem == null)
+            {
                 return;
+            }
+
             Host.CharacterSettings.Script = ComboBoxDungeonScript.SelectedItem.ToString();
             if (ComboBoxDungeonAction.SelectedIndex == 0)
+            {
                 CollectionDungeonCoord.RemoveAll();
+            }
+
             NeedApplyDungeonSettings = true;
         }
 
@@ -155,12 +167,60 @@ namespace WowAI.UI
         private ObservableCollection<AdvancedEquipStat> _collectionAdvancedEquipStats;
         private ObservableCollection<LearnTalent> _collectionLearnTalents;
 
+        private ObservableCollection<EquipAucMask> _collectionEquipAucMasks;
+
+        private ObservableCollection<EquipAucBag> _collectionEquipAucBags;
+
+        private ObservableCollection<TaxyNodeSettings> _collectionTaxyNodeSettingses;
+
+
+        public ObservableCollection<TaxyNodeSettings> CollectionTaxyNodeSettingses
+        {
+            get
+            {
+                if (_collectionTaxyNodeSettingses == null)
+                {
+                    _collectionTaxyNodeSettingses = new ObservableCollection<TaxyNodeSettings>();
+                }
+
+                return _collectionTaxyNodeSettingses;
+            }
+        }
+
+        public ObservableCollection<EquipAucBag> CollectionEquipAucBags
+        {
+            get
+            {
+                if (_collectionEquipAucBags == null)
+                {
+                    _collectionEquipAucBags = new ObservableCollection<EquipAucBag>();
+                }
+
+                return _collectionEquipAucBags;
+            }
+        }
+        public ObservableCollection<EquipAucMask> CollectionEquipAucMasks
+        {
+            get
+            {
+                if (_collectionEquipAucMasks == null)
+                {
+                    _collectionEquipAucMasks = new ObservableCollection<EquipAucMask>();
+                }
+
+                return _collectionEquipAucMasks;
+            }
+        }
+
         public ObservableCollection<LearnTalent> CollectionLearnTalents
         {
             get
             {
                 if (_collectionLearnTalents == null)
+                {
                     _collectionLearnTalents = new ObservableCollection<LearnTalent>();
+                }
+
                 return _collectionLearnTalents;
             }
         }
@@ -170,7 +230,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionAdvancedEquipStats == null)
+                {
                     _collectionAdvancedEquipStats = new ObservableCollection<AdvancedEquipStat>();
+                }
+
                 return _collectionAdvancedEquipStats;
             }
         }
@@ -180,7 +243,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionAdvancedEquipArmors == null)
+                {
                     _collectionAdvancedEquipArmors = new ObservableCollection<AdvancedEquipArmor>();
+                }
+
                 return _collectionAdvancedEquipArmors;
             }
         }
@@ -190,7 +256,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionAdvancedEquipsWeapon == null)
+                {
                     _collectionAdvancedEquipsWeapon = new ObservableCollection<AdvancedEquipWeapon>();
+                }
+
                 return _collectionAdvancedEquipsWeapon;
             }
         }
@@ -201,7 +270,10 @@ namespace WowAI.UI
             get
             {
                 if (_learnSkill == null)
+                {
                     _learnSkill = new ObservableCollection<LearnSkill>();
+                }
+
                 return _learnSkill;
             }
         }
@@ -212,7 +284,10 @@ namespace WowAI.UI
             get
             {
                 if (_equipAucs == null)
+                {
                     _equipAucs = new ObservableCollection<EquipAuc>();
+                }
+
                 return _equipAucs;
             }
         }
@@ -222,7 +297,10 @@ namespace WowAI.UI
             get
             {
                 if (_scriptSchedules == null)
+                {
                     _scriptSchedules = new ObservableCollection<ScriptSchedule>();
+                }
+
                 return _scriptSchedules;
             }
         }
@@ -232,7 +310,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionaAukSettingses == null)
+                {
                     _collectionaAukSettingses = new ObservableCollection<AukSettings>();
+                }
+
                 return _collectionaAukSettingses;
             }
         }
@@ -242,7 +323,10 @@ namespace WowAI.UI
             get
             {
                 if (_gameObjectIgnores == null)
+                {
                     _gameObjectIgnores = new ObservableCollection<GameObjectIgnore>();
+                }
+
                 return _gameObjectIgnores;
             }
         }
@@ -251,7 +335,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionQuestSettings == null)
+                {
                     _collectionQuestSettings = new ObservableCollection<QuestCoordSettings>();
+                }
+
                 return _collectionQuestSettings;
             }
         }
@@ -261,7 +348,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionItemGlobals == null)
+                {
                     _collectionItemGlobals = new ObservableCollection<ItemGlobal>();
+                }
+
                 return _collectionItemGlobals;
             }
         }
@@ -271,7 +361,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionRegenItems == null)
+                {
                     _collectionRegenItems = new ObservableCollection<RegenItems>();
+                }
+
                 return _collectionRegenItems;
             }
         }
@@ -281,7 +374,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionNpcForActions == null)
+                {
                     _collectionNpcForActions = new ObservableCollection<NpcForAction>();
+                }
+
                 return _collectionNpcForActions;
             }
         }
@@ -293,7 +389,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionMultiZone == null)
+                {
                     _collectionMultiZone = new ObservableCollection<MultiZone>();
+                }
+
                 return _collectionMultiZone;
             }
         }
@@ -303,7 +402,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionPropSettings == null)
+                {
                     _collectionPropSettings = new ObservableCollection<PropSettings>();
+                }
+
                 return _collectionPropSettings;
             }
         }
@@ -315,7 +417,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionIgnoreQuest == null)
+                {
                     _collectionIgnoreQuest = new ObservableCollection<IgnoreQuest>();
+                }
+
                 return _collectionIgnoreQuest;
             }
         }
@@ -326,7 +431,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionPetSettings == null)
+                {
                     _collectionPetSettings = new ObservableCollection<PetSettings>();
+                }
+
                 return _collectionPetSettings;
             }
         }
@@ -336,7 +444,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionEvents == null)
+                {
                     _collectionEvents = new ObservableCollection<EventSettings>();
+                }
+
                 return _collectionEvents;
             }
         }
@@ -346,7 +457,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionDungeonCoord == null)
+                {
                     _collectionDungeonCoord = new ObservableCollection<DungeonCoordSettings>();
+                }
+
                 return _collectionDungeonCoord;
             }
             // ReSharper disable once ValueParameterNotUsed
@@ -361,7 +475,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionMobs == null)
+                {
                     _collectionMobs = new ObservableCollection<MobsSettings>();
+                }
+
                 return _collectionMobs;
             }
         }
@@ -371,7 +488,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionActiveSkill == null)
+                {
                     _collectionActiveSkill = new ObservableCollection<SkillSettings>();
+                }
+
                 return _collectionActiveSkill;
             }
             // ReSharper disable once ValueParameterNotUsed
@@ -383,7 +503,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionInvItems == null)
+                {
                     _collectionInvItems = new ObservableCollection<ItemSettings>();
+                }
+
                 return _collectionInvItems;
             }
 
@@ -394,7 +517,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionAllBuff == null)
+                {
                     _collectionAllBuff = new ObservableCollection<BuffTable>();
+                }
+
                 return _collectionAllBuff;
             }
 
@@ -405,7 +531,10 @@ namespace WowAI.UI
             get
             {
                 if (_collectionAllSkill == null)
+                {
                     _collectionAllSkill = new ObservableCollection<SkillTable>();
+                }
+
                 return _collectionAllSkill;
             }
 
@@ -426,7 +555,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { QuestId.Content = s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -445,7 +576,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { QuestState.Content = "State: " + s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -461,7 +594,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { BestMob.Content = "BestMob: " + s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -477,7 +612,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { BestProp.Content = "BestProp: " + s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -493,7 +630,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { FarmState.Content = "FarmState: " + s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -509,7 +648,9 @@ namespace WowAI.UI
             try
             {
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() => { FarmState.ToolTip = s; });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -608,14 +749,19 @@ namespace WowAI.UI
                 }
                 var alternatePoint = EPowerType.AlternatePower;
                 if (Host.Me.Class == EClass.Druid || Host.Me.Class == EClass.Rogue)
+                {
                     alternatePoint = EPowerType.ComboPoints;
+                }
+
                 if (Host.Me.Class == EClass.Monk)
+                {
                     alternatePoint = EPowerType.Chi;
+                }
 
                 double tempGold = Host.Me.Money;
                 var gold = tempGold / 10000;
                 var startGold = Host.StartGold / 10000;
-                invgold = invgold - Host.Startinvgold;
+                invgold -= Host.Startinvgold;
                 var doubleGold = Convert.ToDouble(invgold) / 10000;
 
                 var labelGold = "Золото: " + Math.Round(gold, 2) + " г. [" +
@@ -657,6 +803,7 @@ namespace WowAI.UI
 
                 // CheckSkill();
                 if (Dispatcher != null)
+                {
                     Dispatcher.Invoke(() =>
                     {
                         try
@@ -708,13 +855,16 @@ namespace WowAI.UI
 
 
                             if (sw.ElapsedMilliseconds > 0)
+                            {
                                 Host.log("SetMe " + sw.ElapsedMilliseconds + " mc", LogLvl.Error);
+                            }
                         }
                         catch (Exception e)
                         {
                             Host.log(e.ToString());
                         }
                     });
+                }
             }
             catch (TaskCanceledException)
             {
@@ -753,7 +903,9 @@ namespace WowAI.UI
                 {
                     // MessageBox.Show(ComboBoxKey.Items[j].ToString());
                     if (cb.Items[j].ToString().Contains(value.ToString()))
+                    {
                         return true;
+                    }
                 }
             }
             catch (ThreadAbortException)
@@ -807,37 +959,75 @@ namespace WowAI.UI
                 var textbox = new TextBox();
                 //Персонаж вверх
                 if (Equals(sender, ButtonUpMeMaxHp))
+                {
                     textbox = TextBoxMeMaxHp;
+                }
+
                 if (Equals(sender, ButtonUpMeMaxMp))
+                {
                     textbox = TextBoxMeMaxMp;
+                }
+
                 if (Equals(sender, ButtonUpMeMinHp))
+                {
                     textbox = TextBoxMeMinHp;
+                }
+
                 if (Equals(sender, ButtonUpMeMinMp))
+                {
                     textbox = TextBoxMeMinMp;
+                }
                 //Цель вверх
                 if (Equals(sender, ButtonUpTargetMaxHp))
+                {
                     textbox = TextBoxTargetMaxHp;
+                }
+
                 if (Equals(sender, ButtonUpTargetMinHp))
+                {
                     textbox = TextBoxTargetMinHp;
+                }
                 //Дистанция вверх
                 if (Equals(sender, ButtonUpMaxDist))
+                {
                     textbox = TextBoxMaxDist;
+                }
+
                 if (Equals(sender, ButtonUpMinDist))
+                {
                     textbox = TextBoxMinDist;
+                }
                 //АОЕ вверх
                 if (Equals(sender, ButtonUpAoeMax))
+                {
                     textbox = TextBoxAoeMax;
+                }
+
                 if (Equals(sender, ButtonUpAoeMin))
+                {
                     textbox = TextBoxAoeMin;
+                }
+
                 if (Equals(sender, ButtonUpAoeRadius))
+                {
                     textbox = TextBoxAoeRadius;
+                }
                 //левел вверх
                 if (Equals(sender, ButtonUpMaxLevel))
+                {
                     textbox = TextBoxMaxLevel;
-                if (Equals(sender, ButtonUpMinLevel))
-                    textbox = TextBoxMinLevel;
+                }
 
-                if (Convert.ToInt32(textbox.Text) > 99) return;
+                if (Equals(sender, ButtonUpMinLevel))
+                {
+                    textbox = TextBoxMinLevel;
+                }
+
+                if (Convert.ToInt32(textbox.Text) > 99)
+                {
+                    return;
+                }
+
                 textbox.Text = (Convert.ToInt32(textbox.Text) + 1).ToString();
             }
             catch (ThreadAbortException)
@@ -861,37 +1051,75 @@ namespace WowAI.UI
                 var textbox = new TextBox();
                 // Персонаж вниз
                 if (Equals(sender, ButtonDownMeMaxHp))
+                {
                     textbox = TextBoxMeMaxHp;
+                }
+
                 if (Equals(sender, ButtonDownMeMaxMp))
+                {
                     textbox = TextBoxMeMaxMp;
+                }
+
                 if (Equals(sender, ButtonDownMeMinHp))
+                {
                     textbox = TextBoxMeMinHp;
+                }
+
                 if (Equals(sender, ButtonDownMeMinMp))
+                {
                     textbox = TextBoxMeMinMp;
+                }
                 //Цель вниз
                 if (Equals(sender, ButtonDownTargetMaxHp))
+                {
                     textbox = TextBoxTargetMaxHp;
+                }
+
                 if (Equals(sender, ButtonDownTargetMinHp))
+                {
                     textbox = TextBoxTargetMinHp;
+                }
                 //Дистанция вниз
                 if (Equals(sender, ButtonDownMaxDist))
+                {
                     textbox = TextBoxMaxDist;
+                }
+
                 if (Equals(sender, ButtonDownMinDist))
+                {
                     textbox = TextBoxMinDist;
+                }
                 //АОЕ вниз
                 if (Equals(sender, ButtonDownAoeMax))
+                {
                     textbox = TextBoxAoeMax;
+                }
+
                 if (Equals(sender, ButtonDownAoeMin))
+                {
                     textbox = TextBoxAoeMin;
+                }
+
                 if (Equals(sender, ButtonDownAoeRadius))
+                {
                     textbox = TextBoxAoeRadius;
+                }
                 // level down
                 if (Equals(sender, ButtonDownMaxLevel))
+                {
                     textbox = TextBoxMaxLevel;
-                if (Equals(sender, ButtonDownMinLevel))
-                    textbox = TextBoxMinLevel;
+                }
 
-                if (Convert.ToInt32(textbox.Text) == 0) return;
+                if (Equals(sender, ButtonDownMinLevel))
+                {
+                    textbox = TextBoxMinLevel;
+                }
+
+                if (Convert.ToInt32(textbox.Text) == 0)
+                {
+                    return;
+                }
+
                 textbox.Text = (Convert.ToInt32(textbox.Text) - 1).ToString();
             }
             catch (ThreadAbortException)
@@ -910,7 +1138,11 @@ namespace WowAI.UI
         /// <param name="e"></param>
         private void ButtonUpPriotity_Click(object sender, RoutedEventArgs e)
         {
-            if (Convert.ToInt32(TextBoxPriority.Text) > 8) return;
+            if (Convert.ToInt32(TextBoxPriority.Text) > 8)
+            {
+                return;
+            }
+
             TextBoxPriority.Text = (Convert.ToInt32(TextBoxPriority.Text) + 1).ToString();
         }
 
@@ -921,7 +1153,11 @@ namespace WowAI.UI
         /// <param name="e"></param>
         private void ButtonDownPriority_Click(object sender, RoutedEventArgs e)
         {
-            if (Convert.ToInt32(TextBoxPriority.Text) == 0) return;
+            if (Convert.ToInt32(TextBoxPriority.Text) == 0)
+            {
+                return;
+            }
+
             TextBoxPriority.Text = (Convert.ToInt32(TextBoxPriority.Text) - 1).ToString();
         }
 
@@ -953,7 +1189,7 @@ namespace WowAI.UI
         }
 
 
-        public void buttonOnOff_Click(object sender, RoutedEventArgs e)
+        public void ButtonOnOff_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1049,7 +1285,7 @@ namespace WowAI.UI
             try
             {
                 Main1.Width = 300;
-                Main1.Height = 510;
+                Main1.Height = 440;
 
             }
             catch (Exception err)
@@ -1058,7 +1294,7 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -1066,9 +1302,14 @@ namespace WowAI.UI
                 ComboBoxInvItems.Items.Clear();
 
                 if (Host.Me == null)
+                {
                     return;
+                }
+
                 foreach (var item in Host.ItemManager.GetItems())
+                {
                     ComboBoxInvItems.Items.Add("[" + item.Id + "]" + item.Name + " " + item.NameRu);
+                }
             }
             catch (ThreadAbortException)
             {
@@ -1134,7 +1375,10 @@ namespace WowAI.UI
             try
             {
                 if (Host == null)
+                {
                     return;
+                }
+
                 switch (Host.GetBotLogin())
                 {
                     case "zawww":
@@ -1149,10 +1393,13 @@ namespace WowAI.UI
                 }
 
                 if (ComboBoxSwitchMode == null || ComboBoxSwitchMode.SelectedIndex == -1)
+                {
                     return;
-                Host.log(ComboBoxSwitchMode.SelectedIndex + "  " + Host.CharacterSettings.Mode);
+                }
+
+                // Host.log(ComboBoxSwitchMode.SelectedIndex + "  " + Host.CharacterSettings.Mode);
                 Host.CharacterSettings.Mode = (Mode)ComboBoxSwitchMode.SelectedIndex;
-                Host.log(ComboBoxSwitchMode.SelectedIndex + "  " + Host.CharacterSettings.Mode);
+                // Host.log(ComboBoxSwitchMode.SelectedIndex + "  " + Host.CharacterSettings.Mode);
             }
             catch (Exception err)
             {
@@ -1167,14 +1414,15 @@ namespace WowAI.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void textBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             try
             {
-                var ctrl = sender as TextBox;
                 e.Handled = "0123456789".IndexOf(e.Text, StringComparison.Ordinal) < 0; //только цифры
-                if (ctrl != null)
+                if (sender is TextBox ctrl)
+                {
                     ctrl.MaxLength = 1; //длина текста в текстбоксе
+                }
             }
             catch (ThreadAbortException)
             {
@@ -1196,7 +1444,11 @@ namespace WowAI.UI
             {
                 var ctrl = sender as TextBox;
                 e.Handled = "0123456789".IndexOf(e.Text, StringComparison.Ordinal) < 0; //только цифры
-                if (ctrl != null) ctrl.MaxLength = 3; //длина текста в текстбоксе
+                if (ctrl != null)
+                {
+                    ctrl.MaxLength = 3; //длина текста в текстбоксе
+                }
+
                 if (ctrl != null && Convert.ToInt32(ctrl.Text) > 99)
                 {
                     ctrl.Text = "100";
@@ -1253,14 +1505,16 @@ namespace WowAI.UI
             try
             {
                 if (DataGridAllSkill.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 DataGridActiveSkill.SelectedIndex = -1;
                 ButtonAddSkill.IsEnabled = true;
                 ButtonChangeSkill.IsEnabled = false;
                 ButtonDelSkill.IsEnabled = false;
 
-                var skill = DataGridAllSkill.SelectedItem as SkillTable;
-                if (skill != null)
+                if (DataGridAllSkill.SelectedItem is SkillTable skill)
                 {
                     var spell = Host.SpellManager.GetSpell(skill.Id);
                     GroupBoxSettingsSkill.Header = "Настройки " + skill.Name + "[" + skill.Id + "]" + "  " + spell?.DescriptionRu;
@@ -1407,7 +1661,8 @@ namespace WowAI.UI
                         SkillId = dungeonCoordSettingse.SkillId,
                         PluginPath = dungeonCoordSettingse.PluginPath,
                         QuestId = dungeonCoordSettingse.QuestId,
-                        QuestAction = dungeonCoordSettingse.QuestAction
+                        QuestAction = dungeonCoordSettingse.QuestAction,
+                        Index = dungeonCoordSettingse.Index
                     };
                     Host.DungeonSettings.DungeonCoordSettings.Add(item);
                     i++;
@@ -1428,6 +1683,10 @@ namespace WowAI.UI
         {
             try
             {
+                Host.CharacterSettings.ApplyMail = CheckBoxApplyMail.IsChecked.Value;
+                Host.CharacterSettings.LearnSpell = CheckBoxLearnSpell.IsChecked.Value;
+                Host.CharacterSettings.StopEquipAucMinGold = Convert.ToUInt64(TextBoxStopEquipAucMinGold.Text);
+                Host.CharacterSettings.EquipArmorCoef = Convert.ToDouble(TextBoxStopEquipArmorCoef.Text);
                 Host.CharacterSettings.CheckRepairInCity = CheckBoxCheckRepairInCity.IsChecked.Value;
                 Host.CharacterSettings.LearnAllSpell = CheckBoxLearnAllSpell.IsChecked.Value;
                 Host.CharacterSettings.CraftConjured = CheckBoxCraftConjured.IsChecked.Value;
@@ -1439,7 +1698,7 @@ namespace WowAI.UI
                 Host.CharacterSettings.UseArrow = CheckBoxUseArrow.IsChecked.Value;
                 Host.CharacterSettings.RunRun = CheckBoxRunRun.IsChecked.Value;
                 Host.CharacterSettings.RunRunPercent = Convert.ToInt32(TextBoxRunRunPercent.Text);
-
+                Host.CharacterSettings.LearnPetSpell = CheckBoxLearnPetSpell.IsChecked.Value;
                 Host.CharacterSettings.UseArrowId = Convert.ToUInt32(TextBoxUseArrowId.Text);
                 Host.CharacterSettings.TwoWeapon = CheckBoxTwoWeapon.IsChecked.Value;
                 Host.CharacterSettings.AttackMobForDrop = CheckBoxAttackMobForDrop.IsChecked.Value;
@@ -1632,6 +1891,24 @@ namespace WowAI.UI
                 Host.CharacterSettings.AdvancedEquipStats.Clear();
                 Host.CharacterSettings.PetSettings.Clear();
                 Host.CharacterSettings.LearnTalents.Clear();
+                Host.CharacterSettings.EquipAucMasks.Clear();
+                Host.CharacterSettings.EquipAucBags.Clear();
+                Host.CharacterSettings.TaxyNodeSettingses.Clear();
+
+                foreach (var collectionTaxyNodeSettingse in CollectionTaxyNodeSettingses)
+                {
+                    Host.CharacterSettings.TaxyNodeSettingses.Add(collectionTaxyNodeSettingse);
+                }
+
+                foreach (var collectionEquipAucBag in CollectionEquipAucBags)
+                {
+                    Host.CharacterSettings.EquipAucBags.Add(collectionEquipAucBag);
+                }
+
+                foreach (var collectionEquipAucMask in CollectionEquipAucMasks)
+                {
+                    Host.CharacterSettings.EquipAucMasks.Add(collectionEquipAucMask);
+                }
 
                 foreach (var collectionLearnTalent in CollectionLearnTalents)
                 {
@@ -1639,72 +1916,100 @@ namespace WowAI.UI
                 }
 
                 foreach (var collectionAdvancedEquipStat in CollectionAdvancedEquipStats)
+                {
                     Host.CharacterSettings.AdvancedEquipStats.Add(collectionAdvancedEquipStat);
+                }
 
                 foreach (var collectionAdvancedEquipArmor in CollectionAdvancedEquipArmors)
+                {
                     Host.CharacterSettings.AdvancedEquipArmors.Add(collectionAdvancedEquipArmor);
+                }
 
                 foreach (var collectionAdvancedEquip in CollectionAdvancedEquipsWeapon)
+                {
                     Host.CharacterSettings.AdvancedEquipsWeapon.Add(collectionAdvancedEquip);
+                }
 
                 foreach (var learnSkill in CollectionLearnSkill)
+                {
                     Host.CharacterSettings.LearnSkill.Add(learnSkill);
-
+                }
 
                 foreach (var colectionEquipAuc in CollectionEquipAuc)
+                {
                     Host.CharacterSettings.EquipAucs.Add(colectionEquipAuc);
-
+                }
 
                 foreach (var collectionScriptSchedule in CollectionScriptSchedules)
+                {
                     Host.CharacterSettings.ScriptSchedules.Add(collectionScriptSchedule);
-
+                }
 
                 foreach (var collectionAukSettingse in CollectionAukSettingses)
+                {
                     Host.CharacterSettings.AukSettingses.Add(collectionAukSettingse);
-
+                }
 
                 foreach (var collectionGameObjectIgnore in CollectionGameObjectIgnores)
+                {
                     Host.CharacterSettings.GameObjectIgnores.Add(collectionGameObjectIgnore);
+                }
 
                 foreach (var collectionItemGlobal in CollectionItemGlobals)
+                {
                     Host.CharacterSettings.MyItemGlobals.Add(collectionItemGlobal);
-
+                }
 
                 foreach (var collectionRegenItem in CollectionRegenItems)
+                {
                     Host.CharacterSettings.RegenItemses.Add(collectionRegenItem);
-
-
+                }
 
                 foreach (var collectionNpcForAction in CollectionNpcForActions)
+                {
                     Host.CharacterSettings.NpcForActionSettings.Add(collectionNpcForAction);
-
-
+                }
 
                 foreach (var collectionIgnoreQuests in CollectionIgnoreQuest)
+                {
                     Host.CharacterSettings.IgnoreQuests.Add(collectionIgnoreQuests);
+                }
 
                 foreach (var collectionPet in CollectionPetSettings)
+                {
                     Host.CharacterSettings.PetSettings.Add(collectionPet);
-
+                }
 
                 foreach (var collectionEvent in CollectionEventSettings)
+                {
                     Host.CharacterSettings.EventSettings.Add(collectionEvent);
-
+                }
 
                 foreach (var collectionInvItem in CollectionInvItems)
+                {
                     Host.CharacterSettings.ItemSettings.Add(collectionInvItem);
+                }
 
                 foreach (var collectionProp in CollectionProps)
+                {
                     Host.CharacterSettings.PropssSettings.Add(collectionProp);
+                }
 
                 foreach (var multiZone in CollectionMultiZone)
+                {
                     Host.CharacterSettings.MultiZones.Add(multiZone);
+                }
 
                 foreach (var collectionMobs in CollectionMobs)
+                {
                     Host.CharacterSettings.MobsSettings.Add(collectionMobs);
+                }
 
                 foreach (var r in CollectionActiveSkill)
+                {
                     Host.CharacterSettings.SkillSettings.Add(r);
+                }
+
                 Host.CommonModule.SetEquip();
             }
             catch (ThreadAbortException)
@@ -1717,12 +2022,15 @@ namespace WowAI.UI
         }
 
 
-        private void buttonAddSkill_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddSkill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (DataGridAllSkill.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 if (Convert.ToInt32(TextBoxMaxDist.Text) < 1)
                 {
                     // ReSharper disable once RedundantNameQualifier
@@ -1732,14 +2040,14 @@ namespace WowAI.UI
 
 
 
-                var path = DataGridAllSkill.SelectedItem as SkillTable;
                 var tempNotTargetEffect = Convert.ToInt32(TextBoxNotTargetEffect.Text);
                 var tempNotMeEffect = Convert.ToInt32(TextBoxNotMeEffect.Text);
                 var tempIsMeEffect = Convert.ToInt32(TextBoxIsMeEffect.Text);
 
                 var tempIsTargetEffect = Convert.ToInt32(TextBoxIsTargetEffect.Text);
 
-                if (path != null)
+                if (DataGridAllSkill.SelectedItem is SkillTable path)
+                {
                     CollectionActiveSkill.Add(new SkillSettings
                     {
                         Checked = true,
@@ -1779,6 +2087,7 @@ namespace WowAI.UI
                     }
 
                     );
+                }
                 //сброс настроек по умолчанию
                 ResetSettingSkillDefault();
                 GroupBoxSettingsSkill.Header = "Настройки";
@@ -1803,14 +2112,15 @@ namespace WowAI.UI
             try
             {
                 if (DataGridActiveSkill.SelectedIndex == -1)
+                {
                     return;
+                }
 
-                var skill = DataGridActiveSkill.SelectedItem as SkillSettings;
                 DataGridAllSkill.SelectedIndex = -1;
                 ButtonChangeSkill.IsEnabled = true;
                 ButtonDelSkill.IsEnabled = true;
                 ButtonAddSkill.IsEnabled = false;
-                if (skill != null)
+                if (DataGridActiveSkill.SelectedItem is SkillSettings skill)
                 {
                     var spell = Host.SpellManager.GetSpell(skill.Id);
                     GroupBoxSettingsSkill.Header = "Настройки " + skill.Name + "[" + skill.Id + "] " + spell?.DescriptionRu;
@@ -1915,7 +2225,10 @@ namespace WowAI.UI
             try
             {
                 if (Host.ClientType != EWoWClient.Classic)
+                {
                     return;
+                }
+
                 LabelTalent.Content = "AvailablePoints: " + Host.TalentTree.AvailablePoints + Environment.NewLine;
                 foreach (var characterSettingsLearnTalent in Host.CharacterSettings.LearnTalents)
                 {
@@ -1923,7 +2236,10 @@ namespace WowAI.UI
                     foreach (var talentSpell in Host.TalentTree.GetAllTalents())
                     {
                         if (talentSpell.ID != characterSettingsLearnTalent.Id)
+                        {
                             continue;
+                        }
+
                         LabelTalent.Content += talentSpell.GetCurrentRank() + "/" + talentSpell.GetMaxRank() + "  " + talentSpell.CanLearn() + Environment.NewLine;
                     }
                 }
@@ -1936,13 +2252,15 @@ namespace WowAI.UI
             }
         }
 
-        public void subItem1_Click(object sender, RoutedEventArgs e)
+        public void SubItem1_Click(object sender, RoutedEventArgs e)
         {
 
             try
             {
                 if (!IsToggleDone)
+                {
                     return;
+                }
 
                 IsToggleDone = false;
 
@@ -1970,24 +2288,36 @@ namespace WowAI.UI
                     {
                         /*  if (buff.Place == EItemPlace.Equipment)
                               continue;*/
+                        try
+                        {
+                            if (buff.SpellId == 0)
+                            {
+                                continue;
+                            }
+                            /*  var isbuff = false;
+     Host.log(buff.NameRu);
+     foreach (var effect in buff.GetEffectsData())
+     {
+         Host.log(effect.Effect + " " + effect.ApplyAuraName);
+         if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
+             isbuff = true;
+     }*/
 
-                        if (buff.SpellId == 0)
-                            continue;
-                        /*  var isbuff = false;
-                          Host.log(buff.NameRu);
-                          foreach (var effect in buff.GetEffectsData())
-                          {
-                              Host.log(effect.Effect + " " + effect.ApplyAuraName);
-                              if (effect.Effect == ESpellEffectName.APPLY_AURA && effect.ApplyAuraName == EAuraType.DUMMY)
-                                  isbuff = true;
-                          }*/
+                            /* if (!isbuff)
+                                 continue;*/
+                            var item = new BuffTable(buff.Name, buff.Id, buff.SpellId);
+                            if (CollectionAllBuff.Any(collectionInvItem => buff.Id == collectionInvItem.ItemId))
+                            {
+                                continue;
+                            }
 
-                        /* if (!isbuff)
-                             continue;*/
-                        var item = new BuffTable(buff.Name, buff.Id, buff.SpellId);
-                        if (CollectionAllBuff.Any(collectionInvItem => buff.Id == collectionInvItem.ItemId))
-                            continue;
-                        CollectionAllBuff.Add(item);
+                            CollectionAllBuff.Add(item);
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+
                     }
                     //  Host.log(CollectionAllBuff.Count + "  ");
 
@@ -1995,25 +2325,27 @@ namespace WowAI.UI
                     foreach (var skill in Host.SpellManager.GetSpells())
                     {
                         if (Host.NoShowSkill.Contains(skill.Id))
+                        {
                             continue;
+                        }
                         /*  if (skill.SkillLines.Contains(ESkillType.SKILL_MINING))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_HERBALISM))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_GLYPHS))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_SPECIALIZATIONS))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_COMPANIONS))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_GENERIC_DND))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_FISHING))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_MOUNTS))
-                              continue;
-                          if (skill.SkillLines.Contains(ESkillType.SKILL_FIRST_AID))
-                              continue;*/
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_HERBALISM))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_GLYPHS))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_ALL_SPECIALIZATIONS))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_COMPANIONS))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_GENERIC_DND))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_FISHING))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_MOUNTS))
+     continue;
+ if (skill.SkillLines.Contains(ESkillType.SKILL_FIRST_AID))
+     continue;*/
 
 
 
@@ -2023,7 +2355,10 @@ namespace WowAI.UI
 
                             uint level = 0;
                             if (Host.GameDB.SpellInfoEntries.ContainsKey(skill.Id))
+                            {
                                 level = Host.GameDB.SpellInfoEntries[skill.Id].SpellLevel;
+                            }
+
                             if (!skill.IsPassive())
                             {
                                 /* Host.log(skill.Name + " " + skill.Id + " " );
@@ -2042,6 +2377,83 @@ namespace WowAI.UI
                         }
 
                         MyGetTalent();
+                        var dictionaryMaskTypes = new Dictionary<EInventoryTypeMask, EInventoryType>()
+                        {
+                            {EInventoryTypeMask.Chest, EInventoryType.Chest},//Грудь
+                            {EInventoryTypeMask.Legs, EInventoryType.Legs},//Штаны
+                            {EInventoryTypeMask.Head, EInventoryType.Head},
+                            {EInventoryTypeMask.Shoulders, EInventoryType.Shoulders },
+                            //{EInventoryTypeMask.Body, EInventoryType.Body},//Рубашка
+                            {EInventoryTypeMask.Waist, EInventoryType.Waist},//Ремень
+                            {EInventoryTypeMask.Feet, EInventoryType.Feet},//сапоги
+                            {EInventoryTypeMask.Wrists, EInventoryType.Wrists},//Запястья
+                            {EInventoryTypeMask.Hands, EInventoryType.Hands},//руки
+                            {EInventoryTypeMask.Cloak, EInventoryType.Cloak},//Плащ
+                        };
+
+                        if (CollectionEquipAucMasks.Count == 0)
+                        {
+                            
+                            foreach (var dictionaryMaskType in dictionaryMaskTypes)
+                            {
+                                CollectionEquipAucMasks.Add(new EquipAucMask { CoefRange = 0, MaxPrice = 0, Mask = dictionaryMaskType.Key });
+                            }
+                        }
+
+                        foreach (var dictionaryMaskType in dictionaryMaskTypes)
+                        {
+                            if (CollectionEquipAucMasks.Any(i => i.Mask == dictionaryMaskType.Key))
+                                continue;
+                            CollectionEquipAucMasks.Add(new EquipAucMask { CoefRange = 0, MaxPrice = 0, Mask = dictionaryMaskType.Key });
+                        }
+
+                        if (CollectionEquipAucBags.Count == 0)
+                        {
+                            CollectionEquipAucBags.Add(new EquipAucBag
+                            {
+                                Class = EItemClass.Container,
+                                MaxBagSize = 16,
+                                MaxPrice = 0,
+                                Cell = 19
+                            });
+                            CollectionEquipAucBags.Add(new EquipAucBag
+                            {
+                                Class = EItemClass.Container,
+                                MaxBagSize = 16,
+                                MaxPrice = 0,
+                                Cell = 20
+                            });
+                            CollectionEquipAucBags.Add(new EquipAucBag
+                            {
+                                Class = EItemClass.Container,
+                                MaxBagSize = 16,
+                                MaxPrice = 0,
+                                Cell = 21
+                            });
+                            CollectionEquipAucBags.Add(new EquipAucBag
+                            {
+                                Class = EItemClass.Container,
+                                MaxBagSize = 16,
+                                MaxPrice = 0,
+                                Cell = 22
+                            });
+                        }
+                        else
+                        {
+                            foreach (var collectionEquipAucBag in CollectionEquipAucBags)
+                            {
+                                if (collectionEquipAucBag.Cell == 0)
+                                {
+                                    byte a = 19;
+                                    for (int i = 0; i < CollectionEquipAucBags.Count; i++)
+                                    {
+                                        CollectionEquipAucBags[i].Cell = a;
+                                        a++;
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
                 else
@@ -2055,7 +2467,7 @@ namespace WowAI.UI
                     // if (Main1.Width > 300 || Main1.Height > 400)
                     // {
                     Main1.Width = 300;
-                    Main1.Height = 510;
+                    Main1.Height = 440;
                     // }
 
                 }
@@ -2079,20 +2491,30 @@ namespace WowAI.UI
             {
                 var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
                 if (isReleaseVersion)
+                {
                     initDir = AssemblyDirectory + "\\Configs";
+                }
 
-                var openFileDialog = new System.Windows.Forms.OpenFileDialog
+                using (var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
                     InitialDirectory = initDir,// Host.AssemblyDirectory + "\\Configs",
                     Filter = @"json files (*.json)|*.json|All files|*.*",
                     RestoreDirectory = true
-                };
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-                if (Path.GetExtension(openFileDialog.FileName) != ".json")
-                    return;
-                Host.CfgName = openFileDialog.FileName;
-                Host.FileName = openFileDialog.SafeFileName;
+                })
+                {
+                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    if (Path.GetExtension(openFileDialog.FileName) != ".json")
+                    {
+                        return;
+                    }
+
+                    Host.CfgName = openFileDialog.FileName;
+                    Host.FileName = openFileDialog.SafeFileName;
+                }
                 // CharacterSettings characterSettings;
                 Host.CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(Host.CfgName, typeof(CharacterSettings), Host.CharacterSettings);
 
@@ -2114,51 +2536,57 @@ namespace WowAI.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void buttonSaveSet_Click(object sender, RoutedEventArgs e)
+        private void ButtonSaveSet_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
                 if (isReleaseVersion)
+                {
                     initDir = AssemblyDirectory + "\\Configs";
+                }
 
-                var saveFileDialog = new System.Windows.Forms.SaveFileDialog
+                using (var saveFileDialog = new System.Windows.Forms.SaveFileDialog
                 {
                     InitialDirectory = initDir,//Host.AssemblyDirectory + "\\Configs",
                     Filter = @"json files (*.json)|*.json|All files|*.*",
                     FileName = Host.Me.Name + "[" + Host.GetCurrentAccount().ServerName + "]"
-                };
-                if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-
-                SettingsNeedSave = false;
-                CreateNewSettings();
-                Host.CfgName = saveFileDialog.FileName;
-                Host.FileName = Path.GetFileName(saveFileDialog.FileName);
-                // var writer = new XmlSerializer(typeof(CharacterSettings));
-
-                /*   using (var fs = File.Open(Host.CfgName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
-                   {
-                       writer.Serialize(fs, Host.CharacterSettings);
-
-
-                   }*/
-                //  Host.log(Host.CharacterSettings.PropssSettings.Count + "  Save");
-                ConfigLoader.SaveConfig(Host.CfgName, Host.CharacterSettings);
-                //  Host.log(Host.CharacterSettings.PropssSettings.Count + "  Save 2");
-                _doc = new XmlDocument();
-                try
+                })
                 {
-                    // _doc.Load(Host.CfgName);
-                }
-                catch
-                {
-                    SettingsNeedSave = true;
+                    if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
 
-                    return;
+                    SettingsNeedSave = false;
+                    CreateNewSettings();
+                    Host.CfgName = saveFileDialog.FileName;
+                    Host.FileName = Path.GetFileName(saveFileDialog.FileName);
+                    // var writer = new XmlSerializer(typeof(CharacterSettings));
+
+                    /*   using (var fs = File.Open(Host.CfgName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                       {
+                           writer.Serialize(fs, Host.CharacterSettings);
+
+
+                       }*/
+                    //  Host.log(Host.CharacterSettings.PropssSettings.Count + "  Save");
+                    ConfigLoader.SaveConfig(Host.CfgName, Host.CharacterSettings);
+                    //  Host.log(Host.CharacterSettings.PropssSettings.Count + "  Save 2");
+                    _doc = new XmlDocument();
+                    try
+                    {
+                        // _doc.Load(Host.CfgName);
+                    }
+                    catch
+                    {
+                        SettingsNeedSave = true;
+                        return;
+                    }
+                    NeedApplySettings = true;
+                    SettingsNeedSave = false;
+
                 }
-                NeedApplySettings = true;
-                SettingsNeedSave = false;
             }
             catch (Exception exception)
             {
@@ -2175,21 +2603,22 @@ namespace WowAI.UI
         {
             try
             {
-
                 if (DataGridActiveSkill.SelectedIndex == -1)
+                {
                     return;
+                }
 
                 var tempNotTargetEffect = Convert.ToInt32(TextBoxNotTargetEffect.Text);
                 var tempNotMeEffect = Convert.ToInt32(TextBoxNotMeEffect.Text);
                 var tempIsMeEffect = Convert.ToInt32(TextBoxIsMeEffect.Text);
                 var tempIsTargetEffect = Convert.ToInt32(TextBoxIsTargetEffect.Text);
 
-                var activeskill = DataGridActiveSkill.SelectedItem as SkillSettings;
-                if (activeskill != null)
+                if (DataGridActiveSkill.SelectedItem is SkillSettings activeskill)
                 {
                     for (var i = 0; i < CollectionActiveSkill.Count; i++)
                     {
                         if (CollectionActiveSkill[i] == activeskill)
+                        {
                             CollectionActiveSkill[i] = new SkillSettings
                             {
                                 Checked = true,
@@ -2227,6 +2656,7 @@ namespace WowAI.UI
                                 PetMaxHp = Convert.ToInt32(TextBoxPetMaxHp.Text),
                                 NotTargetId = Convert.ToInt32(TextBoxNotTargetId.Text)
                             };
+                        }
                     }
                 }
                 GroupBoxSettingsSkill.Header = "Настройки";
@@ -2258,7 +2688,10 @@ namespace WowAI.UI
                             if (Host.GameDB.QuestTemplates.ContainsKey(dungeonCoordSetting.QuestId))
                             {
                                 if (dungeonCoordSetting.QuestName == "")
+                                {
                                     name = Host.GameDB.QuestTemplates[dungeonCoordSetting.QuestId].LogTitle;
+                                }
+
                                 minLevel = Host.GameDB.QuestTemplates[dungeonCoordSetting.QuestId].MinLevel;
                                 level = Host.GameDB.QuestTemplates[dungeonCoordSetting.QuestId].QuestLevel;
                             }
@@ -2319,7 +2752,8 @@ namespace WowAI.UI
                                 SkillId = dungeonCoordSetting.SkillId,
                                 PluginPath = dungeonCoordSetting.PluginPath,
                                 QuestId = dungeonCoordSetting.QuestId,
-                                QuestAction = dungeonCoordSetting.QuestAction
+                                QuestAction = dungeonCoordSetting.QuestAction,
+                                Index = dungeonCoordSetting.Index
                             });
                         }
                     }
@@ -2346,11 +2780,16 @@ namespace WowAI.UI
                 {
                     try
                     {
+                        CheckBoxApplyMail.IsChecked = Host.CharacterSettings.ApplyMail;
+                        CheckBoxLearnSpell.IsChecked = Host.CharacterSettings.LearnSpell;
                         LabelProfile.Content = Host.FileName;
+                        TextBoxStopEquipAucMinGold.Text = Host.CharacterSettings.StopEquipAucMinGold.ToString();
                         //Настройки
+                        TextBoxStopEquipArmorCoef.Text = Host.CharacterSettings.EquipArmorCoef.ToString();
                         CheckBoxLearnAllSpell.IsChecked = Host.CharacterSettings.LearnAllSpell;
                         CheckBoxCheckRepairInCity.IsChecked = Host.CharacterSettings.CheckRepairInCity;
                         //Общее
+                        CheckBoxLearnPetSpell.IsChecked = Host.CharacterSettings.LearnPetSpell;
                         CheckBoxCraftConjured.IsChecked = Host.CharacterSettings.CraftConjured;
                         TextBoxCraftConjuredHp.Text = Host.CharacterSettings.CraftConjuredHp.ToString();
                         TextBoxCraftConjuredMp.Text = Host.CharacterSettings.CraftConjuredMp.ToString();
@@ -2401,22 +2840,45 @@ namespace WowAI.UI
                         TextBoxStopQuestingLevel.Text = Host.CharacterSettings.StopQuestingLevel.ToString();
                         CheckBoxAlternateAuk.IsChecked = Host.CharacterSettings.AlternateAuk;
                         if (Host.CharacterSettings.FormForFight == "Не использовать")
+                        {
                             ComboBoxFormForFight.SelectedIndex = 0;
+                        }
+
                         if (Host.CharacterSettings.FormForFight == "Облик медведя")
+                        {
                             ComboBoxFormForFight.SelectedIndex = 1;
+                        }
+
                         if (Host.CharacterSettings.FormForFight == "Облик кошки")
+                        {
                             ComboBoxFormForFight.SelectedIndex = 2;
+                        }
+
                         if (Host.CharacterSettings.FormForFight == "Облик лунного совуха")
+                        {
                             ComboBoxFormForFight.SelectedIndex = 3;
+                        }
 
                         if (Host.CharacterSettings.FormForMove == "Не использовать")
+                        {
                             ComboBoxFormForMove.SelectedIndex = 0;
+                        }
+
                         if (Host.CharacterSettings.FormForMove == "Облик медведя")
+                        {
                             ComboBoxFormForMove.SelectedIndex = 1;
+                        }
+
                         if (Host.CharacterSettings.FormForMove == "Облик кошки")
+                        {
                             ComboBoxFormForMove.SelectedIndex = 2;
+                        }
+
                         if (Host.CharacterSettings.FormForMove == "Походный облик")
+                        {
                             ComboBoxFormForMove.SelectedIndex = 3;
+                        }
+
                         ComboBoxAukTimeClassic.SelectedIndex = Host.CharacterSettings.AukTimeClassic;
                         CheckBoxKillMobsFirst.IsChecked = Host.CharacterSettings.KillMobFirst;
                         ComboBoxAukTime.SelectedIndex = Host.CharacterSettings.AukTime;
@@ -2529,18 +2991,34 @@ namespace WowAI.UI
 
 
                         if (Host.CharacterSettings.Mode == Mode.Questing)
+                        {
                             ComboBoxSwitchMode.SelectedIndex = 0;
-                        if (Host.CharacterSettings.Mode == Mode.FarmMob)
-                            ComboBoxSwitchMode.SelectedIndex = 1;
-                        if (Host.CharacterSettings.Mode == Mode.FarmResource)
-                            ComboBoxSwitchMode.SelectedIndex = 2;
-                        if (Host.CharacterSettings.Mode == Mode.Script)
-                            ComboBoxSwitchMode.SelectedIndex = 3;
-                        if (Host.CharacterSettings.Mode == Mode.OnlyAttack)
-                            ComboBoxSwitchMode.SelectedIndex = 4;
-                        if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
-                            ComboBoxSwitchMode.SelectedIndex = 5;
+                        }
 
+                        if (Host.CharacterSettings.Mode == Mode.FarmMob)
+                        {
+                            ComboBoxSwitchMode.SelectedIndex = 1;
+                        }
+
+                        if (Host.CharacterSettings.Mode == Mode.FarmResource)
+                        {
+                            ComboBoxSwitchMode.SelectedIndex = 2;
+                        }
+
+                        if (Host.CharacterSettings.Mode == Mode.Script)
+                        {
+                            ComboBoxSwitchMode.SelectedIndex = 3;
+                        }
+
+                        if (Host.CharacterSettings.Mode == Mode.OnlyAttack)
+                        {
+                            ComboBoxSwitchMode.SelectedIndex = 4;
+                        }
+
+                        if (Host.CharacterSettings.Mode == Mode.QuestingClassic)
+                        {
+                            ComboBoxSwitchMode.SelectedIndex = 5;
+                        }
 
                         ComboBoxAdvancedEquipQuality.Items.Clear();
 
@@ -2548,14 +3026,18 @@ namespace WowAI.UI
                         {
                             //  Host.log(value.ToString());
                             if (!ComboBoxAdvancedEquipQuality.Items.Contains(value.ToString()))
+                            {
                                 ComboBoxAdvancedEquipQuality.Items.Add(value.ToString());
+                            }
                         }
 
 
                         foreach (var item in ComboBoxAdvancedEquipQuality.Items)
                         {
                             if (item.ToString() == Host.CharacterSettings.MaxItemQuality.ToString())
+                            {
                                 ComboBoxAdvancedEquipQuality.SelectedItem = item;
+                            }
                         }
 
 
@@ -2630,6 +3112,23 @@ namespace WowAI.UI
                         CollectionAdvancedEquipArmors.RemoveAll();
                         CollectionAdvancedEquipStats.RemoveAll();
                         CollectionLearnTalents.RemoveAll();
+                        CollectionEquipAucMasks.RemoveAll();
+                        CollectionEquipAucBags.RemoveAll();
+                        CollectionTaxyNodeSettingses.RemoveAll();
+
+                        foreach (var characterSettingsTaxyNodeSettingse in Host.CharacterSettings.TaxyNodeSettingses)
+                        {
+                            CollectionTaxyNodeSettingses.Add(characterSettingsTaxyNodeSettingse);
+                        }
+
+                        foreach (var characterSettingsEquipAucBag in Host.CharacterSettings.EquipAucBags)
+                        {
+                            CollectionEquipAucBags.Add(characterSettingsEquipAucBag);
+                        }
+                        foreach (var characterSettingsEquipAucMask in Host.CharacterSettings.EquipAucMasks)
+                        {
+                            CollectionEquipAucMasks.Add(characterSettingsEquipAucMask);
+                        }
 
                         foreach (var characterSettingsLearnTalent in Host.CharacterSettings.LearnTalents)
                         {
@@ -2642,58 +3141,95 @@ namespace WowAI.UI
                         }
 
                         foreach (var characterSettingsAdvancedEquipArmor in Host.CharacterSettings.AdvancedEquipArmors)
+                        {
                             CollectionAdvancedEquipArmors.Add(characterSettingsAdvancedEquipArmor);
+                        }
 
                         foreach (var characterSettingsAdvancedEquip in Host.CharacterSettings.AdvancedEquipsWeapon)
+                        {
                             CollectionAdvancedEquipsWeapon.Add(characterSettingsAdvancedEquip);
+                        }
 
                         foreach (var learnSkill in Host.CharacterSettings.LearnSkill)
+                        {
                             CollectionLearnSkill.Add(learnSkill);
+                        }
 
                         foreach (var characterSettingsEquipAuc in Host.CharacterSettings.EquipAucs)
+                        {
                             CollectionEquipAuc.Add(characterSettingsEquipAuc);
+                        }
 
                         foreach (var characterSettingsScriptSchedule in Host.CharacterSettings.ScriptSchedules)
+                        {
                             CollectionScriptSchedules.Add(characterSettingsScriptSchedule);
+                        }
 
                         foreach (var characterSettingsAukSettingse in Host.CharacterSettings.AukSettingses)
+                        {
                             CollectionAukSettingses.Add(characterSettingsAukSettingse);
+                        }
 
                         foreach (var characterSettingsGameObjectIgnore in Host.CharacterSettings.GameObjectIgnores)
+                        {
                             CollectionGameObjectIgnores.Add(characterSettingsGameObjectIgnore);
+                        }
 
                         foreach (var characterSettingsMyItemGlobal in Host.CharacterSettings.MyItemGlobals)
+                        {
                             CollectionItemGlobals.Add(characterSettingsMyItemGlobal);
+                        }
 
                         foreach (var characterSettingsRegenItemse in Host.CharacterSettings.RegenItemses)
+                        {
                             CollectionRegenItems.Add(characterSettingsRegenItemse);
+                        }
 
                         foreach (var characterSettingsNpcForActionSetting in Host.CharacterSettings.NpcForActionSettings)
+                        {
                             CollectionNpcForActions.Add(characterSettingsNpcForActionSetting);
+                        }
 
                         foreach (var ignoreQuestsSettingse in Host.CharacterSettings.IgnoreQuests)
+                        {
                             CollectionIgnoreQuest.Add(ignoreQuestsSettingse);
+                        }
 
                         foreach (var petSettingse in Host.CharacterSettings.PetSettings)
+                        {
                             CollectionPetSettings.Add(petSettingse);
+                        }
 
                         foreach (var characterSettingsEventSetting in Host.CharacterSettings.EventSettings)
+                        {
                             CollectionEventSettings.Add(characterSettingsEventSetting);
+                        }
 
                         foreach (var characterSettingsMultiZone in Host.CharacterSettings.MultiZones)
+                        {
                             CollectionMultiZone.Add(characterSettingsMultiZone);
+                        }
 
                         foreach (var mobsSettingse in Host.CharacterSettings.MobsSettings)
+                        {
                             CollectionMobs.Add(mobsSettingse);
+                        }
 
                         foreach (var propSettingse in Host.CharacterSettings.PropssSettings)
+                        {
                             CollectionProps.Add(propSettingse);
+                        }
 
                         foreach (var itemSettingse in Host.CharacterSettings.ItemSettings)
+                        {
                             CollectionInvItems.Add(itemSettingse);
+                        }
 
                         foreach (var i in Host.CharacterSettings.SkillSettings)
+                        {
                             CollectionActiveSkill.Add(i);
+                        }
+
                         Host.CommonModule?.SetEquip();
                     }
                     catch (Exception err)
@@ -2713,7 +3249,7 @@ namespace WowAI.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void buttonDelSkill_Click(object sender, RoutedEventArgs e)
+        private void ButtonDelSkill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -2735,7 +3271,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonGatherLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonGatherLocFill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -2759,13 +3295,14 @@ namespace WowAI.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxInvItems.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempId = Convert.ToUInt32(GetSkillIdFromCombobox(ComboBoxInvItems.Text));
 
@@ -2782,13 +3319,17 @@ namespace WowAI.UI
                 foreach (var i in Host.ItemManager.GetItems())
                 {
                     if (i.Id != tempId)
+                    {
                         continue;
+                    }
+
                     item = i;
 
                 }
                 if (item == null)
+                {
                     return;
-
+                }
 
                 CollectionInvItems.Add(new ItemSettings
                 {
@@ -2818,7 +3359,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonAddAllInvItems_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddAllInvItems_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -2832,7 +3373,9 @@ namespace WowAI.UI
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (CollectionInvItems.Any(collectionInvItem => item.Id == collectionInvItem.Id))
+                    {
                         continue;
+                    }
 
                     CollectionInvItems.Add(new ItemSettings
                     {
@@ -2855,23 +3398,30 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxMobs_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxMobs_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxMobs.Items.Clear();
                 if (Host.Me == null)
+                {
                     return;
+                }
+
                 foreach (var creature in Host.GetEntities<Unit>())
                 {
                     /* if (creature.Type != EBotTypes.Unit)
                          continue;*/
                     if (!Host.CanAttack(creature, Host.CanSpellAttack))
+                    {
                         continue;
+                    }
                     /*  if (!Host.CachedDbNpcInfos.ContainsKey(creature.Id))
-                         continue;*/
+    continue;*/
                     if (!ComboBoxMobs.Items.Contains("[" + creature.Id + "]" + creature.Name))
+                    {
                         ComboBoxMobs.Items.Add("[" + creature.Id + "]" + creature.Name);
+                    }
                 }
 
             }
@@ -2890,27 +3440,36 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxMobs.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempId = Convert.ToUInt32(GetSkillIdFromCombobox(ComboBoxMobs.Text));
 
 
 
                 if (CollectionMobs.Any(collectionMobs => tempId == collectionMobs.Id))
+                {
                     return;
+                }
 
                 Unit creature = null;
                 foreach (var obj in Host.GetEntities<Unit>())
                 {
                     if (obj.Id != tempId)
+                    {
                         continue;
+                    }
+
                     creature = obj;
                     break;
                 }
 
                 if (creature == null)
+                {
                     return;
+                }
+
                 CollectionMobs.Add(new MobsSettings
                 {
                     Id = tempId,
@@ -2929,7 +3488,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonAddAllMobs_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddAllMobs_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -2937,11 +3496,15 @@ namespace WowAI.UI
                 {
 
                     if (!Host.CanAttack(creature, Host.CanSpellAttack))
+                    {
                         continue;
+                    }
                     /*if (!Host.CachedDbNpcInfos.ContainsKey(creature.Id))
-                        continue;*/
+   continue;*/
                     if (CollectionMobs.Any(collectionMobs => creature.Id == collectionMobs.Id))
+                    {
                         continue;
+                    }
 
                     CollectionMobs.Add(new MobsSettings
                     {
@@ -2961,26 +3524,39 @@ namespace WowAI.UI
         }
 
 
-        private void button2_Click(object sender, RoutedEventArgs e)
+        private void Button2_Click(object sender, RoutedEventArgs e)
         {
 
             try
             {
                 if (ComboBoxDungeonAction.SelectedIndex < 1)
+                {
                     return;
+                }
 
                 var mobId = 0;
                 var propId = 0;
                 var itemId = 0;
                 var skillId = 0;
                 if (ComboBoxDungeonMob.SelectedIndex > 0)
+                {
                     mobId = GetSkillIdFromCombobox(ComboBoxDungeonMob.Text);
+                }
+
                 if (ComboBoxDungeonProp.SelectedIndex > 0)
+                {
                     propId = GetSkillIdFromCombobox(ComboBoxDungeonProp.Text);
+                }
+
                 if (ComboBoxDungeonItem.SelectedIndex > 0)
+                {
                     itemId = GetSkillIdFromCombobox(ComboBoxDungeonItem.Text);
+                }
+
                 if (ComboBoxDungeonSkill.SelectedIndex > 0)
+                {
                     skillId = GetSkillIdFromCombobox(ComboBoxDungeonSkill.Text);
+                }
 
                 /*   if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
                        ComboBoxDungeonAction.SelectedIndex == 6)*/
@@ -2988,19 +3564,21 @@ namespace WowAI.UI
 
                 QuestAction tempQuestAction = QuestAction.Apply;
                 if (ComboBoxDungeonQuestAction.SelectedIndex == 2)
+                {
                     tempQuestAction = QuestAction.Run;
+                }
+
                 if (ComboBoxDungeonQuestAction.SelectedIndex == 3)
+                {
                     tempQuestAction = QuestAction.Complete;
-
-
-
+                }
 
                 CollectionDungeonCoord.Add(new DungeonCoordSettings
                 {
                     Id = CollectionDungeonCoord.Count,
                     Action = ComboBoxDungeonAction.Text,
                     Loc = tempLoc,
-                    MobId = mobId,
+                    MobId = Convert.ToUInt32(mobId),
                     PropId = Convert.ToUInt32(propId),
                     Attack = CheckBoxAttackMobs.IsChecked != null && CheckBoxAttackMobs.IsChecked.Value,
                     MapId = Convert.ToInt32(TextBoxDungeonLocMapId.Text),
@@ -3011,7 +3589,8 @@ namespace WowAI.UI
                     PluginPath = ComboBoxDungeonPlugin.SelectedItem.ToString(),
                     QuestId = Convert.ToUInt32(TextBoxDungeonQuestId.Text),
                     QuestAction = tempQuestAction,
-                    Com = TextBoxDungeonCom.Text
+                    Com = TextBoxDungeonCom.Text,
+                    Index = Convert.ToInt32(TextBoxDungeonQuestIndex.Text)
                 });
 
                 ComboBoxDungeonMob.SelectedIndex = 0;
@@ -3027,13 +3606,27 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxDungeonMob_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonMob_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxDungeonMob.Items.Clear();
                 ComboBoxDungeonMob.Items.Add("Не выбрано");
-
+                foreach (var creature in Host.GetEntities<Unit>())
+                {
+                    /* if (creature.Type != EBotTypes.Unit)
+                         continue;*/
+                    if (!Host.CanAttack(creature, Host.CanSpellAttack))
+                    {
+                        continue;
+                    }
+                    /*  if (!Host.CachedDbNpcInfos.ContainsKey(creature.Id))
+    continue;*/
+                    if (!ComboBoxDungeonMob.Items.Contains("[" + creature.Id + "]" + creature.Name))
+                    {
+                        ComboBoxDungeonMob.Items.Add("[" + creature.Id + "]" + creature.Name);
+                    }
+                }
 
 
             }
@@ -3047,21 +3640,24 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxDungeonMob2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonMob2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxDungeonProp.Items.Clear();
                 ComboBoxDungeonProp.Items.Add("Не выбрано");
                 if (Host.Me == null)
+                {
                     return;
-
+                }
 
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
 
                     if (!ComboBoxDungeonProp.Items.Contains("[" + prop.Id + "]" + prop.Name))
+                    {
                         ComboBoxDungeonProp.Items.Add("[" + prop.Id + "]" + prop.Name);
+                    }
                 }
 
             }
@@ -3077,57 +3673,62 @@ namespace WowAI.UI
 
 
 
-        private void ComboBoxDungeonAction_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
+        /* private void ComboBoxDungeonAction_SelectionChanged(object sender, SelectionChangedEventArgs e)
+         {
 
-            if (CheckBoxAttackMobs == null)
-                return;
+             if (CheckBoxAttackMobs == null)
+                 return;
 
-            CheckBoxAttackMobs.Visibility = Visibility.Hidden;
-            StackPanelDungeonMob.Visibility = Visibility.Hidden;
-            StackPanelDungeonProp.Visibility = Visibility.Hidden;
+             CheckBoxAttackMobs.Visibility = Visibility.Hidden;
+             StackPanelDungeonMob.Visibility = Visibility.Hidden;
+             StackPanelDungeonProp.Visibility = Visibility.Hidden;
 
-            StackPanelDungeonItem.Visibility = Visibility.Hidden;
+             StackPanelDungeonItem.Visibility = Visibility.Hidden;
 
 
 
-            if (ComboBoxDungeonAction.SelectedIndex == 3)
-            {
-                CheckBoxAttackMobs.Visibility = Visibility.Visible;
-                StackPanelDungeonItem.Visibility = Visibility.Visible;
+             if (ComboBoxDungeonAction.SelectedIndex == 3)
+             {
+                 CheckBoxAttackMobs.Visibility = Visibility.Visible;
+                 StackPanelDungeonItem.Visibility = Visibility.Visible;
 
-            }
+             }
 
-            if (ComboBoxDungeonAction.SelectedIndex == 4)
-            {
-                StackPanelDungeonMob.Visibility = Visibility.Visible;
-                StackPanelDungeonItem.Visibility = Visibility.Visible;
+             if (ComboBoxDungeonAction.SelectedIndex == 4)
+             {
+                 StackPanelDungeonMob.Visibility = Visibility.Visible;
+                 StackPanelDungeonItem.Visibility = Visibility.Visible;
 
-            }
+             }
 
-            if (ComboBoxDungeonAction.SelectedIndex == 6)
-            {
-                StackPanelDungeonProp.Visibility = Visibility.Visible;
-                StackPanelDungeonItem.Visibility = Visibility.Visible;
+             if (ComboBoxDungeonAction.SelectedIndex == 6)
+             {
+                 StackPanelDungeonProp.Visibility = Visibility.Visible;
+                 StackPanelDungeonItem.Visibility = Visibility.Visible;
 
-            }
+             }
 
-            if (ComboBoxDungeonAction.SelectedIndex == 1 || ComboBoxDungeonAction.SelectedIndex == 2)
-            {
+             if (ComboBoxDungeonAction.SelectedIndex == 1 || ComboBoxDungeonAction.SelectedIndex == 2)
+             {
 
-                StackPanelDungeonItem.Visibility = Visibility.Visible;
+                 StackPanelDungeonItem.Visibility = Visibility.Visible;
 
-            }
-        }
+             }
+         }*/
 
-        private void buttonDungeonEdit_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonEdit_Click(object sender, RoutedEventArgs e)
         {
             if (DataGridScript.SelectedIndex == -1)
+            {
                 return;
+            }
+
             if (ComboBoxDungeonAction.SelectedIndex < 1)
+            {
                 return;
-            var dungeon = DataGridScript.SelectedItem as DungeonCoordSettings;
-            if (dungeon != null)
+            }
+
+            if (DataGridScript.SelectedItem is DungeonCoordSettings dungeon)
             {
                 for (var i = 0; i < CollectionDungeonCoord.Count; i++)
                 {
@@ -3140,32 +3741,49 @@ namespace WowAI.UI
                         var itemId = 0;
                         var skillId = 0;
                         if (ComboBoxDungeonSkill.SelectedIndex > 0)
+                        {
                             skillId = GetSkillIdFromCombobox(ComboBoxDungeonSkill.Text);
+                        }
 
                         if (ComboBoxDungeonMob.SelectedIndex > 0)
+                        {
                             mobId = GetSkillIdFromCombobox(ComboBoxDungeonMob.Text);
+                        }
+
                         if (ComboBoxDungeonProp.SelectedIndex > 0)
+                        {
                             propId = GetSkillIdFromCombobox(ComboBoxDungeonProp.Text);
+                        }
+
                         if (ComboBoxDungeonItem.SelectedIndex > 0)
+                        {
                             itemId = GetSkillIdFromCombobox(ComboBoxDungeonItem.Text);
+                        }
 
                         var tempLoc = new Vector3F();
                         if (ComboBoxDungeonAction.SelectedIndex == 3 || ComboBoxDungeonAction.SelectedIndex == 4 ||
                             ComboBoxDungeonAction.SelectedIndex == 6)
+                        {
                             tempLoc = Host.Me.Location;
+                        }
 
                         QuestAction tempQuestAction = QuestAction.Apply;
                         if (ComboBoxDungeonQuestAction.SelectedIndex == 2)
+                        {
                             tempQuestAction = QuestAction.Run;
+                        }
+
                         if (ComboBoxDungeonQuestAction.SelectedIndex == 3)
+                        {
                             tempQuestAction = QuestAction.Complete;
+                        }
 
                         CollectionDungeonCoord[i] = new DungeonCoordSettings
                         {
                             Id = i,
                             Action = ComboBoxDungeonAction.Text,
                             Loc = tempLoc,
-                            MobId = mobId,
+                            MobId = Convert.ToUInt32(mobId),
                             PropId = Convert.ToUInt32(propId),
                             Attack = CheckBoxAttackMobs.IsChecked != null && CheckBoxAttackMobs.IsChecked.Value,
                             Pause = Convert.ToInt32(TextBoxScriptPause.Text),
@@ -3189,7 +3807,7 @@ namespace WowAI.UI
 
         }
 
-        private void comboBoxDungeonItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -3218,46 +3836,51 @@ namespace WowAI.UI
         }
 
 
-        private void buttonDungeonSaveScript_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonSaveScript_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var saveFileDialog = new System.Windows.Forms.SaveFileDialog
+                using (var saveFileDialog = new System.Windows.Forms.SaveFileDialog
                 {
                     InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\",
                     Filter = @"xml files (*.xml)|*.xml|All files|*.*",
                     FileName = ""
-                };
-                if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-
-                SettingsNeedSave = false;
-                CreateNewDungeonSettings();
-                Host.ScriptName = saveFileDialog.FileName;
-
-
-
-                var writer = new XmlSerializer(typeof(DungeonSetting));
-
-                using (var fs = File.Open(Host.ScriptName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                })
                 {
-                    writer.Serialize(fs, Host.DungeonSettings);
+                    if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
 
+                    SettingsNeedSave = false;
+                    CreateNewDungeonSettings();
+                    Host.ScriptName = saveFileDialog.FileName;
+
+
+
+                    var writer = new XmlSerializer(typeof(DungeonSetting));
+
+                    using (var fs = File.Open(Host.ScriptName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                    {
+                        writer.Serialize(fs, Host.DungeonSettings);
+
+
+                    }
+
+                    _doc = new XmlDocument();
+                    try
+                    {
+                        _doc.Load(Host.ScriptName);
+                    }
+                    catch
+                    {
+                        SettingsNeedSave = true;
+                        return;
+                    }
+                    NeedApplyDungeonSettings = true;
+                    SettingsNeedSave = false;
 
                 }
-
-                _doc = new XmlDocument();
-                try
-                {
-                    _doc.Load(Host.ScriptName);
-                }
-                catch
-                {
-                    SettingsNeedSave = true;
-                    return;
-                }
-                NeedApplyDungeonSettings = true;
-                SettingsNeedSave = false;
             }
             catch (Exception exception)
             {
@@ -3266,7 +3889,7 @@ namespace WowAI.UI
         }
 
 
-        private void buttonDungeonLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonLocFill_Click(object sender, RoutedEventArgs e)
         {
             TextBoxDungeonLocX.Text = Host.Me.Location.X.ToString();
             TextBoxDungeonLocY.Text = Host.Me.Location.Y.ToString();
@@ -3281,7 +3904,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridScript.SelectedIndex < 1)
+                {
                     return;
+                }
 
                 //  while (Mouse.LeftButton == MouseButtonState.Pressed)
                 //  {
@@ -3306,10 +3931,15 @@ namespace WowAI.UI
             try
             {
                 if (DataGridScript.SelectedIndex == -1)
+                {
                     return;
+                }
 
                 if (DataGridScript.SelectedIndex > CollectionDungeonCoord.Count - 2)
+                {
                     return;
+                }
+
                 var index = DataGridScript.SelectedIndex;
                 var buf = CollectionDungeonCoord[index];
                 CollectionDungeonCoord[index] = CollectionDungeonCoord[index + 1];
@@ -3322,48 +3952,92 @@ namespace WowAI.UI
             }
         }
 
-        private void button2_Click_1(object sender, RoutedEventArgs e)
+        private void Button2_Click_1(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxEventType.SelectedIndex == -1 || ComboBoxEventAction.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 var action = EventsAction.NotSellected;
                 var type = EventsType.NotSellected;
 
                 if (ComboBoxEventAction.SelectedIndex == 0)
+                {
                     action = EventsAction.Log;
+                }
+
                 if (ComboBoxEventAction.SelectedIndex == 1)
+                {
                     action = EventsAction.ExitGame;
+                }
+
                 if (ComboBoxEventAction.SelectedIndex == 2)
+                {
                     action = EventsAction.PlaySound;
+                }
+
                 if (ComboBoxEventAction.SelectedIndex == 3)
+                {
                     action = EventsAction.Pause;
+                }
+
                 if (ComboBoxEventAction.SelectedIndex == 4)
+                {
                     action = EventsAction.ShowGameClient;
+                }
+
                 if (ComboBoxEventAction.SelectedIndex == 5)
+                {
                     action = EventsAction.ShowQuester;
+                }
 
                 if (ComboBoxEventType.SelectedIndex == 0)
+                {
                     type = EventsType.Inactivity;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 1)
+                {
                     type = EventsType.Death;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 2)
+                {
                     type = EventsType.DeathPlayer;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 3)
+                {
                     type = EventsType.ChatMessage;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 4)
+                {
                     type = EventsType.Gm;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 5)
+                {
                     type = EventsType.AttackPlayer;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 6)
+                {
                     type = EventsType.PartyInvite;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 7)
+                {
                     type = EventsType.ClanInvite;
+                }
+
                 if (ComboBoxEventType.SelectedIndex == 8)
+                {
                     type = EventsType.GmServer;
-
-
+                }
 
                 CollectionEventSettings.Add(new EventSettings
                 {
@@ -3382,7 +4056,7 @@ namespace WowAI.UI
 
 
 
-        private void comboBoxInvItems1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxInvItems1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -3390,25 +4064,36 @@ namespace WowAI.UI
                 ComboBoxInvItems1.Items.Clear();
 
                 if (Host.Me == null)
+                {
                     return;
+                }
 
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (!item.IsSoulBound)
+                    {
                         continue;
+                    }
+
                     if (Host.GameDB.SpellInfoEntries.ContainsKey(item.SpellId))
                     {
                         var spellDb = Host.GameDB.SpellInfoEntries[item.SpellId];
                         if (spellDb.Effects != null)
+                        {
                             foreach (var spellDbEffect in spellDb.Effects)
                             {
                                 if (spellDbEffect.Value != null)
+                                {
                                     foreach (var spellEffectInfo in spellDbEffect.Value)
                                     {
                                         if (spellEffectInfo?.ApplyAuraName == EAuraType.MOUNTED)
+                                        {
                                             ComboBoxInvItems1.Items.Add("[" + item.Id + "]" + item.Name);
+                                        }
                                     }
+                                }
                             }
+                        }
                     }
                 }
 
@@ -3418,19 +4103,27 @@ namespace WowAI.UI
                     {
                         var spellDb = Host.GameDB.SpellInfoEntries[item.Id];
                         if (spellDb.Effects != null)
+                        {
                             foreach (var spellDbEffect in spellDb.Effects)
                             {
                                 if (spellDbEffect.Value != null)
+                                {
                                     foreach (var spellEffectInfo in spellDbEffect.Value)
                                     {
                                         if (spellEffectInfo?.ApplyAuraName == EAuraType.MOUNTED)
+                                        {
                                             ComboBoxInvItems1.Items.Add("[" + item.Id + "]" + item.Name);
+                                        }
                                     }
+                                }
                             }
+                        }
                     }
 
                     if (item.IsPartOfSkillLine(777))
+                    {
                         ComboBoxInvItems1.Items.Add("[" + item.Id + "]" + item.Name);
+                    }
                 }
 
             }
@@ -3444,13 +4137,14 @@ namespace WowAI.UI
             }
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
+        private void Button3_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxInvItems1.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempId = GetSkillIdFromCombobox(ComboBoxInvItems1.Text);
                 SpellInfo mount = null;
@@ -3461,7 +4155,10 @@ namespace WowAI.UI
                 foreach (var i in Host.SpellManager.GetSpells())
                 {
                     if (!Host.GameDB.SpellInfoEntries.ContainsKey(i.Id))
+                    {
                         continue;
+                    }
+
                     var spellDb = Host.GameDB.SpellInfoEntries[i.Id];
 
 
@@ -3473,11 +4170,17 @@ namespace WowAI.UI
                             foreach (var spellDbEffect in spellDb.Effects)
                             {
                                 if (spellDbEffect.Value == null)
+                                {
                                     continue;
+                                }
+
                                 foreach (var spellEffectInfo in spellDbEffect.Value)
                                 {
                                     if (spellEffectInfo?.ApplyAuraName != EAuraType.MOUNTED)
+                                    {
                                         continue;
+                                    }
+
                                     mount = spellDb;
                                     mountType = EMountType.Spell;
                                 }
@@ -3505,9 +4208,11 @@ namespace WowAI.UI
                     {
                         var spellDb = Host.GameDB.SpellInfoEntries[item.SpellId];
                         if (spellDb.Effects != null)
+                        {
                             foreach (var spellDbEffect in spellDb.Effects)
                             {
                                 if (spellDbEffect.Value != null)
+                                {
                                     foreach (var spellEffectInfo in spellDbEffect.Value)
                                     {
                                         if (spellEffectInfo?.ApplyAuraName == EAuraType.MOUNTED)
@@ -3516,15 +4221,21 @@ namespace WowAI.UI
                                             mountType = EMountType.Item;
                                         }
                                     }
+                                }
                             }
+                        }
                     }
                 }
 
                 if (mount == null)
+                {
                     return;
+                }
 
                 if (CollectionPetSettings.Any(collectionInvItem => tempId == collectionInvItem.Id))
+                {
                     return;
+                }
 
                 CollectionPetSettings.Add(new PetSettings
                 {
@@ -3547,7 +4258,7 @@ namespace WowAI.UI
 
 
 
-        private void button4_Click(object sender, RoutedEventArgs e)
+        private void Button4_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3565,7 +4276,9 @@ namespace WowAI.UI
                 foreach (var gossipOptionsData in Host.GetNpcQuestDialogs())
                 {
                     if (CollectionQuestSettings.Any(collectionInvItem => gossipOptionsData.QuestID == collectionInvItem.QuestId))
+                    {
                         continue;
+                    }
 
                     Host.log(gossipOptionsData.QuestID + " " + gossipOptionsData.QuestTitle + " ");
 
@@ -3635,21 +4348,30 @@ namespace WowAI.UI
 
 
 
-        private void textBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                var openFileDialog = new System.Windows.Forms.OpenFileDialog
+                using (var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
                     InitialDirectory = AssemblyDirectory + "\\Configs",
                     Filter = @"wav files (*.wav)|*.wav|All files|*.*",
                     RestoreDirectory = true
-                };
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-                if (Path.GetExtension(openFileDialog.FileName) != ".wav")
-                    return;
-                TextBox.Text = openFileDialog.FileName;
+                })
+                {
+                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    if (Path.GetExtension(openFileDialog.FileName) != ".wav")
+                    {
+                        return;
+                    }
+
+                    TextBox.Text = openFileDialog.FileName;
+
+                }
             }
             catch (ThreadAbortException)
             {
@@ -3660,7 +4382,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonClearAllMobs_Click(object sender, RoutedEventArgs e)
+        private void ButtonClearAllMobs_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3685,19 +4407,24 @@ namespace WowAI.UI
             Host.TimeInFight = 0;
         }
 
-        private void comboBoxProp_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxProp_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxProp.Items.Clear();
                 if (Host.Me == null)
+                {
                     return;
+                }
+
                 foreach (var prop in Host.GetEntities<GameObject>())
                 {
                     if (prop.GameObjectType == EGameObjectType.GatheringNode || prop.GameObjectType == EGameObjectType.Chest)
                     {
                         if (!ComboBoxProp.Items.Contains("[" + prop.Id + "]" + prop.Name))
+                        {
                             ComboBoxProp.Items.Add("[" + prop.Id + "]" + prop.Name);
+                        }
                     }
 
 
@@ -3715,21 +4442,23 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonAddProp_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddProp_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxProp.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempId = Convert.ToUInt32(GetSkillIdFromCombobox(ComboBoxProp.Text));
 
 
 
                 if (CollectionProps.Any(collectionprop => tempId == collectionprop.Id))
+                {
                     return;
-
+                }
 
                 GameObject gogAtherNode = null;
                 foreach (var i in Host.GetEntities<GameObject>())
@@ -3738,10 +4467,14 @@ namespace WowAI.UI
                           continue;*/
 
                     if (i.Id == tempId)
+                    {
                         gogAtherNode = i;
+                    }
                 }
                 if (gogAtherNode == null)
+                {
                     return;
+                }
 
                 CollectionProps.Add(new PropSettings
                 {
@@ -3758,12 +4491,14 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonPropsDel_Click(object sender, RoutedEventArgs e)
+        private void ButtonPropsDel_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ListViewProp.SelectedIndex != -1)
+                {
                     CollectionProps.RemoveAt(ListViewProp.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -3771,7 +4506,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonClearAllProps_Click(object sender, RoutedEventArgs e)
+        private void ButtonClearAllProps_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3783,7 +4518,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonAddAllProps_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddAllProps_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3792,7 +4527,9 @@ namespace WowAI.UI
                     /*  if (prop.GameObjectType != EGameObjectType.GatheringNode)
                           continue;*/
                     if (CollectionProps.Any(collectionprop => prop.Id == collectionprop.Id))
+                    {
                         continue;
+                    }
 
                     CollectionProps.Add(new PropSettings
                     {
@@ -3812,7 +4549,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonAddMultiZone_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddMultiZone_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3827,11 +4564,17 @@ namespace WowAI.UI
 
                     var s = inpstr[index];
                     if (s == "")
+                    {
                         continue;
+                    }
+
                     s = s.Trim();
                     Host.log(s);
                     if (s == "")
+                    {
                         continue;
+                    }
+
                     listMob.Add(Convert.ToUInt32(s));
 
                 }
@@ -3844,8 +4587,8 @@ namespace WowAI.UI
                     ChangeByTime = CheckBoxChangeTime.IsChecked.Value,
                     Time = Convert.ToInt32(TextBoxMultiZoneTime.Text),
                     Radius = Convert.ToInt32(TextBoxMultiZoneRadius.Text),
-                    //ChangeByDeathPlayer = CheckBoxChangeDeathByPlayer.IsChecked.Value,
-                    // CountDeathByPlayer = Convert.ToInt32(textBoxCountDeathByPlayer.Text),
+                    ChangeByDeathPlayer = CheckBoxChangeDeathByPlayer.IsChecked.Value,
+                    CountDeathByPlayer = Convert.ToInt32(textBoxCountDeathByPlayer.Text),
                     ListMobs = listMob,
                     UseFilter = CheckBoxUseFilterMultiZone.IsChecked.Value,
                     ChangeByLevel = CheckBoxChangeByLevel.IsChecked.Value,
@@ -3855,7 +4598,11 @@ namespace WowAI.UI
                     MinLevel = Convert.ToInt32(TextBoxMultiZoneMinLevel.Text),
                     MaxLevel = Convert.ToInt32(TextBoxMultiZoneMaxLevel.Text),
                     ChangeByPlayer = CheckBoxChangeByPlayer.IsChecked.Value,
-                    TimePlayer = Convert.ToInt32(TextBoxChangeByPlayerTime.Text)
+                    TimePlayer = Convert.ToInt32(TextBoxChangeByPlayerTime.Text),
+                    UseStone = CheckBoxRegisterStoneMultiZone.IsChecked.Value,
+                    LocStone = new Vector3F(Convert.ToSingle(TextBoxStoneLocXMultiZone.Text), Convert.ToSingle(TextBoxStoneLocYMultiZone.Text), Convert.ToSingle(TextBoxStoneLocZMultiZone.Text)),
+                    MapIdStone = Convert.ToInt32(TextBoxStoneLocMapIdMultiZone.Text),
+                    AreaIdStone = Convert.ToUInt32(TextBoxStoneLocAreaIdMultiZone.Text),
                 });
             }
             catch (Exception exception)
@@ -3864,12 +4611,14 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonDelMultiZone_Click(object sender, RoutedEventArgs e)
+        private void ButtonDelMultiZone_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (DataGridMultiZone.SelectedIndex != -1)
+                {
                     CollectionMultiZone.RemoveAt(DataGridMultiZone.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -3879,13 +4628,14 @@ namespace WowAI.UI
 
 
 
-        private void buttonMultiFarmEdit_Click(object sender, RoutedEventArgs e)
+        private void ButtonMultiFarmEdit_Click(object sender, RoutedEventArgs e)
         {
             if (DataGridMultiZone.SelectedIndex == -1)
+            {
                 return;
+            }
 
-            var multiZone = DataGridMultiZone.SelectedItem as MultiZone;
-            if (multiZone != null)
+            if (DataGridMultiZone.SelectedItem is MultiZone multiZone)
             {
                 for (var i = 0; i < CollectionMultiZone.Count; i++)
                 {
@@ -3902,8 +4652,8 @@ namespace WowAI.UI
                             ChangeByTime = CheckBoxChangeTime.IsChecked.Value,
                             Time = Convert.ToInt32(TextBoxMultiZoneTime.Text),
                             Radius = Convert.ToInt32(TextBoxMultiZoneRadius.Text),
-                            //  ChangeByDeathPlayer = CheckBoxChangeDeathByPlayer.IsChecked.Value,
-                            //  CountDeathByPlayer = Convert.ToInt32(textBoxCountDeathByPlayer.Text),
+                            ChangeByDeathPlayer = CheckBoxChangeDeathByPlayer.IsChecked.Value,
+                            CountDeathByPlayer = Convert.ToInt32(textBoxCountDeathByPlayer.Text),
 
 
                         };
@@ -3920,7 +4670,7 @@ namespace WowAI.UI
 
         }
 
-        private void buttonFarmLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonFarmLocFill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3936,7 +4686,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonMultiZoneLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonMultiZoneLocFill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3954,7 +4704,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonDungeonImport_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonImport_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -3968,52 +4718,63 @@ namespace WowAI.UI
 
                 var initDir = AssemblyDirectory + "\\Plugins\\Quester\\Configs";
                 if (isReleaseVersion)
+                {
                     initDir = AssemblyDirectory + "\\Configs";
+                }
 
-                var openFileDialog = new System.Windows.Forms.OpenFileDialog
+                using (var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
                     InitialDirectory = initDir,// Host.AssemblyDirectory + "\\Configs",
                     Filter = @"xml files (*.xml)|*.xml|All files|*.*",
                     RestoreDirectory = true
-                };
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-                if (Path.GetExtension(openFileDialog.FileName) != ".xml")
-                    return;
-                //  Host.CfgName = openFileDialog.FileName;
-                // Host.FileName = openFileDialog.SafeFileName;
-                Host.log(openFileDialog.FileName + "   " + openFileDialog.SafeFileName);
-                var lines = File.ReadAllLines(openFileDialog.FileName);
-
-                var delim = new[] { '"', ':' };
-                string[] inpstr;
-
-                for (var i = 0; i < lines.Length; i++)
+                })
                 {
-                    if (!lines[i].Contains("Vector3 X"))
-                        continue;
-                    // Host.log(lines[i]);
-
-
-                    inpstr = lines[i].Split(delim);
-
-
-                    CollectionDungeonCoord.Add(new DungeonCoordSettings
+                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     {
-                        Id = CollectionDungeonCoord.Count,
-                        Action = "Бежать на точку",
-                        Loc = new Vector3F(Convert.ToSingle(inpstr[1]), Convert.ToSingle(inpstr[3]), Convert.ToSingle(inpstr[5])),
-                        MobId = 0,
-                        PropId = 0,
-                        Attack = CheckBoxAttackMobs.IsChecked != null && CheckBoxAttackMobs.IsChecked.Value,
+                        return;
+                    }
 
-                        ItemId = 0,
-                        AreaId = Convert.ToUInt32(TextBoxDungeonLocAreaId.Text),
-                        MapId = Convert.ToInt32(TextBoxDungeonLocMapId.Text)
-                    });
+                    if (Path.GetExtension(openFileDialog.FileName) != ".xml")
+                    {
+                        return;
+                    }
+                    //  Host.CfgName = openFileDialog.FileName;
+                    // Host.FileName = openFileDialog.SafeFileName;
+                    Host.log(openFileDialog.FileName + "   " + openFileDialog.SafeFileName);
+                    var lines = File.ReadAllLines(openFileDialog.FileName);
+
+                    var delim = new[] { '"', ':' };
+                    string[] inpstr;
+
+                    for (var i = 0; i < lines.Length; i++)
+                    {
+                        if (!lines[i].Contains("Vector3 X"))
+                        {
+                            continue;
+                        }
+                        // Host.log(lines[i]);
+
+
+                        inpstr = lines[i].Split(delim);
+
+
+                        CollectionDungeonCoord.Add(new DungeonCoordSettings
+                        {
+                            Id = CollectionDungeonCoord.Count,
+                            Action = "Бежать на точку",
+                            Loc = new Vector3F(Convert.ToSingle(inpstr[1]), Convert.ToSingle(inpstr[3]), Convert.ToSingle(inpstr[5])),
+                            MobId = 0,
+                            PropId = 0,
+                            Attack = CheckBoxAttackMobs.IsChecked != null && CheckBoxAttackMobs.IsChecked.Value,
+
+                            ItemId = 0,
+                            AreaId = Convert.ToUInt32(TextBoxDungeonLocAreaId.Text),
+                            MapId = Convert.ToInt32(TextBoxDungeonLocMapId.Text)
+                        });
+
+                    }
 
                 }
-
             }
             catch (Exception err)
             {
@@ -4021,7 +4782,7 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxDungeonScript_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonScript_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -4029,10 +4790,14 @@ namespace WowAI.UI
                 if (ComboBoxDungeonScript.Items != null)
                 {
                     if (ComboBoxDungeonScript.Items.Count > 0)
+                    {
                         ComboBoxDungeonScript?.Items.Clear();
-                    if (ComboBoxDungeonScriptCopy.Items.Count > 0)
-                        ComboBoxDungeonScriptCopy?.Items.Clear();
+                    }
 
+                    if (ComboBoxDungeonScriptCopy.Items.Count > 0)
+                    {
+                        ComboBoxDungeonScriptCopy?.Items.Clear();
+                    }
                 }
 
                 if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
@@ -4055,7 +4820,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonDungeonDelAll_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonDelAll_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4069,14 +4834,16 @@ namespace WowAI.UI
 
 
 
-        private void buttonAddNpc_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddNpc_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 foreach (var obj in Host.GetEntities<Unit>())
                 {
                     if (CollectionNpcForActions.Any(collectionprop => obj.Id == collectionprop.Id))
+                    {
                         continue;
+                    }
 
                     if (obj.IsVendor || obj.IsArmorer || obj.IsAuctioner || obj.IsBanker || obj.IsTaxi)
                     {
@@ -4102,7 +4869,7 @@ namespace WowAI.UI
 
 
 
-        private void buttonScriptSavePointMove_Click(object sender, RoutedEventArgs e)
+        private void ButtonScriptSavePointMove_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4141,12 +4908,19 @@ namespace WowAI.UI
                 foreach (var s in Host.SpellManager.GetSpells())
                 {
                     if (s.IsPassive())
+                    {
                         continue;
+                    }
+
                     if (s.DescriptionRu == "")
+                    {
                         continue;
+                    }
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (s.GetMaxCastRange() == 0)
+                    {
                         continue;
+                    }
 
                     if (s.DescriptionRu.Contains("ед. урона") || s.DescriptionRu.Contains("физический урон") || s.DescriptionRu.Contains("физического урона"))
                     {
@@ -4155,19 +4929,31 @@ namespace WowAI.UI
                          Host.log("DescriptionRu: " + s.DescriptionRu, LogLvl.Important);
                          Host.log("AuraDescriptionRu: " + s.AuraDescriptionRu + " \n");*/
                         if (CollectionActiveSkill.Any(collectionInvItem => s.Id == collectionInvItem.Id))
+                        {
                             continue;
+                        }
 
                         var cd = s.ChargeRecoveryTime + s.RecoveryTime;
                         var priority = 0;
                         if (cd > 0)
+                        {
                             priority = 1;
+                        }
+
                         if (cd > 5000)
+                        {
                             priority = 2;
+                        }
+
                         if (cd > 10000)
+                        {
                             priority = 3;
+                        }
 
                         if (s.Id == 116)//Ледяная стрела
+                        {
                             priority = 1;
+                        }
 
                         CollectionActiveSkill.Add(new SkillSettings
                         {
@@ -4216,8 +5002,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridAllBuff.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempNotMeEffect = Convert.ToUInt32(TextBoxNotMeEffect1.Text);
 
@@ -4225,6 +5012,7 @@ namespace WowAI.UI
 
 
                 if (DataGridAllBuff.SelectedItem is BuffTable path)
+                {
                     CollectionRegenItems.Add(new RegenItems
                     {
                         Checked = true,
@@ -4249,6 +5037,7 @@ namespace WowAI.UI
                     }
 
                     );
+                }
                 //сброс настроек по умолчанию
                 // ResetSettingSkillDefault();
                 GroupBoxSettingsSkill1.Header = "Настройки";
@@ -4266,14 +5055,16 @@ namespace WowAI.UI
             try
             {
                 if (DataGridAllBuff.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 DataGridActiveSkill.SelectedIndex = -1;
 
                 ButtonAddBuff.IsEnabled = true;
 
                 ButtonDelBuff.IsEnabled = false;
-                var skill = DataGridAllBuff.SelectedItem as BuffTable;
-                if (skill != null)
+                if (DataGridAllBuff.SelectedItem is BuffTable skill)
                 {
                     /*  GroupBoxSettingsSkill.Header = "Настройки " + skill.Name + "[" + skill.Id + "]";
                       TextBoxMinDist.Text =
@@ -4315,8 +5106,9 @@ namespace WowAI.UI
         private void ListViewActiveItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataGridRegenItems.SelectedIndex == -1)
+            {
                 return;
-
+            }
 
             DataGridAllBuff.SelectedIndex = -1;
 
@@ -4340,7 +5132,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonFarmLocFill1_Click(object sender, RoutedEventArgs e)
+        private void ButtonFarmLocFill1_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4356,43 +5148,75 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxDungeonSkill_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonSkill_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxDungeonSkill.Items.Clear();
                 ComboBoxDungeonSkill.Items.Add("Не выбрано");
                 if (Host.Me == null)
+                {
                     return;
-
+                }
 
                 foreach (var skill in Host.SpellManager.GetSpells())
                 {
                     if (skill.SkillLines.Contains(186))//   SKILL_MINING 
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(182))//SKILL_HERBALISM                      
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(810))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(934))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(778))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(183))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(356))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(777))
+                    {
                         continue;
+                    }
+
                     if (skill.SkillLines.Contains(129))
+                    {
                         continue;
+                    }
+
                     if (skill.IsPassive())
+                    {
                         continue;
+                    }
 
                     /* if (item.Db.Target != ESpellTarget.Self)
                          continue;*/
                     if (!ComboBoxDungeonSkill.Items.Contains("[" + skill.Id + "]" + skill.Name))
+                    {
                         ComboBoxDungeonSkill.Items.Add("[" + skill.Id + "]" + skill.Name);
+                    }
                 }
 
             }
@@ -4406,33 +5230,38 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxInvItemsGlobalClass_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxInvItemsGlobalClass_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             foreach (var value in Enum.GetValues(typeof(EItemClass)))
             {
                 //  Host.log(value.ToString());
                 if (!ComboBoxInvItemsGlobalClass.Items.Contains(value.ToString()))
+                {
                     ComboBoxInvItemsGlobalClass.Items.Add(value.ToString());
+                }
             }
         }
 
-        private void comboBoxInvItemsGlobalQuality_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxInvItemsGlobalQuality_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             foreach (var value in Enum.GetValues(typeof(EItemQuality)))
             {
                 //  Host.log(value.ToString());
                 if (!ComboBoxInvItemsGlobalQuality.Items.Contains(value.ToString()))
+                {
                     ComboBoxInvItemsGlobalQuality.Items.Add(value.ToString());
+                }
             }
         }
 
-        private void buttonAddItemGlobal_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddItemGlobal_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxInvItemsGlobalQuality.SelectedIndex == -1 || ComboBoxInvItemsGlobalClass.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 CollectionItemGlobals.Add(new ItemGlobal
                 {
@@ -4451,7 +5280,7 @@ namespace WowAI.UI
 
 
 
-        private void comboBoxQuestSet_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxQuestSet_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -4459,7 +5288,9 @@ namespace WowAI.UI
                 if (ComboBoxQuestSet.Items != null)
                 {
                     if (ComboBoxQuestSet.Items.Count > 0)
+                    {
                         ComboBoxQuestSet?.Items.Clear();
+                    }
                 }
 
                 if (Directory.Exists(Host.PathQuestSet))
@@ -4478,46 +5309,51 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonSaveQuest_Click(object sender, RoutedEventArgs e)
+        private void ButtonSaveQuest_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var saveFileDialog = new System.Windows.Forms.SaveFileDialog
+                using (var saveFileDialog = new System.Windows.Forms.SaveFileDialog
                 {
                     InitialDirectory = Host.PathQuestSet,
                     Filter = @"xml files (*.xml)|*.xml|All files|*.*",
                     FileName = ""
-                };
-                if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
-
-                SettingsNeedSave = false;
-                CreateNewQuestSettings();
-                Host.QuestName = saveFileDialog.FileName;
-
-
-
-                var writer = new XmlSerializer(typeof(QuestSetting));
-
-                using (var fs = File.Open(Host.QuestName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                })
                 {
-                    writer.Serialize(fs, Host.QuestSettings);
+                    if (saveFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
 
+                    SettingsNeedSave = false;
+                    CreateNewQuestSettings();
+                    Host.QuestName = saveFileDialog.FileName;
+
+
+
+                    var writer = new XmlSerializer(typeof(QuestSetting));
+
+                    using (var fs = File.Open(Host.QuestName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                    {
+                        writer.Serialize(fs, Host.QuestSettings);
+
+
+                    }
+
+                    _doc = new XmlDocument();
+                    try
+                    {
+                        _doc.Load(Host.QuestName);
+                    }
+                    catch
+                    {
+                        SettingsNeedSave = true;
+                        return;
+                    }
+                    NeedApplyQuestSettings = true;
+                    SettingsNeedSave = false;
 
                 }
-
-                _doc = new XmlDocument();
-                try
-                {
-                    _doc.Load(Host.QuestName);
-                }
-                catch
-                {
-                    SettingsNeedSave = true;
-                    return;
-                }
-                NeedApplyQuestSettings = true;
-                SettingsNeedSave = false;
             }
             catch (Exception exception)
             {
@@ -4530,7 +5366,9 @@ namespace WowAI.UI
             try
             {
                 if (ListViewQuest.SelectedIndex < 1)
+                {
                     return;
+                }
 
                 //  while (Mouse.LeftButton == MouseButtonState.Pressed)
                 //  {
@@ -4555,9 +5393,15 @@ namespace WowAI.UI
             try
             {
                 if (ListViewQuest.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 if (ListViewQuest.SelectedIndex > CollectionQuestSettings.Count - 2)
+                {
                     return;
+                }
+
                 var index = ListViewQuest.SelectedIndex;
                 var buf = CollectionQuestSettings[index];
                 CollectionQuestSettings[index] = CollectionQuestSettings[index + 1];
@@ -4570,7 +5414,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonAddResourceIgnore_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddResourceIgnore_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4597,12 +5441,14 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonResourceIgnore_Click(object sender, RoutedEventArgs e)
+        private void ButtonResourceIgnore_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (DataGridResourceIgnore.SelectedIndex != -1)
+                {
                     CollectionGameObjectIgnores.RemoveAt(DataGridResourceIgnore.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -4616,15 +5462,21 @@ namespace WowAI.UI
             {
                 ComboBoxAuk.Items.Clear();
                 if (Host.Me == null)
+                {
                     return;
-
+                }
 
                 foreach (var item in Host.ItemManager.GetItems())
                 {
                     if (item.IsSoulBound)
+                    {
                         continue;
+                    }
+
                     if (!ComboBoxAuk.Items.Contains("[" + item.Id + "]" + item.Name))
+                    {
                         ComboBoxAuk.Items.Add("[" + item.Id + "]" + item.Name);
+                    }
                 }
             }
             catch (ThreadAbortException)
@@ -4651,7 +5503,9 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxAuk.SelectedIndex == -1)
+                {
                     return;
+                }
 
 
                 //   var tempByte = GetSkillIdFromComboboxByte(comboBoxProp.Text);
@@ -4692,7 +5546,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridAuk.SelectedIndex != -1)
+                {
                     CollectionAukSettingses.RemoveAt(DataGridAuk.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -4700,7 +5556,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonAukLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonAukLocFill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4719,14 +5575,16 @@ namespace WowAI.UI
 
 
 
-        private void comboBoxDungeonPlugin_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxDungeonPlugin_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
                 ComboBoxDungeonPlugin.Items.Clear();
                 ComboBoxDungeonPlugin.Items.Add("Не выбрано");
                 if (Host.Me == null)
+                {
                     return;
+                }
 
                 if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\"))
                 {
@@ -4738,7 +5596,10 @@ namespace WowAI.UI
                         foreach (var fileInfo in directoryInfo.GetFiles())
                         {
                             if (!fileInfo.Name.Contains(".dll"))
+                            {
                                 continue;
+                            }
+
                             ComboBoxDungeonPlugin.Items.Add(directoryInfo.Name + "\\" + fileInfo.Name);
                         }
                     }
@@ -4756,12 +5617,14 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonDungeonSheduleDel_Click(object sender, RoutedEventArgs e)
+        private void ButtonDungeonSheduleDel_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (DataGridScriptSchedule.SelectedIndex != -1)
+                {
                     CollectionScriptSchedules.RemoveAt(DataGridScriptSchedule.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -4769,7 +5632,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonScriptScheduleAdd_Click(object sender, RoutedEventArgs e)
+        private void ButtonScriptScheduleAdd_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4794,7 +5657,7 @@ namespace WowAI.UI
             Dispatcher?.Invoke(() => { ButtonContinue.IsEnabled = false; });
         }
 
-        private void comboBoxBuyAuc_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxBuyAuc_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             foreach (EEquipmentSlot value in Enum.GetValues(typeof(EEquipmentSlot)))
             {
@@ -4802,19 +5665,22 @@ namespace WowAI.UI
                      continue;*/
                 //  Host.log(value.ToString());
                 if (!ComboBoxBuyAuc.Items.Contains(value.ToString()))
+                {
                     ComboBoxBuyAuc.Items.Add(value.ToString());
+                }
             }
         }
 
 
 
-        private void buttonAddEquipAuc_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddEquipAuc_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ComboBoxBuyAuc.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 CollectionEquipAuc.Add(new EquipAuc()
                 {
@@ -4828,7 +5694,7 @@ namespace WowAI.UI
             }
         }
 
-        private void buttonSendMailLocFill_Click(object sender, RoutedEventArgs e)
+        private void ButtonSendMailLocFill_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -4881,7 +5747,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridLearn.SelectedIndex != -1)
+                {
                     CollectionLearnSkill.RemoveAt(DataGridLearn.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -4896,8 +5764,9 @@ namespace WowAI.UI
                 var name = "Неизвестно";
                 var id = Convert.ToUInt32(TextBoxLearnSkillId.Text);
                 if (Host.GameDB.SpellInfoEntries.ContainsKey(id))
+                {
                     name = Host.GameDB.SpellInfoEntries[id].SpellName;
-
+                }
 
                 CollectionLearnSkill.Add(new LearnSkill
                 {
@@ -4923,27 +5792,35 @@ namespace WowAI.UI
             try
             {
                 if (TextBoxIgnoreQuestId.Text == "Id")
+                {
                     return;
-
+                }
 
                 var tempId = Convert.ToUInt32(TextBoxIgnoreQuestId.Text);
 
 
                 if (CollectionIgnoreQuest.Any(collectionInvItem => tempId == collectionInvItem.Id))
+                {
                     return;
+                }
 
+                var name = "Неизветный квест";
                 if (!Host.GameDB.QuestTemplates.ContainsKey(tempId))
                 {
                     // ReSharper disable once RedundantNameQualifier
-                    System.Windows.MessageBox.Show("Нет такого квеста");
-                    return;
+                   /* System.Windows.MessageBox.Show("Нет такого квеста");
+                    return;*/
+                }
+                else
+                {
+                    name = Host.GameDB.QuestTemplates[tempId].LogTitle;
                 }
 
 
                 CollectionIgnoreQuest.Add(new IgnoreQuest
                 {
                     Id = tempId,
-                    Name = Host.GameDB.QuestTemplates[tempId].LogTitle,
+                    Name = name
                 });
             }
             catch (Exception exception)
@@ -4958,7 +5835,9 @@ namespace WowAI.UI
             {
                 //  Host.log(value.ToString());
                 if (!ComboBoxAdvancedEquipWeapon.Items.Contains(value.ToString()))
+                {
                     ComboBoxAdvancedEquipWeapon.Items.Add(value.ToString());
+                }
             }
         }
 
@@ -4967,7 +5846,9 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxAdvancedEquipWeapon.SelectedIndex == -1)
+                {
                     return;
+                }
 
                 CollectionAdvancedEquipsWeapon.Add(new AdvancedEquipWeapon
                 {
@@ -4986,7 +5867,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridEquip.SelectedIndex != -1)
+                {
                     CollectionAdvancedEquipsWeapon.RemoveAt(DataGridEquip.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -5002,7 +5885,9 @@ namespace WowAI.UI
                 {
                     //  Host.log(value.ToString());
                     if (!ComboBoxAdvancedEquipArmor.Items.Contains(value.ToString()))
+                    {
                         ComboBoxAdvancedEquipArmor.Items.Add(value.ToString());
+                    }
                 }
             }
             catch (Exception exception)
@@ -5016,7 +5901,9 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxAdvancedEquipArmor.SelectedIndex == -1)
+                {
                     return;
+                }
 
                 CollectionAdvancedEquipArmors.Add(new AdvancedEquipArmor
                 {
@@ -5035,7 +5922,9 @@ namespace WowAI.UI
             try
             {
                 if (DataGridEquipArmor.SelectedIndex != -1)
+                {
                     CollectionAdvancedEquipArmors.RemoveAt(DataGridEquipArmor.SelectedIndex);
+                }
             }
             catch (Exception exception)
             {
@@ -5067,7 +5956,9 @@ namespace WowAI.UI
                 {
                     //  Host.log(value.ToString());
                     if (!ComboBoxAdvancedEquipStat.Items.Contains(value.ToString()))
+                    {
                         ComboBoxAdvancedEquipStat.Items.Add(value.ToString());
+                    }
                 }
             }
             catch (Exception exception)
@@ -5081,7 +5972,10 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxAdvancedEquipStat.SelectedIndex == -1)
+                {
                     return;
+                }
+
                 CollectionAdvancedEquipStats.Add(new AdvancedEquipStat
                 {
                     StatType = (EItemModType)Enum.Parse(typeof(EItemModType), ComboBoxAdvancedEquipStat.Text),
@@ -5104,11 +5998,16 @@ namespace WowAI.UI
                 foreach (var item1 in Host.ItemManager.GetItems())
                 {
                     if (item1.Place != EItemPlace.Equipment)
+                    {
                         continue;
+                    }
+
                     if (item1.Cell != (int)value)
+                    {
                         continue;
+                    }
                     /* if (Host.CommonModule.GetItemEPlayerPartsType(item1.InventoryType) != value)
-                         continue;*/
+    continue;*/
                     item = item1;
                     break;
                 }
@@ -5123,13 +6022,17 @@ namespace WowAI.UI
                     if (item.ItemClass == EItemClass.Weapon)
                     {
                         if ((Host.GetProficiency(EItemClass.Weapon) & (1 << (int)item.Template.GetSubClass())) == 0)
+                        {
                             canequip = false;
+                        }
                     }
 
                     if (item.ItemClass == EItemClass.Armor)
                     {
                         if ((Host.GetProficiency(EItemClass.Armor) & (1 << (int)item.Template.GetSubClass())) == 0)
+                        {
                             canequip = false;
+                        }
                     }
                     TextBlockEquipCoef.Text += value + ": " + item.Name + "[" + item.Id + "] ["
                                                + item.InventoryType + "] ["
@@ -5150,9 +6053,14 @@ namespace WowAI.UI
                 if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 &&
                     item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 &&
                     item.Place != EItemPlace.InventoryItem && item.Place != EItemPlace.Equipment)
+                {
                     continue;
+                }
+
                 if (item.ItemClass != EItemClass.Armor && item.ItemClass != EItemClass.Weapon)
+                {
                     continue;
+                }
 
                 if (item.Place == EItemPlace.Equipment)
                 {
@@ -5164,13 +6072,17 @@ namespace WowAI.UI
                     if (item.ItemClass == EItemClass.Weapon)
                     {
                         if ((Host.GetProficiency(EItemClass.Weapon) & (1 << (int)item.Template.GetSubClass())) == 0)
+                        {
                             canequip = false;
+                        }
                     }
 
                     if (item.ItemClass == EItemClass.Armor)
                     {
                         if ((Host.GetProficiency(EItemClass.Armor) & (1 << (int)item.Template.GetSubClass())) == 0)
+                        {
                             canequip = false;
+                        }
                     }
 
                     TextBlockInvCoef.Text += item.Name + "[" + item.Id + "] ["
@@ -5186,7 +6098,7 @@ namespace WowAI.UI
             }
         }
 
-        private void comboBoxAdvancedEquipQuality_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComboBoxAdvancedEquipQuality_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -5196,7 +6108,9 @@ namespace WowAI.UI
                 {
                     //  Host.log(value.ToString());
                     if (!ComboBoxAdvancedEquipQuality.Items.Contains(value.ToString()))
+                    {
                         ComboBoxAdvancedEquipQuality.Items.Add(value.ToString());
+                    }
                 }
             }
             catch (Exception exception)
@@ -5213,9 +6127,14 @@ namespace WowAI.UI
                 ComboBoxLearnTalent.Items.Clear();
 
                 if (Host.Me == null)
+                {
                     return;
+                }
+
                 foreach (var item in Host.TalentTree.GetAllTalents())
+                {
                     ComboBoxLearnTalent.Items.Add("[" + item.ID + "]" + item.Name + " " + item.NameRu);
+                }
             }
             catch (ThreadAbortException)
             {
@@ -5232,8 +6151,9 @@ namespace WowAI.UI
             try
             {
                 if (ComboBoxLearnTalent.SelectedIndex == -1)
+                {
                     return;
-
+                }
 
                 var tempId = Convert.ToUInt32(GetSkillIdFromCombobox(ComboBoxLearnTalent.Text));
 
@@ -5243,11 +6163,16 @@ namespace WowAI.UI
                 foreach (var i in Host.TalentTree.GetAllTalents())
                 {
                     if (i.ID != tempId)
+                    {
                         continue;
+                    }
+
                     item = i;
                 }
                 if (item == null)
+                {
                     return;
+                }
 
                 CollectionLearnTalents.Add(new LearnTalent
                 {
@@ -5260,6 +6185,53 @@ namespace WowAI.UI
             {
                 Host.log(exception.ToString());
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TextBoxStoneLocXMultiZone.Text = Convert.ToInt32(Host.Me.Location.X).ToString();
+                TextBoxStoneLocYMultiZone.Text = Convert.ToInt32(Host.Me.Location.Y).ToString();
+                TextBoxStoneLocZMultiZone.Text = Convert.ToInt32(Host.Me.Location.Z).ToString();
+                TextBoxStoneLocMapIdMultiZone.Text = Convert.ToInt32(Host.MapID).ToString();
+                TextBoxStoneLocAreaIdMultiZone.Text = Convert.ToInt32(Host.Area.Id).ToString();
+            }
+            catch (Exception err)
+            {
+                Host.log(err.ToString());
+            }
+        }
+
+        private void ComboBoxTaxyNode_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ComboBoxTaxyNode.Items.Clear();
+            foreach (var taxiNode in Host.GetallNodesOnMyMap())
+            {
+                ComboBoxTaxyNode.Items.Add("[" + taxiNode.Id + "] " + taxiNode.Name);
+            }
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            if (ComboBoxTaxyNode.SelectedIndex == -1)
+                return;
+            var tempId = Convert.ToUInt32(GetSkillIdFromCombobox(ComboBoxTaxyNode.Text));
+
+            foreach (var taxiNode in Host.GetallNodesOnMyMap())
+            {
+                if (taxiNode.Id == tempId)
+                {
+                    CollectionTaxyNodeSettingses.Add(new TaxyNodeSettings
+                    {
+                        Id = taxiNode.Id,
+                        MapId = taxiNode.MapId,
+                        Name = taxiNode.Name,
+                        Loc = taxiNode.Location
+                    });
+                }
+            }
+
         }
     }
 

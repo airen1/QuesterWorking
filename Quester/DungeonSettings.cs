@@ -19,7 +19,7 @@ namespace WowAI
         public Vector3F Loc { get; set; }
         public int MapId { get; set; }
         public uint AreaId { get; set; }
-        public int MobId { get; set; }
+        public uint MobId { get; set; }
         public uint PropId { get; set; }
         public bool Attack { get; set; }
         public int Pause { get; set; }
@@ -29,5 +29,6 @@ namespace WowAI
         public string PluginPath { get; set; }
         public uint QuestId { get; set; }
         public QuestAction QuestAction { get; set; }
+        public int Index { get; set; }
     }
 }

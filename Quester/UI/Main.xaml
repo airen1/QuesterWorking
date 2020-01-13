@@ -16,15 +16,15 @@
     </controls:MetroWindow.Resources>
 
     <Grid>
-        <Grid Background="#FF36393E"   VerticalAlignment="Top" Width="300" Height="480" HorizontalAlignment="Left">
+        <Grid Background="#FF36393E"   VerticalAlignment="Top" Width="300" HorizontalAlignment="Left">
             <StackPanel>
-                <StackPanel Orientation="Horizontal" >
+                <WrapPanel >
                     <Menu
-                       Foreground="White" 
+                        Foreground="White" 
                         Background="#FF36393E">
                         <MenuItem
                             Header="Настройки" 
-                            Click="subItem1_Click" 
+                            Click="SubItem1_Click" 
                             HorizontalAlignment="Left" 
                             FontSize="12" 
                             Background="#FF4A4F55" 
@@ -32,7 +32,7 @@
                     </Menu>
                     <WrapPanel Margin="5,0,0,0">
                         <Button Content="Load" Click="ButtonLoadSet_Click"  />
-                        <Button Content="Save" Click="buttonSaveSet_Click"  Margin="5,0,0,0" />
+                        <Button Content="Save" Click="ButtonSaveSet_Click"  Margin="5,0,0,0" />
                     </WrapPanel>
                     <ComboBox x:Name="ComboBoxSwitchMode"  SelectionChanged="ComboBoxSwitchMode_SelectionChanged" Margin="5,0,0,0" Width="138" Height="Auto">
                         <ComboBoxItem Content="Квестинг"/>
@@ -43,13 +43,10 @@
                         <ComboBoxItem Content="Квестинг Классик" />
                     </ComboBox>
 
-                </StackPanel>
-                <Label x:Name="LabelProfile" Content="Профиль" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,-4,0,0"/>
-
-                <Label x:Name="LabelGameState" Content="GameState:" Margin="0,-6,0,0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
-
-                <Label x:Name="MeTarget" Content="Цель: " HorizontalAlignment="Left" Margin="1,-5,0,0" VerticalAlignment="Top" Foreground="White"/>
-
+                </WrapPanel>
+                <Label x:Name="LabelProfile" Content="Профиль" Margin="0,-10,0,0"/>
+                <Label x:Name="LabelGameState" Content="GameState:" Margin="0,-10,0,0" />
+                <Label x:Name="MeTarget" Content="Цель: " Margin="0,-10,0,0" Foreground="White"/>
                 <controls:MetroProgressBar 
                                     x:Name="ProgressBarTargetHp" 
                                     Margin="5,-4,5,0" 
@@ -57,17 +54,17 @@
                                     Foreground="#FFD81313" BorderBrush="#FF4A4F55" Background="#FF4A4F55" />
                 <TextBlock x:Name="TextBlockTargetHp" HorizontalAlignment="Center" Margin="0,-15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Text="{Binding Value, ElementName=ProgressBarTargetHp}" RenderTransformOrigin="0.769,6.188" Foreground="White"/>
 
-                <Label x:Name="BestMob" Content="BestMob: " Margin="1,-5,1,0" Foreground="White"/>
-                <Label x:Name="BestProp" Content="BestProp:"  Margin="1,-5,1,0" Foreground="White"/>
-                <Label x:Name="FarmState" Content="FarmState: null"  Margin="1,-5,1,0" Foreground="White" />
-                <Label x:Name="QuestId" Content="QuestId: null" Margin="1,-5,1,0" Foreground="White" />
-                <Label x:Name="QuestState" Content="QuestState: null" Margin="1,-5,1,0" Foreground="White" />
-                <Label x:Name="IsMoveToNow" Content="isMoveToNow:null" Margin="1,-5,1,0" Foreground="White" />
-                <Label x:Name="LabelTimeWork" Content="Время работы:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" />
-                <Label x:Name="LabelKillMobs" Content="Убито мобов:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <Label x:Name="LabelGold" Content="Золото:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" />
-                <Label x:Name="LabelGoldInHour" Content="Золото в час/день:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" />
-                <Label x:Name="LabelExp" Content="Опыт:" Margin="0,-5,0,0" Foreground="White" HorizontalAlignment="Left" />
+                <Label x:Name="BestMob" Content="BestMob: " Margin="0,-10,0,0"/>
+                <Label x:Name="BestProp" Content="BestProp:"  Margin="0,-10,0,0"/>
+                <Label x:Name="FarmState" Content="FarmState: null"  Margin="0,-10,0,0" />
+                <Label x:Name="QuestId" Content="QuestId: null" Margin="0,-10,0,0" />
+                <Label x:Name="QuestState" Content="QuestState: null" Margin="0,-10,0,0" />
+                <Label x:Name="IsMoveToNow" Content="isMoveToNow:null" Margin="0,-10,0,0" />
+                <Label x:Name="LabelTimeWork" Content="Время работы:" Margin="0,-10,0,0" />
+                <Label x:Name="LabelKillMobs" Content="Убито мобов:" Margin="0,-10,0,0" />
+                <Label x:Name="LabelGold" Content="Золото:" Margin="0,-10,0,0" />
+                <Label x:Name="LabelGoldInHour" Content="Золото в час/день:" Margin="0,-10,0,0" />
+                <Label x:Name="LabelExp" Content="Опыт:" Margin="0,-10,0,0" />
                 <controls:MetroProgressBar  x:Name="ProgressBarMeHp" 
                                     Margin="5,-3,5,0" 
                                     VerticalAlignment="Stretch" 
@@ -86,13 +83,13 @@
                 <Grid Margin="0,5,0,0">
                     <Button Content="Сброс стат" HorizontalAlignment="Right" Margin="0,0,0,10" VerticalAlignment="Bottom" Click="ButtonResetStat_Click" RenderTransformOrigin="-2.107,2.12"
                             Background="#FF36393E"  Panel.ZIndex="1"/>
-                    <Button x:Name="ButtonOnOff" Content="Выключить" HorizontalAlignment="Center" Margin="112,0,107,10" VerticalAlignment="Bottom" Click="buttonOnOff_Click" RenderTransformOrigin="-2.107,2.12"
+                    <Button x:Name="ButtonOnOff" Content="Выключить" HorizontalAlignment="Center" Margin="112,0,107,10" VerticalAlignment="Bottom" Click="ButtonOnOff_Click" RenderTransformOrigin="-2.107,2.12"
                             Background="#FF36393E"  Panel.ZIndex="1"/>
 
-                    <Button x:Name="ButtonContinue" Content="Продолжить" HorizontalAlignment="Left" Margin="0,0,0,10" VerticalAlignment="Bottom" Click="ButtonContinue_Click" RenderTransformOrigin="-2.107,2.12"
-                            Background="#FF36393E"  Panel.ZIndex="1" IsEnabled="False"/>
+                    <Button x:Name="ButtonContinue" Content="Продолжить" Margin="0,0,0,9" VerticalAlignment="Bottom" Click="ButtonContinue_Click" RenderTransformOrigin="-2.107,2.12"
+                            Background="#FF36393E" IsEnabled="False" HorizontalAlignment="Left"/>
                 </Grid>
-                <ComboBox x:Name="ComboBoxDungeonScript" VerticalAlignment="Top" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0" Foreground="White" BorderBrush="#FF36393E" Background="#FF4A4F55">
+                <ComboBox x:Name="ComboBoxDungeonScript" SelectedIndex="0" PreviewMouseLeftButtonDown="ComboBoxDungeonScript_PreviewMouseLeftButtonDown">
                     <ComboBoxItem Content="Не выбрано"/>
                 </ComboBox>
 
@@ -101,233 +98,233 @@
 
         <Grid Margin="300,0,0,0" Background="#FF36393E" Panel.ZIndex="2">
             <TabControl Margin="0" Grid.Column="0" Grid.Row="0" SelectedIndex="0">
-                <TabItem Header="Настройки" VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <Grid Margin="0" Background="#FF36393E">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="356"/>
-                            <ColumnDefinition Width="360*"/>
-                            <ColumnDefinition Width="361*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="375*"/>
-                            <RowDefinition Height="299*"/>
-                        </Grid.RowDefinitions>
-                        <GroupBox Header="Квестинг" Margin="0">
-                            <Grid Margin="0">
-
-                                <StackPanel Margin="0" Orientation="Vertical" VerticalAlignment="Top">
-                                    <ComboBox x:Name="ComboBoxQuestSet" VerticalAlignment="Top" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxQuestSet_PreviewMouseLeftButtonDown" Margin="0,0,150,0" Height="Auto">
-                                        <ComboBoxItem Content="Не выбрано"/>
-                                    </ComboBox>
+                <TabItem Header="Настройки">
+                    <StackPanel Background="#FF36393E" Margin="0" >
+                        <WrapPanel Orientation="Horizontal">
+                            <GroupBox Header="Общее" Margin="0">
+                                <StackPanel>
                                     <WrapPanel>
-                                        <CheckBox x:Name="CheckBoxStopQuesting" Content="Выключать квестинг по достижению "   IsChecked="{Binding StopQuesting}"/>
-                                        <TextBox x:Name="TextBoxStopQuestingLevel" Text="12" />
-                                        <Label Content="уровня"/>
+                                        <CheckBox x:Name="CheckBoxAutoEquip" IsChecked="{Binding AutoEquip}" Content="Автоэкипировка"/>
+                                        <TextBox x:Name="TextBoxEquipStateWeapon" Text="0" />
                                     </WrapPanel>
-                                    <CheckBox x:Name="CheckBoxDebuffDeath" Content="Ожидать дебаф смерти" IsChecked="True"/>
-                                    <CheckBox x:Name="CheckBoxLaunchSkript" Content="Запустить скрипт по завершению квестов" />
-                                    <CheckBox x:Name="CheckBoxWorldQuest" Content="Мировые квесты"  IsChecked="True"/>
-                                    <CheckBox x:Name="CheckBoxAdvancedFight" Content="Улучшенная боевка"/>
-                                    <CheckBox x:Name="CheckBoxLearnAllSpell" Content="Изучать все скилы"/>
+                                    <CheckBox x:Name="CheckBoxNoAttackOnMount" Content="Не отбиваться на маунте"  IsChecked="{Binding NoAttackOnMount}"/>
+                                    <CheckBox x:Name="CheckBoxUnmountMoveFail" Content="Слезать с маунта при застревании"  IsChecked="True"/>
+                                    <CheckBox x:Name="CheckBoxAttackForSitMount" Content="Отбиваться если нужно сесть на маунта"   IsChecked="{Binding NoAttackOnMount}"/>
+                                    <CheckBox x:Name="CheckBoxUseDash" Content="Использовать ускорение" IsChecked="{Binding UseDash}"/>
+                                    <CheckBox x:Name="CheckBoxPickUpLoot" Content="Подбирать лут" IsChecked="True"/>
+                                    <WrapPanel>
+                                        <Label Content="Игнорировать моба через"/>
+                                        <TextBox x:Name="TextBoxIgnoreMob"  Text="20000" />
+                                        <Label Content="мс"/>
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxUseRegen" Content="Реген когда ХП &lt;" />
+                                        <TextBox x:Name="TextBoxHpRegen"  Text="85"  />
+                                        <Label Content="МП &lt;"/>
+                                        <TextBox x:Name="TextBoxMpRegen"  Text="85" />
+                                        <Label Content="Пет &lt;"/>
+                                        <TextBox x:Name="TextBoxPetRegen" Text="85"/>
+                                    </WrapPanel>
+                                    <CheckBox x:Name="CheckBoxPvp" Content="Отбиваться в ПВП"  Margin="0,0,-158,0"  />
+                                    <CheckBox x:Name="CheckBoxUseFly" Content="Использовать перелеты"  IsChecked="True" Margin="0,0,-158,0"/>
+                                    <CheckBox x:Name="CheckBoxKillRunaways" Content="Добивать убегающих мобов"  IsChecked="True" Margin="0,0,-158,0"/>
+                                    <CheckBox x:Name="CheckBoxKillMobsFirst" Content="Нападать на мобов первым" Margin="0,0,-158,0" />
+                                    <CheckBox x:Name="CheckBoxRandomJump" Content="Рандомные прыжки" Margin="0,0,-158,0" />
+                                    <CheckBox x:Name="CheckBoxUseStoneIsStuck" Content="Использовать камень при застревании"  IsChecked="True" Margin="0,0,-158,0"/>
+                                    <CheckBox x:Name="CheckBoxAttackMobForDrop" Content="Убивать мобов, которые мешают при подборе дропа"  IsChecked="True" Margin="0,0,-158,0"/>
+                                    <WrapPanel Margin="0" >
+                                        <CheckBox x:Name="CheckBoxRegisterStone" Content="Рег. камень"/>
+                                        <TextBox x:Name="TextBoxStoneLocX" TextWrapping="Wrap" Text="0" />
+                                        <TextBox x:Name="TextBoxStoneLocY" TextWrapping="Wrap" Text="0"  />
+                                        <TextBox x:Name="TextBoxStoneLocZ" TextWrapping="Wrap" Text="0"  />
+                                        <Label Content="Map" Margin="0" Background="#00000000" Foreground="White"/>
+                                        <TextBox x:Name="TextBoxStoneLocMapId" TextWrapping="Wrap" Text="0"  />
+                                        <Label Content="Area" Margin="0" Background="#00000000" Foreground="White"/>
+                                        <TextBox x:Name="TextBoxStoneLocAreaId" TextWrapping="Wrap" Text="0"  />
+                                        <Button Content="XYZ" Margin="10,0,0,0" Click="ButtonStoneLocFill_Click" />
+                                    </WrapPanel>
+                                    <WrapPanel Margin="0,0,-158,0">
+                                        <CheckBox x:Name="CheckBoxRunRun" Content="Пытаться убежать, если шанс смерти больше"/>
+                                        <TextBox x:Name="TextBoxRunRunPercent" Text="80" />
+                                    </WrapPanel>
                                 </StackPanel>
-                                <StackPanel Margin="0" VerticalAlignment="Bottom">
-                                    <CheckBox x:Name="CheckBoxLogScript" Content="Лог режима скрипт(Действия)"  />
-                                    <CheckBox x:Name="CheckBoxLogSkill" Content="Лог использования скилов" IsChecked="{Binding LogSkill}"/>
-                                    <CheckBox x:Name="CheckBoxAllLog" Content="Все логи"/>
-                                </StackPanel>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="Общее" Grid.Row="1" Grid.Column="0" Margin="0">
-                            <StackPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxAutoEquip" Content="Авто подбор экипировки " IsChecked="{Binding AutoEquip}"/>
-                                    <TextBox x:Name="TextBoxEquipStateWeapon" Text="0" />
-                                </WrapPanel>
-                                <CheckBox x:Name="CheckBoxNoAttackOnMount" Content="Не отбиваться на маунте"  IsChecked="{Binding NoAttackOnMount}"/>
-                                <CheckBox x:Name="CheckBoxUnmountMoveFail" Content="Слезать с маунта при застревании"  IsChecked="True"/>
-                                <CheckBox x:Name="CheckBoxAttackForSitMount" Content="Отбиваться если нужно сесть на маунта"   IsChecked="{Binding NoAttackOnMount}"/>
-                                <CheckBox x:Name="CheckBoxUseDash" Content="Использовать ускорение" IsChecked="{Binding UseDash}"/>
-                                <CheckBox x:Name="CheckBoxPickUpLoot" Content="Подбирать лут" IsChecked="True"/>
-                                <WrapPanel>
-                                    <Label Content="Игнорировать моба через"/>
-                                    <TextBox x:Name="TextBoxIgnoreMob"  Text="20000" />
-                                    <Label Content="мс"/>
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxUseRegen" Content="Реген когда ХП &lt;" />
-                                    <TextBox x:Name="TextBoxHpRegen"  Text="85"  />
-                                    <Label Content="МП &lt;"/>
-                                    <TextBox x:Name="TextBoxMpRegen"  Text="85" />
-                                    <Label Content="Пет &lt;"/>
-                                    <TextBox x:Name="TextBoxPetRegen" Text="85"/>
-                                </WrapPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Общее" Grid.Row="1" Grid.Column="1" Margin="0">
-                            <StackPanel Margin="0">
-                                <CheckBox x:Name="CheckBoxPvp" Content="Отбиваться в ПВП"  />
-                                <CheckBox x:Name="CheckBoxUseFly" Content="Использовать перелеты"  IsChecked="True"/>
-                                <CheckBox x:Name="CheckBoxKillRunaways" Content="Добивать убегающих мобов"  IsChecked="True"/>
-                                <CheckBox x:Name="CheckBoxKillMobsFirst" Content="Нападать на мобов первым" />
-                                <CheckBox x:Name="CheckBoxRandomJump" Content="Рандомные прыжки" />
-                                <CheckBox x:Name="CheckBoxUseStoneIsStuck" Content="Использовать камень при застревании"  IsChecked="True"/>
-                                <CheckBox x:Name="CheckBoxAttackMobForDrop" Content="Убивать мобов, которые мешают при подборе дропа"  IsChecked="True"/>
-                                <WrapPanel >
-                                    <CheckBox x:Name="CheckBoxRegisterStone" Content="Регистрировать камень"/>
-                                    <TextBox x:Name="TextBoxStoneLocX" TextWrapping="Wrap" Text="0" />
-                                    <TextBox x:Name="TextBoxStoneLocY" TextWrapping="Wrap" Text="0"  />
-                                    <TextBox x:Name="TextBoxStoneLocZ" TextWrapping="Wrap" Text="0"  />
-                                    <Label Content="MapId" Margin="0" Background="#00000000" Foreground="White"/>
-                                    <TextBox x:Name="TextBoxStoneLocMapId" TextWrapping="Wrap" Text="0"  />
-                                    <Label Content="AreaId" Margin="0" Background="#00000000" Foreground="White"/>
-                                    <TextBox x:Name="TextBoxStoneLocAreaId" TextWrapping="Wrap" Text="0"  />
-                                    <Button Content="XYZ" Margin="10,0,0,0" Click="ButtonStoneLocFill_Click" />
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxRunRun" Content="Пытаться убежать, если шанс смерти больше"/>
-                                    <TextBox x:Name="TextBoxRunRunPercent" Text="80" />
-                                </WrapPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Настройки маунта" Margin="0" Grid.Row="0" Grid.Column="2">
-                            <StackPanel>
-                                <DataGrid ItemsSource="{Binding CollectionPetSettings}" CanUserAddRows="False" Height="250"/>
-                                <StackPanel>
-                                    <ComboBox x:Name="ComboBoxInvItems1" PreviewMouseLeftButtonDown="comboBoxInvItems1_PreviewMouseLeftButtonDown" Width="220" HorizontalAlignment="Left"/>
-                                    <Button Content="Добавить" Click="button3_Click" HorizontalAlignment="Left"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Список квестов" Margin="0" Grid.Column="1"
-                                          Grid.Row="0" Grid.ColumnSpan="2" Visibility="Collapsed">
-                            <Grid Margin="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="481*"/>
-                                    <ColumnDefinition Width="596*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="462*"/>
-                                    <RowDefinition Height="215*"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.ColumnSpan="2" Margin="0" Orientation="Vertical" Grid.RowSpan="2">
-                                    <ListView x:Name="ListViewQuest" ItemsSource="{Binding CollectionQuestSettings}" Height="200" Margin="0,5,0,0">
-                                        <ListView.View>
-                                            <GridView>
-                                                <GridViewColumn Header="Run" >
-                                                    <GridViewColumn.CellTemplate>
-                                                        <DataTemplate>
-                                                            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                                                            <CheckBox Content="" IsChecked="{Binding Run}"/>
-                                                        </DataTemplate>
-                                                    </GridViewColumn.CellTemplate>
-                                                </GridViewColumn>
-                                                <GridViewColumn Header="QuestId" DisplayMemberBinding="{Binding QuestId}" Width="80"/>
-                                                <GridViewColumn Header="QuestName" DisplayMemberBinding="{Binding QuestName}" Width="280"/>
-                                                <GridViewColumn Header="NpcId" DisplayMemberBinding="{Binding NpcId}" Width="80"/>
-                                                <GridViewColumn Header="Loc" DisplayMemberBinding="{Binding Loc}" Width="150"/>
-                                                <GridViewColumn Header="State" DisplayMemberBinding="{Binding State}" Width="80"/>
-                                                <GridViewColumn Header="Level" DisplayMemberBinding="{Binding Level}" Width="80"/>
-                                                <GridViewColumn Header="MinLevel" DisplayMemberBinding="{Binding MinLevel}" Width="80"/>
+                            </GroupBox>
+                            <GroupBox Header="Квестинг" Margin="0">
+                                <Grid Margin="0">
 
-                                            </GridView>
-                                        </ListView.View>
-                                    </ListView>
-                                    <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
-                                        <Label Content="QuestId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                        <TextBox TextWrapping="Wrap" Text="{Binding MountLocX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59"/>
-                                        <Label Content="NpcId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                        <TextBox TextWrapping="Wrap" Text="{Binding MountLocX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,-5,0"/>
-                                        <Button Content="&gt;" RenderTransformOrigin="0.5,0.5"
-                                                        controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
-                                                        Click="ButtonUpQuest_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                     Margin="80,0,0,0">
-                                            <Button.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform/>
-                                                    <SkewTransform/>
-                                                    <RotateTransform Angle="-90"/>
-                                                    <TranslateTransform/>
-                                                </TransformGroup>
-                                            </Button.RenderTransform>
-                                        </Button>
-                                        <Button Content="&lt;" RenderTransformOrigin="0.5,0.5"
-                                                        controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15"
-                                                        Background="#FF36393E" Click="ButtonDownQuest_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                     Margin="20,0,0,0">
-                                            <Button.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform/>
-                                                    <SkewTransform/>
-                                                    <RotateTransform Angle="-90"/>
-                                                    <TranslateTransform/>
-                                                </TransformGroup>
-                                            </Button.RenderTransform>
-                                        </Button>
+                                    <StackPanel Margin="0" Orientation="Vertical" VerticalAlignment="Top">
+                                        <ComboBox x:Name="ComboBoxQuestSet" VerticalAlignment="Top" SelectedIndex="0" PreviewMouseLeftButtonDown="ComboBoxQuestSet_PreviewMouseLeftButtonDown" Margin="0,0,150,0" Height="Auto">
+                                            <ComboBoxItem Content="Не выбрано"/>
+                                        </ComboBox>
+                                        <WrapPanel>
+                                            <CheckBox x:Name="CheckBoxStopQuesting" Content="Выключать квестинг по достижению "   IsChecked="{Binding StopQuesting}"/>
+                                            <TextBox x:Name="TextBoxStopQuestingLevel" Text="12" />
+                                            <Label Content="уровня"/>
+                                        </WrapPanel>
+                                        <CheckBox x:Name="CheckBoxDebuffDeath" Content="Ожидать дебаф смерти" IsChecked="True"/>
+                                        <CheckBox x:Name="CheckBoxLaunchSkript" Content="Запустить скрипт по завершению квестов" />
+                                        <CheckBox x:Name="CheckBoxWorldQuest" Content="Мировые квесты"  IsChecked="True"/>
+                                        <CheckBox x:Name="CheckBoxAdvancedFight" Content="Улучшенная боевка"/>
+                                        <CheckBox x:Name="CheckBoxLearnAllSpell" Content="Изучать все скилы"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,5,0,0">
-                                        <Button Content="Добавить" Margin="5,0,0,0" Click="button4_Click"/>
-                                        <Button Content="Удалить" Margin="10,0,0,0"/>
-                                        <Button Content="Сохранить" Margin="5,0,0,0" Click="buttonSaveQuest_Click"/>
+                                    <StackPanel Margin="0" VerticalAlignment="Bottom">
+                                        <CheckBox x:Name="CheckBoxLogScript" Content="Лог режима скрипт(Действия)"  />
+                                        <CheckBox x:Name="CheckBoxLogSkill" Content="Лог использования скилов" IsChecked="{Binding LogSkill}"/>
+                                        <CheckBox x:Name="CheckBoxAllLog" Content="Все логи"/>
                                     </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="Игнор квестов" Margin="0" Grid.Row="0" Grid.Column="1">
-                            <StackPanel>
-                                <DataGrid ItemsSource="{Binding CollectionIgnoreQuest}" CanUserAddRows="False" Height="250"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Игнор квестов" Margin="0" Width="250">
                                 <StackPanel>
-                                    <TextBox x:Name="TextBoxIgnoreQuestId" Text="Id" HorizontalAlignment="Left" />
-                                    <Button Content="Добавить" Click="ButtonIgnoreQuestAdd_Click" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                                    <DataGrid ItemsSource="{Binding CollectionIgnoreQuest}" CanUserAddRows="False" Height="250"/>
+                                    <StackPanel>
+                                        <TextBox x:Name="TextBoxIgnoreQuestId" Text="Id" HorizontalAlignment="Left" />
+                                        <Button Content="Добавить" Click="ButtonIgnoreQuestAdd_Click" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Настройки классов" Margin="0" Grid.Row="1" Grid.Column="2">
-                            <StackPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxSummonBattlePet" Content="Призывать боевого питомца" />
-                                    <ComboBox x:Name="ComboBoxSummonBattlePetNumber" Width="150" SelectedIndex="0">
-                                        <ComboBoxItem Content="Пет 1"/>
-                                        <ComboBoxItem Content="Пет 2"/>
-                                        <ComboBoxItem Content="Пет 3"/>
-                                        <ComboBoxItem Content="Пет 4"/>
-                                        <ComboBoxItem Content="Пет 5"/>
-                                    </ComboBox>
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxResPetInCombat" Content="Воскрешать питомца в бою. Mp персонажа &gt;" IsChecked="True"/>
-                                    <TextBox x:Name="TextBoxResPetMeMp" Text="90" />
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <Label Content="Форма для боя "/>
-                                    <ComboBox x:Name="ComboBoxFormForFight" SelectedIndex="0" Width="150" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
-                                        <ComboBoxItem Content="Не использовать" />
-                                        <ComboBoxItem Content="Облик медведя"/>
-                                        <ComboBoxItem Content="Облик кошки" />
-                                        <ComboBoxItem Content="Облик лунного совуха" />
-                                    </ComboBox>
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <Label Content="Форма для бега"/>
-                                    <ComboBox x:Name="ComboBoxFormForMove" SelectedIndex="0" Width="150" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
-                                        <ComboBoxItem Content="Не использовать" />
-                                        <ComboBoxItem Content="Облик медведя"/>
-                                        <ComboBoxItem Content="Облик кошки" />
-                                        <ComboBoxItem Content="Походный облик"/>
-                                    </ComboBox>
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxCraftConjured" Content="Крафтить и использовать бутылки магом HP &lt;" IsChecked="True"/>
-                                    <TextBox x:Name="TextBoxCraftConjuredHp" Text="80" />
-                                    <Label Content="Mp &lt;"/>
-                                    <TextBox x:Name="TextBoxCraftConjuredMp"  Text="80" />
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <CheckBox x:Name="CheckBoxUseArrow" Content="Использовать указанные стрелы"/>
-                                    <TextBox x:Name="TextBoxUseArrowId"  Text="0" />
-                                </WrapPanel>
-                            </StackPanel>
-                        </GroupBox>
-                    </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Список квестов" Margin="0" Visibility="Collapsed">
+                                <Grid Margin="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="481*"/>
+                                        <ColumnDefinition Width="596*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="462*"/>
+                                        <RowDefinition Height="215*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.ColumnSpan="2" Margin="0" Orientation="Vertical" Grid.RowSpan="2">
+                                        <ListView x:Name="ListViewQuest" ItemsSource="{Binding CollectionQuestSettings}" Height="200" Margin="0,5,0,0">
+                                            <ListView.View>
+                                                <GridView>
+                                                    <GridViewColumn Header="Run" >
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                                <CheckBox Content="" IsChecked="{Binding Run}"/>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn Header="QuestId" DisplayMemberBinding="{Binding QuestId}" Width="80"/>
+                                                    <GridViewColumn Header="QuestName" DisplayMemberBinding="{Binding QuestName}" Width="280"/>
+                                                    <GridViewColumn Header="NpcId" DisplayMemberBinding="{Binding NpcId}" Width="80"/>
+                                                    <GridViewColumn Header="Loc" DisplayMemberBinding="{Binding Loc}" Width="150"/>
+                                                    <GridViewColumn Header="State" DisplayMemberBinding="{Binding State}" Width="80"/>
+                                                    <GridViewColumn Header="Level" DisplayMemberBinding="{Binding Level}" Width="80"/>
+                                                    <GridViewColumn Header="MinLevel" DisplayMemberBinding="{Binding MinLevel}" Width="80"/>
+
+                                                </GridView>
+                                            </ListView.View>
+                                        </ListView>
+                                        <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
+                                            <Label Content="QuestId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox TextWrapping="Wrap" Text="{Binding MountLocX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59"/>
+                                            <Label Content="NpcId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                            <TextBox TextWrapping="Wrap" Text="{Binding MountLocX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="59" Margin="5,0,-5,0"/>
+                                            <Button Content="&gt;" RenderTransformOrigin="0.5,0.5"
+                                                controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
+                                                Click="ButtonUpQuest_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                Margin="80,0,0,0">
+                                                <Button.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform/>
+                                                        <SkewTransform/>
+                                                        <RotateTransform Angle="-90"/>
+                                                        <TranslateTransform/>
+                                                    </TransformGroup>
+                                                </Button.RenderTransform>
+                                            </Button>
+                                            <Button Content="&lt;" RenderTransformOrigin="0.5,0.5"
+                                                controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15"
+                                                Background="#FF36393E" Click="ButtonDownQuest_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                Margin="20,0,0,0">
+                                                <Button.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform/>
+                                                        <SkewTransform/>
+                                                        <RotateTransform Angle="-90"/>
+                                                        <TranslateTransform/>
+                                                    </TransformGroup>
+                                                </Button.RenderTransform>
+                                            </Button>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,5,0,0">
+                                            <Button Content="Добавить" Margin="5,0,0,0" Click="Button4_Click"/>
+                                            <Button Content="Удалить" Margin="10,0,0,0"/>
+                                            <Button Content="Сохранить" Margin="5,0,0,0" Click="ButtonSaveQuest_Click"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Настройки маунта" Margin="0" Width="250">
+                                <StackPanel>
+                                    <DataGrid ItemsSource="{Binding CollectionPetSettings}" CanUserAddRows="False" Height="250"/>
+                                    <StackPanel>
+                                        <ComboBox x:Name="ComboBoxInvItems1" PreviewMouseLeftButtonDown="ComboBoxInvItems1_PreviewMouseLeftButtonDown" Width="220" HorizontalAlignment="Left"/>
+                                        <Button Content="Добавить" Click="Button3_Click" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <GroupBox Header="Настройки классов" Margin="0">
+                                <StackPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxSummonBattlePet" Content="Призывать боевого питомца" />
+                                        <ComboBox x:Name="ComboBoxSummonBattlePetNumber" Width="150" SelectedIndex="0">
+                                            <ComboBoxItem Content="Пет 1"/>
+                                            <ComboBoxItem Content="Пет 2"/>
+                                            <ComboBoxItem Content="Пет 3"/>
+                                            <ComboBoxItem Content="Пет 4"/>
+                                            <ComboBoxItem Content="Пет 5"/>
+                                        </ComboBox>
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxResPetInCombat" Content="Воскрешать питомца в бою. Mp персонажа &gt;" IsChecked="True"/>
+                                        <TextBox x:Name="TextBoxResPetMeMp" Text="90" />
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <Label Content="Форма для боя "/>
+                                        <ComboBox x:Name="ComboBoxFormForFight" SelectedIndex="0" Width="150" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
+                                            <ComboBoxItem Content="Не использовать" />
+                                            <ComboBoxItem Content="Облик медведя"/>
+                                            <ComboBoxItem Content="Облик кошки" />
+                                            <ComboBoxItem Content="Облик лунного совуха" />
+                                        </ComboBox>
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <Label Content="Форма для бега"/>
+                                        <ComboBox x:Name="ComboBoxFormForMove" SelectedIndex="0" Width="150" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
+                                            <ComboBoxItem Content="Не использовать" />
+                                            <ComboBoxItem Content="Облик медведя"/>
+                                            <ComboBoxItem Content="Облик кошки" />
+                                            <ComboBoxItem Content="Походный облик"/>
+                                        </ComboBox>
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxCraftConjured" Content="Крафтить и использовать бутылки магом HP &lt;" IsChecked="True"/>
+                                        <TextBox x:Name="TextBoxCraftConjuredHp" Text="80" />
+                                        <Label Content="Mp &lt;"/>
+                                        <TextBox x:Name="TextBoxCraftConjuredMp"  Text="80" />
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxUseArrow" Content="Использовать указанные стрелы"/>
+                                        <TextBox x:Name="TextBoxUseArrowId"  Text="0" />
+                                    </WrapPanel>
+                                    <CheckBox x:Name="CheckBoxLearnPetSpell" Content="Изучать скилы питомца охотника"/>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Открывать TaxyNode" Margin="0">
+                                <StackPanel>
+                                    <DataGrid ItemsSource="{Binding CollectionTaxyNodeSettingses}" CanUserAddRows="False" Height="250"/>
+                                    <StackPanel>
+                                        <ComboBox x:Name="ComboBoxTaxyNode" PreviewMouseLeftButtonDown="ComboBoxTaxyNode_PreviewMouseLeftButtonDown" Width="220" HorizontalAlignment="Left"/>
+                                        <Button Content="Добавить" Click="Button_Click_2" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </WrapPanel>
+                    </StackPanel>
                 </TabItem>
                 <TabItem Header="Умения">
                     <TabControl>
@@ -352,8 +349,8 @@
                                           Grid.Column="0" Margin="0">
                                     <StackPanel >
                                         <WrapPanel Margin="0,0,0,5">
-                                            <Button  x:Name="ButtonAddSkill" IsEnabled="False" Content="Добавить" Click="buttonAddSkill_Click" />
-                                            <Button  x:Name="ButtonDelSkill" IsEnabled="False" Content="Удалить" Click="buttonDelSkill_Click" Margin="10,0,0,0" />
+                                            <Button  x:Name="ButtonAddSkill" IsEnabled="False" Content="Добавить" Click="ButtonAddSkill_Click" />
+                                            <Button  x:Name="ButtonDelSkill" IsEnabled="False" Content="Удалить" Click="ButtonDelSkill_Click" Margin="10,0,0,0" />
                                             <Button  x:Name="ButtonChangeSkill" Margin="10,0,0,0" IsEnabled="False" Content="Редактировать" Click="ButtonChangeSkill_Click" />
                                             <Button Content="Авто добавление скилов"  Click="ButtonAddSkillAuto_Click" Margin="30,0,5,0"/>
                                             <CheckBox x:Name="CheckBoxRandomDistForAttack" Content="Начинать атаку с рандомной дистанции. MaxDist -"/>
@@ -363,7 +360,7 @@
                                             <StackPanel>
                                                 <GroupBox Header="Приоритет:">
                                                     <Grid>
-                                                        <TextBox x:Name="TextBoxPriority" TextWrapping="Wrap" Text="0" PreviewTextInput="textBox_PreviewTextInput" VerticalAlignment="Top" HorizontalAlignment="Left" />
+                                                        <TextBox x:Name="TextBoxPriority" TextWrapping="Wrap" Text="0" PreviewTextInput="TextBox_PreviewTextInput" VerticalAlignment="Top" HorizontalAlignment="Left" />
                                                         <Button Content="&gt;"  HorizontalAlignment="Right" Margin="0,-7,5,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"
                                                                 controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
                                                                 Click="ButtonUpPriotity_Click" >
@@ -1111,7 +1108,7 @@
 
                                             <GroupBox Header="Приоритет:" VerticalAlignment="Top">
                                                 <Grid>
-                                                    <TextBox x:Name="TextBoxPriority1" HorizontalAlignment="Left" Margin="0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" PreviewTextInput="textBox_PreviewTextInput" />
+                                                    <TextBox x:Name="TextBoxPriority1" HorizontalAlignment="Left" Margin="0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" PreviewTextInput="TextBox_PreviewTextInput" />
                                                     <Button Content="&gt;"  HorizontalAlignment="Right" Margin="0,-7,5,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"
                                                             controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
                                                             Click="ButtonUpPriotity_Click" >
@@ -1826,6 +1823,7 @@
                                             <Button Content="Удалить" Margin="10,0,0,0" Click="ButtonInvItemsDel2_Click_1" />
                                         </WrapPanel>
                                         <CheckBox x:Name="CheckBoxUseStoneForLearnSpell" Content="Использовать камень телепорта "/>
+                                        <CheckBox x:Name="CheckBoxLearnSpell" Content="Изучать умения" IsChecked="True"/>
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
@@ -1873,7 +1871,7 @@
                                                 <TextBox x:Name="TextBoxFarmLocMapId" Text="{Binding FarmLocMapId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
                                                 <Label Content="AreaId" />
                                                 <TextBox x:Name="TextBoxFarmLocAreaId"  Text="{Binding FarmLocAreaId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                <Button Content="XYZ" Click="buttonFarmLocFill_Click" Margin="10,0,0,0" />
+                                                <Button Content="XYZ" Click="ButtonFarmLocFill_Click" Margin="10,0,0,0" />
                                                 <CheckBox x:Name="CheckBoxAoeFarm" Content="Собирать мобов" IsChecked="{Binding AoeFarm}" Margin="5,0,0,0"/>
                                                 <TextBox x:Name="TextBoxAoeMobsCount"  Text="{Binding AoeMobsCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
                                                 <Label Content="Радиус" />
@@ -1903,7 +1901,7 @@
                                                     <TextBox x:Name="TextBoxFarmMultiZoneMapId" Text="0" />
                                                     <Label Content="AreaId"/>
                                                     <TextBox x:Name="TextBoxFarmMultiZoneAreaId" Text="0" />
-                                                    <Button x:Name="ButtonMultiZoneLocFill" Content="XYZ" Click="buttonMultiZoneLocFill_Click" />
+                                                    <Button x:Name="ButtonMultiZoneLocFill" Content="XYZ" Click="ButtonMultiZoneLocFill_Click" />
                                                     <Label Content="Радиус:"/>
                                                     <TextBox x:Name="TextBoxMultiZoneRadius" Text="50" />
                                                 </WrapPanel>
@@ -1912,10 +1910,10 @@
                                                     <TextBox x:Name="TextBoxMultiZoneTime" Text="30" />
                                                     <Label Content="секунд"/>
                                                 </WrapPanel>
-                                                <WrapPanel Visibility="Collapsed">
-                                                    <CheckBox Content="Менять зону если умер &gt;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E"  Margin="0,5,0,0"/>
-                                                    <TextBox TextWrapping="Wrap" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Margin="5,0,0,0"/>
-                                                    <Label Content="раза от игрока" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
+                                                <WrapPanel>
+                                                    <CheckBox x:Name="CheckBoxChangeDeathByPlayer" Content="Менять зону если умер &gt;"/>
+                                                    <TextBox x:Name="textBoxCountDeathByPlayer"  Text="1"/>
+                                                    <Label Content="раза от игрока" />
                                                 </WrapPanel>
                                                 <WrapPanel>
                                                     <CheckBox x:Name="CheckBoxChangeByLevel" Content="Менять зону по уровню. MinLevel"/>
@@ -1932,8 +1930,19 @@
                                                     <CheckBox x:Name="CheckBoxUseFilterMultiZone" Content="Убивать только этих мобов, указывать через запятую"/>
                                                     <TextBox x:Name="TextBoxMultiZoneListMob" Text="0" />
                                                 </WrapPanel>
+                                                <WrapPanel Margin="0" >
+                                                    <CheckBox x:Name="CheckBoxRegisterStoneMultiZone" Content="Регистрировать камень для мультизоны"/>
+                                                    <TextBox x:Name="TextBoxStoneLocXMultiZone" TextWrapping="Wrap" Text="0" />
+                                                    <TextBox x:Name="TextBoxStoneLocYMultiZone" TextWrapping="Wrap" Text="0"  />
+                                                    <TextBox x:Name="TextBoxStoneLocZMultiZone" TextWrapping="Wrap" Text="0"  />
+                                                    <Label Content="MapId" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxStoneLocMapIdMultiZone" TextWrapping="Wrap" Text="0"  />
+                                                    <Label Content="AreaId" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxStoneLocAreaIdMultiZone" TextWrapping="Wrap" Text="0"  />
+                                                    <Button Content="XYZ" Margin="10,0,0,0" Click="Button_Click_1" />
+                                                </WrapPanel>
                                                 <WrapPanel>
-                                                    <Button Content="Добавить" Click="buttonAddMultiZone_Click" />
+                                                    <Button Content="Добавить" Click="ButtonAddMultiZone_Click" />
                                                 </WrapPanel>
                                             </StackPanel>
                                         </StackPanel>
@@ -1949,11 +1958,11 @@
                                         </GroupBox.Header>
                                         <StackPanel>
                                             <DataGrid Height="400"  ItemsSource="{Binding CollectionMobs}" CanUserAddRows="False" />
-                                            <ComboBox x:Name="ComboBoxMobs" HorizontalAlignment="Left" VerticalAlignment="Top" Width="466" PreviewMouseLeftButtonDown="comboBoxMobs_PreviewMouseLeftButtonDown"/>
+                                            <ComboBox x:Name="ComboBoxMobs" HorizontalAlignment="Left" VerticalAlignment="Top" Width="466" PreviewMouseLeftButtonDown="ComboBoxMobs_PreviewMouseLeftButtonDown"/>
                                             <WrapPanel>
                                                 <Button Content="Добавить" Click="Button1_Click" />
-                                                <Button Content="Добавить всё" Margin="5,0,0,0" Click="buttonAddAllMobs_Click" Height="25" />
-                                                <Button Content="Очистить" Margin="20,0,0,0" Click="buttonClearAllMobs_Click" Height="25" />
+                                                <Button Content="Добавить всё" Margin="5,0,0,0" Click="ButtonAddAllMobs_Click" Height="25" />
+                                                <Button Content="Очистить" Margin="20,0,0,0" Click="ButtonClearAllMobs_Click" Height="25" />
                                             </WrapPanel>
                                             <CheckBox x:Name="CheckBoxChangeTargetInCombat" Content="Менять цели на приоритетные во время боя" Margin="0,5,0,0"/>
                                         </StackPanel>
@@ -2009,12 +2018,12 @@
                                             </ListView>
                                             <StackPanel Margin="0,10,0,0" Orientation="Vertical" Grid.Row="1"
                                                         Grid.Column="0">
-                                                <ComboBox x:Name="ComboBoxProp" VerticalAlignment="Top" Margin="5,0" PreviewMouseLeftButtonDown="comboBoxProp_PreviewMouseLeftButtonDown"/>
+                                                <ComboBox x:Name="ComboBoxProp" VerticalAlignment="Top" Margin="5,0" PreviewMouseLeftButtonDown="ComboBoxProp_PreviewMouseLeftButtonDown"/>
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
-                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="buttonAddProp_Click" />
-                                                    <Button Content="Удалить" Margin="10,0,0,0" Click="buttonPropsDel_Click" />
-                                                    <Button Content="Добавить всё" Margin="10,0,0,0" Click="buttonAddAllProps_Click" />
-                                                    <Button Content="Очистить" Margin="30,0,0,0" Click="buttonClearAllProps_Click" />
+                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddProp_Click" />
+                                                    <Button Content="Удалить" Margin="10,0,0,0" Click="ButtonPropsDel_Click" />
+                                                    <Button Content="Добавить всё" Margin="10,0,0,0" Click="ButtonAddAllProps_Click" />
+                                                    <Button Content="Очистить" Margin="30,0,0,0" Click="ButtonClearAllProps_Click" />
                                                 </StackPanel>
                                             </StackPanel>
                                             <GroupBox Header="Сбор" Margin="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1" Grid.Column="1">
@@ -2028,7 +2037,7 @@
                                                         <TextBox x:Name="TextBoxGatherLocMapId" TextWrapping="Wrap" Text="{Binding GatherLocMapId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
                                                         <Label Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
                                                         <TextBox x:Name="TextBoxGatherLocAreaId" TextWrapping="Wrap" Text="{Binding GatherLocAreaId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                        <Button Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonGatherLocFill_Click" Margin="10,0,0,0" />
+                                                        <Button Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonGatherLocFill_Click" Margin="10,0,0,0" />
                                                     </WrapPanel>
                                                     <WrapPanel Orientation="Horizontal" Margin="0,5,0,0">
                                                         <Label Content="Радиус:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
@@ -2045,8 +2054,8 @@
                                 <Grid>
                                     <DataGrid x:Name="DataGridResourceIgnore" ItemsSource="{Binding CollectionGameObjectIgnores}"  Margin="0" Height="500" VerticalAlignment="Top" CanUserAddRows="False"/>
                                     <StackPanel Margin="5,520,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        <Button Content="Добавить" Click="buttonAddResourceIgnore_Click" HorizontalAlignment="Left" />
-                                        <Button Content="Удалить" Margin="5,0,0,0" Click="buttonResourceIgnore_Click" HorizontalAlignment="Left" />
+                                        <Button Content="Добавить" Click="ButtonAddResourceIgnore_Click" HorizontalAlignment="Left" />
+                                        <Button Content="Удалить" Margin="5,0,0,0" Click="ButtonResourceIgnore_Click" HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </Grid>
                             </TabItem>
@@ -2070,7 +2079,7 @@
                                             </Grid.RowDefinitions>
                                             <DataGrid Grid.ColumnSpan="2"  ItemsSource="{Binding CollectionInvItems}" CanUserAddRows="False"  />
                                             <StackPanel Grid.Row="1" Grid.Column="0">
-                                                <ComboBox x:Name="ComboBoxInvItems" Width="466" PreviewMouseLeftButtonDown="comboBox_PreviewMouseLeftButtonDown" HorizontalAlignment="Left" Height="Auto"/>
+                                                <ComboBox x:Name="ComboBoxInvItems" Width="466" PreviewMouseLeftButtonDown="ComboBox_PreviewMouseLeftButtonDown" HorizontalAlignment="Left" Height="Auto"/>
                                                 <WrapPanel>
                                                     <Label Content="Использование"/>
                                                     <ComboBox x:Name="ComboBoxInvItemsUse" Width="200" SelectedIndex="0" Height="Auto">
@@ -2083,6 +2092,7 @@
                                                         <ComboBoxItem Content="Отправить почтой"/>
                                                         <ComboBoxItem Content="Кормить питомца"/>
                                                         <ComboBoxItem Content="Покупать"/>
+                                                        <ComboBoxItem Content="Не одевать"/>
                                                     </ComboBox>
                                                 </WrapPanel>
                                                 <WrapPanel>
@@ -2105,8 +2115,8 @@
                                                     <TextBox x:Name="TextBoxItemsMaxCount" Text="0" />
                                                 </WrapPanel>
                                                 <WrapPanel>
-                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="button_Click" />
-                                                    <Button Content="Добавить всё" Margin="5,0,0,0" Click="buttonAddAllInvItems_Click" />
+                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="Button_Click" />
+                                                    <Button Content="Добавить всё" Margin="5,0,0,0" Click="ButtonAddAllInvItems_Click" />
                                                     <Label Content="Мой уровень &gt; " Margin="5,0,0,0"/>
                                                     <TextBox x:Name="TextBoxInvMeLevel" Text="1" />
                                                 </WrapPanel>
@@ -2129,7 +2139,7 @@
                                                         <TextBox x:Name="TextBoxMountLocMapId" Text="{Binding MountLocMapId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                         <Label Content="AreaId"/>
                                                         <TextBox x:Name="TextBoxMountLocAreaId" Text="{Binding MountLocAreaId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        <Button Content="XYZ" Click="buttonFarmLocFill1_Click" Margin="10,0,0,0" />
+                                                        <Button Content="XYZ" Click="ButtonFarmLocFill1_Click" Margin="10,0,0,0" />
                                                     </WrapPanel>
                                                     <WrapPanel>
                                                         <CheckBox x:Name="CheckBoxUseWhistleForSellAndRepair" Content="Использовать свисток для починки/продажи"/>
@@ -2159,8 +2169,9 @@
                                                         <TextBox x:Name="TextBoxSendMailLocMapId" Text="0" />
                                                         <Label Content="AreaId" />
                                                         <TextBox x:Name="TextBoxSendMailLocAreaId" Text="0" />
-                                                        <Button Content="XYZ" Click="buttonSendMailLocFill_Click" Margin="10,0,0,0" />
+                                                        <Button Content="XYZ" Click="ButtonSendMailLocFill_Click" Margin="10,0,0,0" />
                                                     </WrapPanel>
+                                                    <CheckBox x:Name="CheckBoxApplyMail" Content="Принимать почту" Margin="0" IsChecked="True"/>
                                                 </StackPanel>
                                             </GroupBox>
                                         </Grid>
@@ -2183,17 +2194,17 @@
                                             <StackPanel Grid.Row="1" Grid.Column="0">
                                                 <WrapPanel>
                                                     <Label Content="Тип:" Width="60"/>
-                                                    <ComboBox x:Name="ComboBoxInvItemsGlobalClass" Width="200" PreviewMouseLeftButtonDown="comboBoxInvItemsGlobalClass_PreviewMouseLeftButtonDown"/>
+                                                    <ComboBox x:Name="ComboBoxInvItemsGlobalClass" Width="200" PreviewMouseLeftButtonDown="ComboBoxInvItemsGlobalClass_PreviewMouseLeftButtonDown"/>
                                                 </WrapPanel>
                                                 <WrapPanel>
                                                     <Label Content="Качество"/>
-                                                    <ComboBox x:Name="ComboBoxInvItemsGlobalQuality" Width="200" PreviewMouseLeftButtonDown="comboBoxInvItemsGlobalQuality_PreviewMouseLeftButtonDown"/>
+                                                    <ComboBox x:Name="ComboBoxInvItemsGlobalQuality" Width="200" PreviewMouseLeftButtonDown="ComboBoxInvItemsGlobalQuality_PreviewMouseLeftButtonDown"/>
                                                 </WrapPanel>
                                                 <WrapPanel>
                                                     <Label Content="Уровень предмета &lt;= "/>
                                                     <TextBox x:Name="TextBoxItemLevel" Text="0" />
                                                 </WrapPanel>
-                                                <Button Content="Добавить" Click="buttonAddItemGlobal_Click" HorizontalAlignment="Left" />
+                                                <Button Content="Добавить" Click="ButtonAddItemGlobal_Click" HorizontalAlignment="Left" />
                                             </StackPanel>
                                         </Grid>
                                     </GroupBox>
@@ -2215,10 +2226,10 @@
                                             <StackPanel Margin="5,5,0,0" Grid.Row="1" Grid.Column="0">
                                                 <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                                     <Label Content="Слот:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
-                                                    <ComboBox x:Name="ComboBoxBuyAuc" Width="200" PreviewMouseLeftButtonDown="comboBoxBuyAuc_PreviewMouseLeftButtonDown" HorizontalAlignment="Right"/>
+                                                    <ComboBox x:Name="ComboBoxBuyAuc" Width="200" PreviewMouseLeftButtonDown="ComboBoxBuyAuc_PreviewMouseLeftButtonDown" HorizontalAlignment="Right"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
-                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="buttonAddEquipAuc_Click" />
+                                                    <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddEquipAuc_Click" />
                                                 </StackPanel>
                                             </StackPanel>
                                         </Grid>
@@ -2237,10 +2248,7 @@
                                                 <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                                     <Label Content="Weapon: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
                                                     <ComboBox x:Name="ComboBoxAdvancedEquipWeapon" Width="200" PreviewMouseLeftButtonDown="ComboBoxAdvancedEquipWeapon_PreviewMouseLeftButtonDown" HorizontalAlignment="Right" Margin="0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
                                                     <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddAdvancedEquip_Click" Height="25" VerticalAlignment="Top" />
-                                                    <Button Content="Удалить" Margin="10,0,0,0" Click="ButtonDelAdvancedEquip_Click" />
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
@@ -2250,49 +2258,69 @@
                                                 <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                                     <Label Content="Armor:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
                                                     <ComboBox x:Name="ComboBoxAdvancedEquipArmor" Width="200" PreviewMouseLeftButtonDown="ComboBoxAdvancedEquipArmor_PreviewMouseLeftButtonDown" HorizontalAlignment="Right" Margin="0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
                                                     <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddAdvancedEquipArmor_Click" Height="25" VerticalAlignment="Top" />
-                                                    <Button Content="Удалить" Margin="10,0,0,0" Click="ButtonDelAdvancedEquipArmor_Click" />
                                                 </StackPanel>
-                                                <CheckBox x:Name="CheckBoxAdvancedEquipShield" Content="Использовать Щит" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" />
-                                                <CheckBox x:Name="CheckBoxTwoWeapon" Content="Два оружия" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E" />
-                                                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                                                    <Label Content="Макс качество:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                                    <ComboBox x:Name="ComboBoxAdvancedEquipQuality" Width="150" PreviewMouseLeftButtonDown="comboBoxAdvancedEquipQuality_PreviewMouseLeftButtonDown" HorizontalAlignment="Right" Margin="0"/>
-                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
+                                        <GroupBox Header="" Margin="0">
+                                            <StackPanel Margin="0" Orientation="Vertical">
+                                                <DataGrid x:Name="DataGridEquipArmorType" ItemsSource="{Binding CollectionEquipAucMasks}" AutoGenerateColumns="True" CanUserAddRows="False"/>
                                             </StackPanel>
                                         </GroupBox>
                                     </StackPanel>
                                     <GroupBox Header="" Margin="0">
                                         <StackPanel Margin="0" Orientation="Vertical">
-                                            <DataGrid ItemsSource="{Binding CollectionAdvancedEquipStats}" AutoGenerateColumns="True" Height="400" CanUserAddRows="False"/>
+                                            <DataGrid ItemsSource="{Binding CollectionAdvancedEquipStats}" AutoGenerateColumns="True" Height="250" CanUserAddRows="False"/>
                                             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                                 <Label Content="Stat" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
                                                 <ComboBox x:Name="ComboBoxAdvancedEquipStat" Width="200" PreviewMouseLeftButtonDown="ComboBoxAdvancedEquipStat_PreviewMouseLeftButtonDown" HorizontalAlignment="Right" Margin="0"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="138">
                                                 <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddAdvancedEquipStat_Click" Height="25" VerticalAlignment="Top" />
                                             </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                            <GroupBox Header="" Margin="0">
+                                                <StackPanel Margin="0" Orientation="Vertical">
+                                                    <DataGrid x:Name="DataGridEquipBag" ItemsSource="{Binding CollectionEquipAucBags}" AutoGenerateColumns="True" CanUserAddRows="False"/>
+                                                </StackPanel>
+                                            </GroupBox>
                                         </StackPanel>
                                     </GroupBox>
-                                    <GroupBox Header="Формула расчета: Броня или ДПС + Стат* Коэф" Margin="0">
-                                        <StackPanel HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top">
-                                            <TextBlock x:Name="TextBlockEquipCoef" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Одето" VerticalAlignment="Top" Foreground="#FFFFFEFE"/>
-                                            <TextBlock x:Name="TextBlockInvCoef" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Инвентарь" VerticalAlignment="Top" Foreground="#FFF7F2F2"/>
-                                            <Button Content="Расчитать" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="ButtonCheckCoef_Click" RenderTransformOrigin="-2.107,2.12"
-                                                      Panel.ZIndex="1"/>
-                                        </StackPanel>
-                                    </GroupBox>
+                                    <StackPanel Orientation="Vertical">
+                                        <GroupBox Header="" Margin="0">
+                                            <StackPanel>
+                                                <CheckBox x:Name="CheckBoxAdvancedEquipShield" Content="Использовать Щит" />
+                                                <CheckBox x:Name="CheckBoxTwoWeapon" Content="Два оружия" />
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Label Content="Не покупать если меди &lt;"/>
+                                                    <TextBox x:Name="TextBoxStopEquipAucMinGold" Text="10" />
+                                                </WrapPanel>
+                                                <WrapPanel>
+                                                    <Label Content="Макс качество:"/>
+                                                    <ComboBox x:Name="ComboBoxAdvancedEquipQuality" Width="150" PreviewMouseLeftButtonDown="ComboBoxAdvancedEquipQuality_PreviewMouseLeftButtonDown" HorizontalAlignment="Right"/>
+                                                </WrapPanel>
+                                                <WrapPanel Margin="0,0,35,0">
+                                                    <Label Content="Коэф брони:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                                    <TextBox x:Name="TextBoxStopEquipArmorCoef" Text="1" Margin="0" />
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </GroupBox>
+                                        <GroupBox Header="Формула расчета: Броня или ДПС + Стат* Коэф" Margin="0">
+                                            <StackPanel HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top">
+                                                <TextBlock x:Name="TextBlockEquipCoef" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Одето" VerticalAlignment="Top" Foreground="#FFFFFEFE"/>
+                                                <TextBlock x:Name="TextBlockInvCoef" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Инвентарь" VerticalAlignment="Top" Foreground="#FFF7F2F2"/>
+                                                <Button Content="Расчитать" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="ButtonCheckCoef_Click" RenderTransformOrigin="-2.107,2.12"
+                                                    Panel.ZIndex="1"/>
+                                            </StackPanel>
+                                        </GroupBox>
+                                    </StackPanel>
                                 </StackPanel>
                             </TabItem>
                         </TabControl>
                     </Grid>
                 </TabItem>
-                <TabItem Header="События" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Grid Margin="0">
+                <TabItem Header="События">
+                    <Grid>
                         <GroupBox Header="Список событий" Margin="0">
-                            <Grid Margin="0,0,0,-3">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="481*"/>
                                     <ColumnDefinition Width="596*"/>
@@ -2302,361 +2330,326 @@
                                     <RowDefinition Height="215*"/>
                                 </Grid.RowDefinitions>
                                 <DataGrid CanUserAddRows="False" Grid.ColumnSpan="2" ItemsSource="{Binding CollectionEventSettings}"/>
-                                <GroupBox Header="События" HorizontalAlignment="Left" Margin="0" Grid.Row="1"
+                                <GroupBox Header="События" Margin="0" Grid.Row="1"
                                           Grid.Column="0">
                                     <StackPanel>
-                                        <StackPanel Margin="0" Orientation="Vertical">
-                                            <ComboBox x:Name="ComboBoxEventType" HorizontalAlignment="Left" VerticalAlignment="Top" Width="466" PreviewMouseLeftButtonDown="comboBoxMobs_PreviewMouseLeftButtonDown">
-                                                <ComboBoxItem Content="Нет активности"/>
-                                                <ComboBoxItem Content="Смерть"/>
-                                                <ComboBoxItem Content="Смерть от вражеского игрока" IsEnabled="True"/>
-                                                <ComboBoxItem Content="Чат"/>
-                                                <ComboBoxItem Content="GM" IsEnabled="False"/>
-                                                <ComboBoxItem Content="Атака вражеского игрока" IsEnabled="True"/>
-                                                <ComboBoxItem Content="Приглашение в группу"/>
-                                                <ComboBoxItem Content="Приглашение в клан" IsEnabled="False"/>
-                                                <ComboBoxItem Content="GM на сервере" IsEnabled="False"/>
-                                                <ComboBoxItem Content="Игрок в зоне"/>
-                                            </ComboBox>
-                                            <ComboBox x:Name="ComboBoxEventAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="466" PreviewMouseLeftButtonDown="comboBoxMobs_PreviewMouseLeftButtonDown" Margin="0,5,0,0">
-                                                <ComboBoxItem Content="Записать в лог"/>
-                                                <ComboBoxItem Content="Выход из игры"/>
-                                                <ComboBoxItem Content="Проиграть звук"/>
-                                                <ComboBoxItem Content="Пауза"/>
-                                                <ComboBoxItem Content="Развернуть клиент игры"/>
-                                                <ComboBoxItem Content="Развернуть окно квестера"/>
-                                            </ComboBox>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,20,0,0">
-                                            <Button Content="Добавить" Margin="5,0,0,0" Click="button2_Click_1" />
-                                            <Button Content="Редактировать" Margin="5,0,0,0" Click="buttonAddAllMobs_Click" IsEnabled="False" />
-                                        </StackPanel>
+                                        <ComboBox x:Name="ComboBoxEventType" PreviewMouseLeftButtonDown="ComboBoxMobs_PreviewMouseLeftButtonDown">
+                                            <ComboBoxItem Content="Нет активности"/>
+                                            <ComboBoxItem Content="Смерть"/>
+                                            <ComboBoxItem Content="Смерть от вражеского игрока" IsEnabled="True"/>
+                                            <ComboBoxItem Content="Чат"/>
+                                            <ComboBoxItem Content="GM" IsEnabled="False"/>
+                                            <ComboBoxItem Content="Атака вражеского игрока" IsEnabled="True"/>
+                                            <ComboBoxItem Content="Приглашение в группу"/>
+                                            <ComboBoxItem Content="Приглашение в клан" IsEnabled="False"/>
+                                            <ComboBoxItem Content="GM на сервере" IsEnabled="False"/>
+                                            <ComboBoxItem Content="Игрок в зоне"/>
+                                        </ComboBox>
+                                        <ComboBox x:Name="ComboBoxEventAction" PreviewMouseLeftButtonDown="ComboBoxMobs_PreviewMouseLeftButtonDown">
+                                            <ComboBoxItem Content="Записать в лог"/>
+                                            <ComboBoxItem Content="Выход из игры"/>
+                                            <ComboBoxItem Content="Проиграть звук"/>
+                                            <ComboBoxItem Content="Пауза"/>
+                                            <ComboBoxItem Content="Развернуть клиент игры"/>
+                                            <ComboBoxItem Content="Развернуть окно квестера"/>
+                                        </ComboBox>
+                                        <Button Content="Добавить" Click="Button2_Click_1" HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox Grid.Column="1" Header="Настройки событий" Margin="0" Grid.Row="1">
-                                    <StackPanel Margin="5,5,0,0" Orientation="Vertical">
-                                        <Label Content="Звуковой файл:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0"/>
-                                        <TextBox x:Name="TextBox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Выберите файл для звука" VerticalAlignment="Top" PreviewMouseLeftButtonDown="textBox_PreviewMouseLeftButtonDown" Margin="5,0,0,0" />
-                                        <Label Content="Пауза:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0"/>
-                                        <TextBox x:Name="TextBoxCopy" HorizontalAlignment="Left" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                    <StackPanel>
+                                        <WrapPanel>
+                                            <Label Content="Звуковой файл:" Margin="0"/>
+                                            <TextBox x:Name="TextBox" TextWrapping="Wrap" Text="Выберите файл для звука" PreviewMouseLeftButtonDown="TextBox_PreviewMouseLeftButtonDown" Margin="0" />
+                                        </WrapPanel>
+                                        <WrapPanel>
+                                            <Label Content="Пауза:" Foreground="White"/>
+                                            <TextBox x:Name="TextBoxCopy"  Text="0" Margin="0" />
+                                            <Label Content="мс" Foreground="White"/>
+                                        </WrapPanel>
                                     </StackPanel>
                                 </GroupBox>
                             </Grid>
                         </GroupBox>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Скрипт" VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <Grid Margin="0">
-                        <TabControl Foreground="Black">
-                            <TabItem Header="Основное" BorderBrush="{x:Null}" Background="{x:Null}">
-                                <Grid>
-                                    <GroupBox Header="Список действий" Margin="0">
-                                        <Grid Margin="0,0,0,-3">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="611*"/>
-                                                <ColumnDefinition Width="466*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="327*"/>
-                                                <RowDefinition Height="350*"/>
-                                            </Grid.RowDefinitions>
-                                            <DataGrid x:Name="DataGridScript" CanUserAddRows="False" ItemsSource="{Binding CollectionDungeonCoord}"  Grid.ColumnSpan="2"/>
-                                            <GroupBox Header="Выбор действий" Margin="0,1,0,0" Grid.Row="1" Grid.Column="1">
-                                                <Grid Margin="0">
-                                                    <StackPanel Margin="5,0,0,0" Orientation="Vertical">
-                                                        <CheckBox x:Name="CheckBoxRunScriptfrombegin" Content="Запускать с начала" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Margin="5,0,0,0"/>
-                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                            <CheckBox x:Name="CheckBoxGatherResourceScript" Content="Собирать ресурсы по дороге с радиусом" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  IsChecked="{Binding GatherResouceScript}"/>
-                                                            <TextBox x:Name="TextBoxGatherRadiusScript" TextWrapping="Wrap" Text="{Binding GatherRadiusScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <CheckBox x:Name="CheckBoxFindBestPoint" Content="Ближайшая точка" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  IsChecked="True" Margin="5,0,0,0"/>
-                                                        </StackPanel>
-                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                            <CheckBox x:Name="CheckBoxForceMoveScriptEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  IsChecked="{Binding ForceMoveScriptEnable}" Content="Использовать ForceMove на дистанцию до"/>
-                                                            <TextBox x:Name="TextBoxForceMoveScriptDist" TextWrapping="Wrap" Text="{Binding ForceMoveScriptDist}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <Label Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                        </StackPanel>
-                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                            <CheckBox x:Name="CheckBoxFightIfHpLess" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  IsChecked="{Binding FightIfHPLess}" Content="Отбиваться если HP меньше"/>
-                                                            <TextBox x:Name="TextBoxFightIfHpLessCount" TextWrapping="Wrap" Text="{Binding FightIfHPLessCount}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <CheckBox x:Name="CheckBoxFightIfMobs" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Отбиваться если моб мешает сбору"/>
-                                                        </StackPanel>
-                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                                            <CheckBox x:Name="CheckBoxAttack" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  IsChecked="{Binding Attack}" Content="Атаковать мобов в радиусе"/>
-                                                            <TextBox x:Name="TextBoxAttackRadius" TextWrapping="Wrap" Text="{Binding AttackRadius}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                        </StackPanel>
-                                                        <CheckBox x:Name="CheckBoxWaitSixMin" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Ожидать до 6 минут" Margin="5,0,0,0" IsChecked="True"/>
-                                                        <CheckBox x:Name="CheckBoxScriptReverse" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Реверс маршрута" Margin="5,5,0,0"/>
-                                                        <StackPanel Margin="0,16,0,0" Orientation="Horizontal" VerticalAlignment="Bottom">
-                                                            <Button x:Name="ButtonScriptSavePointMove" Content="Запись точек в движении(выкл)" Click="buttonScriptSavePointMove_Click" HorizontalAlignment="Left" />
-                                                            <Label Content="Дистанция между точками" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxScriptSavePointMoveDist" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" Text="5" />
-                                                            <Label Content="метров" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                    <Button Content="Сохранить" Click="buttonDungeonSaveScript_Click"  Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                                                </Grid>
-                                            </GroupBox>
-                                            <GroupBox Header="Настройки действий" Margin="0" Grid.Row="1"
-                                                      Grid.Column="0">
-                                                <Grid>
-                                                    <WrapPanel Orientation="Horizontal">
-                                                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                                            <Label Content="Действие: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0" SelectionChanged="ComboBoxDungeonAction_SelectionChanged">
-                                                                <ComboBoxItem Content="Не выбрано"/>
-                                                                <ComboBoxItem Content="Вход в данж" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Выход из данжа" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Бежать на точку"/>
-                                                                <ComboBoxItem Content="Фарм мобов" IsEnabled="False"/>
-                                                                <ComboBoxItem Content="Отбиться от мобов"/>
-                                                                <ComboBoxItem Content="Фарм пропов" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Пауза"/>
-                                                                <ComboBoxItem Content="Пауза 2"/>
-                                                                <ComboBoxItem Content="Сбросить все данжи"/>
-                                                                <ComboBoxItem Content="Использовать скилл"/>
-                                                                <ComboBoxItem Content="Выбрать диалог"/>
+                <TabItem Header="Скрипт">
+                    <TabControl>
+                        <TabItem Header="Основное">
+                            <StackPanel>
+                                <GroupBox Header="Список действий" Height="300" Margin="0">
+                                    <DataGrid x:Name="DataGridScript" CanUserAddRows="False" ItemsSource="{Binding CollectionDungeonCoord}"/>
+                                </GroupBox>
+                                <DockPanel>
+                                    <GroupBox Header="Настройки действий" Margin="0" Width="657">
+                                        <StackPanel>
+                                            <StackPanel>
+                                                <WrapPanel>
+                                                    <Label Content="Действие: "/>
+                                                    <ComboBox x:Name="ComboBoxDungeonAction" HorizontalAlignment="Left" Width="200" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
+                                                        <ComboBoxItem Content="Вход в данж"/>
+                                                        <ComboBoxItem Content="Выход из данжа" />
+                                                        <ComboBoxItem Content="Бежать на точку"/>
+                                                        <ComboBoxItem Content="Фарм мобов"/>
+                                                        <ComboBoxItem Content="Отбиться от мобов"/>
+                                                        <ComboBoxItem Content="Фарм пропов"/>
+                                                        <ComboBoxItem Content="Пауза"/>
+                                                        <ComboBoxItem Content="Пауза 2"/>
+                                                        <ComboBoxItem Content="Сбросить все данжи"/>
+                                                        <ComboBoxItem Content="Использовать скилл"/>
+                                                        <ComboBoxItem Content="Выбрать диалог"/>
+                                                        <ComboBoxItem Content="Проверить инвентарь"/>
+                                                        <ComboBoxItem Content="Выключить плагин"/>
+                                                        <ComboBoxItem Content="Остановить скрипт"/>
+                                                        <ComboBoxItem Content="Запустить другой плагин"/>
+                                                        <ComboBoxItem Content="Рыбалка"/>
+                                                        <ComboBoxItem Content="Включить сбор"/>
+                                                        <ComboBoxItem Content="Выключить сбор"/>
+                                                        <ComboBoxItem Content="Включить сбор шкуры"/>
+                                                        <ComboBoxItem Content="Выключить сбор шкуры"/>
+                                                        <ComboBoxItem Content="Аукцион"/>
+                                                        <ComboBoxItem Content="Почта"/>
+                                                        <ComboBoxItem Content="Ремонт"/>
+                                                        <ComboBoxItem Content="Крафт"/>
+                                                        <ComboBoxItem Content="Купить нитки"/>
+                                                        <ComboBoxItem Content="Токен"/>
+                                                        <ComboBoxItem Content="Эквип на ауке"/>
+                                                        <ComboBoxItem Content="Использовать портал"/>
+                                                        <ComboBoxItem Content="Положить нитки на склад"/>
+                                                        <ComboBoxItem Content="Выполнить квест"/>
+                                                        <ComboBoxItem Content="Загрузить профиль"/>
+                                                        <ComboBoxItem Content="Прыжок"/>
+                                                        <ComboBoxItem Content="Приручить питомца"/>
+                                                        <ComboBoxItem Content="Перезапустить окно"/>
+                                                        <ComboBoxItem Content="Реген"/>
+                                                        <ComboBoxItem Content="Прокачать инженера"/>
 
-                                                                <ComboBoxItem Content="Проверить инвентарь"/>
-                                                                <ComboBoxItem Content="Выключить плагин" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Остановить скрипт" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Запустить другой плагин" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Рыбалка" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Включить сбор" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Выключить сбор" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Включить сбор шкуры" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Выключить сбор шкуры" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Аукцион" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Почта" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Ремонт" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Крафт" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Купить нитки" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Токен" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Эквип на ауке" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Использовать портал" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Положить нитки на склад" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Выполнить квест" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Загрузить профиль" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Прыжок" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Приручить питомца" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Перезапустить окно" IsEnabled="True"/>
+                                                    </ComboBox>
+                                                    <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" IsChecked="True"/>
+                                                    <Button Content="&gt;" RenderTransformOrigin="0.5,0.5"
+                                                        controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
+                                                        Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                        Margin="80,0,0,0">
+                                                        <Button.RenderTransform>
+                                                            <TransformGroup>
+                                                                <ScaleTransform/>
+                                                                <SkewTransform/>
+                                                                <RotateTransform Angle="-90"/>
+                                                                <TranslateTransform/>
+                                                            </TransformGroup>
+                                                        </Button.RenderTransform>
+                                                    </Button>
+                                                    <Button Content="&lt;" RenderTransformOrigin="0.5,0.5"
+                                                        controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15"
+                                                        Background="#FF36393E" Click="ButtonDownDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
+                                                        Margin="20,0,0,0">
+                                                        <Button.RenderTransform>
+                                                            <TransformGroup>
+                                                                <ScaleTransform/>
+                                                                <SkewTransform/>
+                                                                <RotateTransform Angle="-90"/>
+                                                                <TranslateTransform/>
+                                                            </TransformGroup>
+                                                        </Button.RenderTransform>
+                                                    </Button>
+                                                </WrapPanel>
+                                                <WrapPanel>
+                                                    <Label Content="Координаты:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonLocX" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <TextBox x:Name="TextBoxDungeonLocY" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <TextBox x:Name="TextBoxDungeonLocZ" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <Label Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonLocMapId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <Label Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonLocAreaId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <Button Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonDungeonLocFill_Click" Margin="10,0,0,0" />
+                                                </WrapPanel>
+                                                <WrapPanel>
+                                                    <Label Content="Моб: "/>
+                                                    <ComboBox x:Name="ComboBoxDungeonMob" Width="200" PreviewMouseLeftButtonDown="ComboBoxDungeonMob_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
+                                                    </ComboBox>
+                                                    <Label Content="Проп: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <ComboBox x:Name="ComboBoxDungeonProp" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="ComboBoxDungeonMob2_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
+                                                    </ComboBox>
+                                                </WrapPanel>
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Label Content="Предмет: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <ComboBox x:Name="ComboBoxDungeonItem" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="ComboBoxDungeonItem_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
+                                                        <ComboBoxItem Content="Тюрьма Бальмонта"/>
+                                                        <ComboBoxItem Content="Древний Мавзолей"/>
+                                                    </ComboBox>
+                                                    <Label Content="Скилл" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <ComboBox x:Name="ComboBoxDungeonSkill" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="ComboBoxDungeonSkill_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
 
-                                                            </ComboBox>
-                                                            <CheckBox x:Name="CheckBoxAttackMobs" Content="Отбиваться от мобов по дороге" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Margin="5,4,0,0" IsChecked="True"/>
-                                                            <Button Content="&gt;" RenderTransformOrigin="0.5,0.5"
-                                                                    controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15" Background="#FF36393E"
-                                                                    Click="ButtonUpDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                     Margin="80,0,0,0">
-                                                                <Button.RenderTransform>
-                                                                    <TransformGroup>
-                                                                        <ScaleTransform/>
-                                                                        <SkewTransform/>
-                                                                        <RotateTransform Angle="-90"/>
-                                                                        <TranslateTransform/>
-                                                                    </TransformGroup>
-                                                                </Button.RenderTransform>
-                                                            </Button>
-                                                            <Button Content="&lt;" RenderTransformOrigin="0.5,0.5"
-                                                                    controls:ControlsHelper.ContentCharacterCasing="Lower" FontSize="8" Width="15"
-                                                                    Background="#FF36393E" Click="ButtonDownDungeon_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25"
-                                                     Margin="20,0,0,0">
-                                                                <Button.RenderTransform>
-                                                                    <TransformGroup>
-                                                                        <ScaleTransform/>
-                                                                        <SkewTransform/>
-                                                                        <RotateTransform Angle="-90"/>
-                                                                        <TranslateTransform/>
-                                                                    </TransformGroup>
-                                                                </Button.RenderTransform>
-                                                            </Button>
-                                                        </StackPanel>
-                                                        <StackPanel x:Name="StackPanelDungeonMob" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Моб: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonMob" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                        <StackPanel x:Name="StackPanelDungeonProp" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Проп: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonProp" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonMob2_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                        <StackPanel x:Name="StackPanelDungeonItem" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Предмет: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonItem" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonItem_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
-                                                                <ComboBoxItem Content="Тюрьма Бальмонта"/>
-                                                                <ComboBoxItem Content="Древний Мавзолей"/>
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                        <WrapPanel Margin="5,5,0,0">
-                                                            <Label Content="Координаты:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxDungeonLocX" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <TextBox x:Name="TextBoxDungeonLocY" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <TextBox x:Name="TextBoxDungeonLocZ" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <Label Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxDungeonLocMapId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <Label Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxDungeonLocAreaId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <Button Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonDungeonLocFill_Click" Margin="10,0,0,0" />
-                                                        </WrapPanel>
-                                                        <WrapPanel Margin="0,5,0,0">
-                                                            <Label Content="Комментарий:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxDungeonCom" TextWrapping="Wrap" Text="Комментарий" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left" />
-                                                        </WrapPanel>
-                                                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                            <Label Content="Пауза(мс)" HorizontalAlignment="Left" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxScriptPause" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left" />
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Скилл" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonSkill" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonSkill_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                    </ComboBox>
+                                                </WrapPanel>
+                                                <WrapPanel>
+                                                    <Label Content="Комментарий:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonCom" TextWrapping="Wrap" Text="Комментарий" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left" />
+                                                    <Label Content="Пауза(мс)" HorizontalAlignment="Left" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxScriptPause" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Left" />
+                                                    <Label Content="Плагин" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <ComboBox x:Name="ComboBoxDungeonPlugin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="ComboBoxDungeonPlugin_PreviewMouseLeftButtonDown" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
 
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Плагин" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonPlugin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" PreviewMouseLeftButtonDown="comboBoxDungeonPlugin_PreviewMouseLeftButtonDown" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
+                                                    </ComboBox>
+                                                </WrapPanel>
+                                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                    <Label Content="Квест" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonQuestId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                    <Label Content="Действие" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <ComboBox x:Name="ComboBoxDungeonQuestAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0">
+                                                        <ComboBoxItem Content="Не выбрано"/>
+                                                        <ComboBoxItem Content="Взять квест"/>
+                                                        <ComboBoxItem Content="Выполнить квест" IsEnabled="True"/>
+                                                        <ComboBoxItem Content="Сдать квест" IsEnabled="True"/>
 
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0">
-                                                            <Label Content="Квест" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <TextBox x:Name="TextBoxDungeonQuestId" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                                            <Label Content="Действие" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                                            <ComboBox x:Name="ComboBoxDungeonQuestAction" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" SelectedIndex="0">
-                                                                <ComboBoxItem Content="Не выбрано"/>
-                                                                <ComboBoxItem Content="Взять квест"/>
-                                                                <ComboBoxItem Content="Выполнить квест" IsEnabled="True"/>
-                                                                <ComboBoxItem Content="Сдать квест" IsEnabled="True"/>
-
-                                                            </ComboBox>
-                                                        </StackPanel>
-                                                    </WrapPanel>
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom">
-                                                        <Button Content="Добавить" Margin="5,0,0,0" Click="button2_Click" />
-                                                        <Button Content="Редактировать" Margin="10,0,0,0" Click="buttonDungeonEdit_Click" />
-                                                        <Button Content="Импорт из wrobot" Margin="10,0,0,0" Click="buttonDungeonImport_Click" />
-                                                        <Button Content="Очистить" Margin="10,0,0,0" Click="buttonDungeonDelAll_Click" />
-                                                    </StackPanel>
-                                                </Grid>
-                                            </GroupBox>
-                                        </Grid>
+                                                    </ComboBox>
+                                                    <Label Content="Индекс" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
+                                                    <TextBox x:Name="TextBoxDungeonQuestIndex" TextWrapping="Wrap" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
+                                                </WrapPanel>
+                                            </StackPanel>
+                                            <WrapPanel Margin="0">
+                                                <Button Content="Добавить" Margin="5,0,0,0" Click="Button2_Click" />
+                                                <Button Content="Очистить" Margin="10,0,0,0" Click="ButtonDungeonDelAll_Click" />
+                                            </WrapPanel>
+                                        </StackPanel>
                                     </GroupBox>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Расписание" Background="{x:Null}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="171*"/>
-                                        <RowDefinition Height="163*"/>
-                                    </Grid.RowDefinitions>
-                                    <DataGrid x:Name="DataGridScriptSchedule" ItemsSource="{Binding CollectionScriptSchedules}" CanUserAddRows="False" />
-                                    <StackPanel Grid.Row="1" Margin="0,5,0,0">
-                                        <CheckBox x:Name="CheckBoxScriptScheduleEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Включить запуск по расписанию" Margin="5,5,0,0"/>
-                                        <StackPanel Margin="5,10,0,0" Orientation="Horizontal" Width="1083" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                            <Label Content="С" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                            <TextBox x:Name="TextBoxScriptScheduleStartTime" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
-                                            <Label Content="до" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                            <TextBox x:Name="TextBoxScriptSheduleEndTime" TextWrapping="Wrap" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
-                                            <Label Content="выполнять скрипт" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                            <ComboBox x:Name="ComboBoxDungeonScriptCopy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" SelectedIndex="0" PreviewMouseLeftButtonDown="comboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0">
-                                                <ComboBoxItem Content="Не выбрано"/>
-                                            </ComboBox>
+                                    <GroupBox Header="Выбор действий" Margin="0" DockPanel.Dock="Right">
+                                        <StackPanel>
+                                            <WrapPanel>
+                                                <CheckBox x:Name="CheckBoxRunScriptfrombegin" Content="Запускать с начала"/>
+                                                <CheckBox x:Name="CheckBoxFindBestPoint" Content="Ближайшая точка"  IsChecked="True"/>
+                                                <CheckBox x:Name="CheckBoxScriptReverse"  Content="Реверс маршрута"/>
+                                            </WrapPanel>
+                                            <WrapPanel>
+                                                <CheckBox x:Name="CheckBoxGatherResourceScript" Content="Собирать ресурсы по дороге с радиусом"  IsChecked="{Binding GatherResouceScript}"/>
+                                                <TextBox x:Name="TextBoxGatherRadiusScript" Text="{Binding GatherRadiusScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                <CheckBox x:Name="CheckBoxFightIfMobs"  Content="Отбиваться если моб мешает сбору" Margin="0"/>
+                                            </WrapPanel>
+                                            <WrapPanel>
+                                                <CheckBox x:Name="CheckBoxForceMoveScriptEnable"  IsChecked="{Binding ForceMoveScriptEnable}" Content="Использовать ForceMove на дистанцию до"/>
+                                                <TextBox x:Name="TextBoxForceMoveScriptDist"  Text="{Binding ForceMoveScriptDist}" />
+                                                <Label Content="метров"/>
+                                            </WrapPanel>
+                                            <WrapPanel>
+                                                <CheckBox x:Name="CheckBoxFightIfHpLess"   IsChecked="{Binding FightIfHPLess}" Content="Отбиваться если HP меньше"/>
+                                                <TextBox x:Name="TextBoxFightIfHpLessCount" Text="{Binding FightIfHPLessCount}"/>
+                                            </WrapPanel>
+                                            <WrapPanel>
+                                                <CheckBox x:Name="CheckBoxAttack"  IsChecked="{Binding Attack}" Content="Атаковать мобов в радиусе"/>
+                                                <TextBox x:Name="TextBoxAttackRadius"  Text="{Binding AttackRadius}"/>
+                                            </WrapPanel>
+                                            <CheckBox x:Name="CheckBoxWaitSixMin"  Content="Ожидать до 6 минут" IsChecked="True"/>
+                                            <WrapPanel>
+                                                <Button x:Name="ButtonScriptSavePointMove" Content="Запись точек в движении(выкл)" Click="ButtonScriptSavePointMove_Click" />
+                                                <Label Content="Дистанция между точками"/>
+                                                <TextBox x:Name="TextBoxScriptSavePointMoveDist" Text="5" />
+                                                <Label Content="метров"/>
+                                            </WrapPanel>
+                                            <Button Content="Сохранить" Click="ButtonDungeonSaveScript_Click" HorizontalAlignment="Left"/>
                                         </StackPanel>
-                                        <CheckBox x:Name="CheckBoxScriptReverseShedule" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Реверс" Margin="5,5,0,0"/>
-                                        <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
-                                            <Button Content="Добавить" Click="buttonScriptScheduleAdd_Click" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                            <Button Content="Удалить" Click="buttonDungeonSheduleDel_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Grid>
-                            </TabItem>
-                        </TabControl>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="NPC" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Grid Margin="0">
-                        <GroupBox Header="NPC" Margin="0">
-                            <Grid Margin="0,0,0,-3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="611*"/>
-                                    <ColumnDefinition Width="466*"/>
-                                </Grid.ColumnDefinitions>
+                                    </GroupBox>
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Расписание" Background="{x:Null}">
+                            <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="407*"/>
-                                    <RowDefinition Height="270*"/>
+                                    <RowDefinition Height="171*"/>
+                                    <RowDefinition Height="163*"/>
                                 </Grid.RowDefinitions>
-                                <DataGrid Grid.ColumnSpan="2" ItemsSource="{Binding CollectionNpcForActions}" CanUserAddRows="False"/>
-                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
-                                    <Button Content="Добавить" Click="buttonAddNpc_Click" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                <DataGrid x:Name="DataGridScriptSchedule" ItemsSource="{Binding CollectionScriptSchedules}" CanUserAddRows="False" />
+                                <StackPanel Grid.Row="1" Margin="0,5,0,0">
+                                    <CheckBox x:Name="CheckBoxScriptScheduleEnable" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Включить запуск по расписанию" Margin="5,5,0,0"/>
+                                    <StackPanel Margin="5,10,0,0" Orientation="Horizontal" Width="1083" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <Label Content="С" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                        <TextBox x:Name="TextBoxScriptScheduleStartTime" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
+                                        <Label Content="до" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                        <TextBox x:Name="TextBoxScriptSheduleEndTime" TextWrapping="Wrap" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
+                                        <Label Content="выполнять скрипт" Margin="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                        <ComboBox x:Name="ComboBoxDungeonScriptCopy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" SelectedIndex="0" PreviewMouseLeftButtonDown="ComboBoxDungeonScript_PreviewMouseLeftButtonDown" Margin="0">
+                                            <ComboBoxItem Content="Не выбрано"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <CheckBox x:Name="CheckBoxScriptReverseShedule" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" BorderBrush="#FF797A7C" Background="#FF4A4F55"  Content="Реверс" Margin="5,5,0,0"/>
+                                    <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
+                                        <Button Content="Добавить" Click="ButtonScriptScheduleAdd_Click" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                        <Button Content="Удалить" Click="ButtonDungeonSheduleDel_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0" />
+                                    </StackPanel>
                                 </StackPanel>
                             </Grid>
-                        </GroupBox>
-                    </Grid>
+                        </TabItem>
+                    </TabControl>
                 </TabItem>
-                <TabItem Header="Аук" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TabItem Header="NPC">
+                    <GroupBox Header="NPC">
+                        <StackPanel>
+                            <DataGrid ItemsSource="{Binding CollectionNpcForActions}" CanUserAddRows="False" Height="406"/>
+                            <Button Content="Добавить" Click="ButtonAddNpc_Click" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </GroupBox>
+                </TabItem>
+                <TabItem Header="Аук">
                     <Grid>
-                        <StackPanel Margin="1,0" Orientation="Vertical">
-                            <GroupBox Header="GroupBox" Margin="0" Height="386">
-                                <DataGrid x:Name="DataGridAuk" ItemsSource="{Binding CollectionAukSettingses}" Margin="0" CanUserAddRows="False"/>
+                        <StackPanel>
+                            <GroupBox Header="Продажа на аукционе" Height="386">
+                                <DataGrid x:Name="DataGridAuk" ItemsSource="{Binding CollectionAukSettingses}" CanUserAddRows="False"/>
                             </GroupBox>
-                            <GroupBox Header="GroupBox" Margin="0" Height="324">
-                                <StackPanel Margin="5,0,0,0" Orientation="Vertical">
-                                    <ComboBox x:Name="ComboBoxAuk" HorizontalAlignment="Left" VerticalAlignment="Top" Width="466" PreviewMouseLeftButtonDown="ComboBoxAuk_PreviewMouseLeftButtonDown" Height="26"/>
-                                    <StackPanel Orientation="Horizontal" Margin="0,3,-5,0" VerticalAlignment="Top">
-                                        <Button Content="Добавить" Margin="5,0,0,0" Click="ButtonAddProp1_Click" Height="25" VerticalAlignment="Top" />
-                                        <Button Content="Удалить" Margin="10,0,0,0" Click="ButtonAukDel_Click" />
-                                        <Button Content="Редактировать" Margin="5,0,0,0" IsEnabled="False" />
-                                        <Button Content="Очистить" Margin="20,0,0,0" IsEnabled="False" />
-                                        <Label Content="Уровень вещи" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxLevel" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0" />
-                                        <Label Content="Макс. цена" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxMaxPrice" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0" />
-                                        <Label Content="Скидка от конкурента" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxDiscount" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0" />
-                                        <Label Content="Макс. кол-во" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxMaxCount" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
-                                        <CheckBox x:Name="CheckBoxCheckAuk" Content="Бежать на аук если предметов с Id" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E"  Margin="5,5,0,0"/>
-                                        <TextBox x:Name="TextBoxFreeInvCountForAukId" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="0" />
-                                        <Label Content="больше" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxFreeInvCountForAuk" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="10" />
-                                    </StackPanel>
-                                    <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
-                                        <CheckBox x:Name="CheckBoxAukRun" Content="Перед использованием камня бежать в координаты" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E"  Margin="0,4,0,0"/>
-                                        <WrapPanel Margin="0">
-                                            <TextBox x:Name="TextBoxAukLocX" TextWrapping="Wrap" Text="{Binding FarmLocX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                            <TextBox x:Name="TextBoxAukLocY" TextWrapping="Wrap" Text="{Binding FarmLocY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                            <TextBox x:Name="TextBoxAukLocZ" TextWrapping="Wrap" Text="{Binding FarmLocZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                            <Label Content="MapId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                            <TextBox x:Name="TextBoxAukLocMapId" TextWrapping="Wrap" Text="{Binding FarmLocMapId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                            <Label Content="AreaId" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Background="#00000000" Foreground="White"/>
-                                            <TextBox x:Name="TextBoxAukLocAreaId" TextWrapping="Wrap" Text="{Binding FarmLocAreaId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" />
-                                            <Button Content="XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonAukLocFill_Click" Margin="10,0,0,0" />
-                                        </WrapPanel>
-                                    </StackPanel>
-                                    <StackPanel Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
-                                        <CheckBox x:Name="CheckBoxCheckAukTime" Content="Проверять аук в указанное время. С" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E"  Margin="5,5,0,0"/>
-                                        <TextBox x:Name="TextBoxCheckAukStartTime" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
-                                        <Label Content="по" Margin="0" Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBox x:Name="TextBoxCheckAukEndTime" TextWrapping="Wrap" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="00:00" />
-                                    </StackPanel>
-                                    <CheckBox x:Name="CheckBoxAlternateAuk" Content="Использовать второй аук в столице" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF4A4F55" Background="#FF36393E"  Margin="5,5,0,0"/>
+                            <GroupBox Header="GroupBox">
+                                <StackPanel>
+                                    <ComboBox x:Name="ComboBoxAuk" Width="466" PreviewMouseLeftButtonDown="ComboBoxAuk_PreviewMouseLeftButtonDown" Height="Auto" HorizontalAlignment="Left"/>
+                                    <WrapPanel>
+                                        <Button Content="Добавить" Click="ButtonAddProp1_Click" />
+                                        <Label Content="Уровень вещи" />
+                                        <TextBox x:Name="TextBoxLevel" Text="0" />
+                                        <Label Content="Макс. цена" />
+                                        <TextBox x:Name="TextBoxMaxPrice"  Text="0" />
+                                        <Label Content="Скидка от конкурента"  />
+                                        <TextBox x:Name="TextBoxDiscount" Text="0" />
+                                        <Label Content="Макс. кол-во" />
+                                        <TextBox x:Name="TextBoxMaxCount"  Text="0" />
+                                    </WrapPanel>
+                                    <WrapPanel >
+                                        <CheckBox x:Name="CheckBoxCheckAuk" Content="Бежать на аук если предметов с Id" />
+                                        <TextBox x:Name="TextBoxFreeInvCountForAukId"  Text="0" />
+                                        <Label Content="больше" />
+                                        <TextBox x:Name="TextBoxFreeInvCountForAuk" Text="10" />
+                                    </WrapPanel>
+                                    <WrapPanel >
+                                        <CheckBox x:Name="CheckBoxAukRun" Content="Перед использованием камня бежать в координаты"/>
+                                        <TextBox x:Name="TextBoxAukLocX" />
+                                        <TextBox x:Name="TextBoxAukLocY" />
+                                        <TextBox x:Name="TextBoxAukLocZ" />
+                                        <Label Content="MapId" />
+                                        <TextBox x:Name="TextBoxAukLocMapId" />
+                                        <Label Content="AreaId" />
+                                        <TextBox x:Name="TextBoxAukLocAreaId"  />
+                                        <Button Content="XYZ" Click="ButtonAukLocFill_Click" Margin="5,0,0,0" />
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <CheckBox x:Name="CheckBoxCheckAukTime" Content="Проверять аук в указанное время. С"/>
+                                        <TextBox x:Name="TextBoxCheckAukStartTime"  Text="00:00" />
+                                        <Label Content="по" />
+                                        <TextBox x:Name="TextBoxCheckAukEndTime" Text="00:00" />
+                                    </WrapPanel>
+                                    <CheckBox x:Name="CheckBoxAlternateAuk" Content="Использовать второй аук в столице"/>
                                     <StackPanel Margin="0,5,0,0" Orientation="Vertical">
-                                        <ComboBox x:Name="ComboBoxAukTime" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Width="154" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
-                                            <ComboBoxItem Content="12 часов" Background="#FF36393E" Foreground="White"/>
-                                            <ComboBoxItem Content="24 часа" Background="#FF36393E" Foreground="White"/>
-                                            <ComboBoxItem Content="48 часов" Background="#FF36393E" Foreground="White"/>
+                                        <ComboBox x:Name="ComboBoxAukTime" SelectedIndex="0" Width="154" SelectionChanged="ComboBoxSwitchMode_SelectionChanged" HorizontalAlignment="Left" Height="Auto">
+                                            <ComboBoxItem Content="12 часов"/>
+                                            <ComboBoxItem Content="24 часа"/>
+                                            <ComboBoxItem Content="48 часов"/>
 
                                         </ComboBox>
-                                        <ComboBox x:Name="ComboBoxAukTimeClassic" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Width="154" Background="#FF4A4F55" BorderBrush="#FF4A4F55" Foreground="White" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
-                                            <ComboBoxItem Content="2 часа" Background="#FF36393E" Foreground="White"/>
-                                            <ComboBoxItem Content="8 часов" Background="#FF36393E" Foreground="White"/>
-                                            <ComboBoxItem Content="24 часа" Background="#FF36393E" Foreground="White"/>
+                                        <ComboBox x:Name="ComboBoxAukTimeClassic" HorizontalAlignment="Left" SelectedIndex="0" Width="154" SelectionChanged="ComboBoxSwitchMode_SelectionChanged">
+                                            <ComboBoxItem Content="2 часа"/>
+                                            <ComboBoxItem Content="8 часов"/>
+                                            <ComboBoxItem Content="24 часа"/>
 
 
                                         </ComboBox>

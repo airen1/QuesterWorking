@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Out.Utility;
 
+// ReSharper disable once CheckNamespace
 namespace WowAI
 {
     internal partial class MyQuestHelpClass

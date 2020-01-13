@@ -18,7 +18,11 @@ namespace WowAI
             get => _use;
             set
             {
-                if (_use == value) return;
+                if (_use == value)
+                {
+                    return;
+                }
+
                 _use = value;
                 NotifyPropertyChanged();
             }
@@ -29,7 +33,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -41,7 +49,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -53,7 +65,11 @@ namespace WowAI
             get => _loc;
             set
             {
-                if (_loc == value) return;
+                if (_loc == value)
+                {
+                    return;
+                }
+
                 _loc = value;
                 NotifyPropertyChanged();
             }
@@ -65,7 +81,11 @@ namespace WowAI
             get => _mapId;
             set
             {
-                if (_mapId == value) return;
+                if (_mapId == value)
+                {
+                    return;
+                }
+
                 _mapId = value;
                 NotifyPropertyChanged();
             }
@@ -77,7 +97,11 @@ namespace WowAI
             get => _areaId;
             set
             {
-                if (_areaId == value) return;
+                if (_areaId == value)
+                {
+                    return;
+                }
+
                 _areaId = value;
                 NotifyPropertyChanged();
             }
@@ -89,7 +113,11 @@ namespace WowAI
             get => _isVendor;
             set
             {
-                if (_isVendor == value) return;
+                if (_isVendor == value)
+                {
+                    return;
+                }
+
                 _isVendor = value;
                 NotifyPropertyChanged();
             }
@@ -101,7 +129,11 @@ namespace WowAI
             get => _isArmorer;
             set
             {
-                if (_isArmorer == value) return;
+                if (_isArmorer == value)
+                {
+                    return;
+                }
+
                 _isArmorer = value;
                 NotifyPropertyChanged();
             }

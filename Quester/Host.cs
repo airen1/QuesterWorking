@@ -1,10 +1,12 @@
 ﻿using Out.Internal.Core;
 using Out.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,18 +20,13 @@ using WoWBot.Core;
 
 namespace WowAI
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     internal partial class Host : Core
     {
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once MemberCanBePrivate.Global
-        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public static bool isReleaseVersion = false;
 
         private const string Ch = "Quester\\";
         public const uint CanSpellAttack = 6603;
-        private const string Version = "v0.33";
-
+        private const string Version = "v0.34";
         public Random RandGenerator { get; private set; }
         public string CfgName = "";
         public string ScriptName = "";
@@ -42,11 +39,12 @@ namespace WowAI
         public int CheckCount;
         public double StartGold;
         public long Startinvgold;
-        internal CharacterSettings CharacterSettings { get; set; }
+        internal CharacterSettings CharacterSettings { get; set; } = new CharacterSettings();
         internal DungeonSetting DungeonSettings { get; set; }
         internal QuestSetting QuestSettings { get; set; }
         internal QuestStates QuestStates { get; set; }
         internal DropBases DropBases { get; set; } = new DropBases();
+        internal MyTaxyNode MyTaxyNode { get; set; } = new MyTaxyNode();
         internal MonsterGroup2 MonsterGroup { get; set; } = new MonsterGroup2();
         internal Main MainForm { get; set; }
         internal CommonModule CommonModule { get; set; }
@@ -62,6 +60,7 @@ namespace WowAI
         private string _pathDropjson = "";
         public string PathQuestSet = "";
         public string PathQuestState = "";
+        public string PathTaxyNode = "";
         private string _pathMonsterGroup = "";
         public bool AdvancedLog;
         public string PathGps;
@@ -76,74 +75,82 @@ namespace WowAI
         public long TimeAttack;
         private WowGuid _badSid;
 
-        private bool _cancelRequested;
-        internal bool CancelRequested
-        {
-            get => _cancelRequested;
-            set => _cancelRequested = value;
-        }
+        internal bool CancelRequested { get; set; }
 
-        // ReSharper disable once InconsistentNaming
         public void log(string text, LogLvl type = LogLvl.Info)
         {
-            if (CharacterSettings != null)
-                if (!CharacterSettings.LogAll)
-                    return;
-
-            var color = new Color();
-            switch (type)
+            try
             {
-                case LogLvl.Ok:
-                    color = Color.Green;
-                    break;
-                case LogLvl.Error:
-                    color = Color.Red;
-                    break;
-                case LogLvl.Info:
-                    color = Color.DarkGray;
-                    break;
-                case LogLvl.Important:
-                    color = Color.DarkOrange;
-                    break;
+                if (CharacterSettings != null)
+                {
+                    if (!CharacterSettings.LogAll)
+                    {
+                        return;
+                    }
+                }
+
+                var color = new Color();
+                switch (type)
+                {
+                    case LogLvl.Ok:
+                        color = Color.Green;
+                        break;
+                    case LogLvl.Error:
+                        color = Color.Red;
+                        break;
+                    case LogLvl.Info:
+                        color = Color.DarkGray;
+                        break;
+                    case LogLvl.Important:
+                        color = Color.DarkOrange;
+                        break;
+                }
+
+                if (Me != null)
+                {
+                    Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + Me?.Name + "(" + Me?.Level + ")  " + FarmModule?.FarmState + "   " + text, color, GetCurrentAccount().Name);
+                }
+                else
+                {
+                    Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + "Character offline: " + "   " + text, color, GetCurrentAccount().Name);
+                }
             }
-
-            if (Me != null)
-                Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + Me?.Name + "(" /* + Me?.Level*/ + ")  " + FarmModule?.FarmState + "   " + text, color, GetCurrentAccount().Name);
-
-            else
-                Log(DateTime.Now.ToString("hh:mm:ss.fff", CultureInfo.InvariantCulture) + ":   " + "Character offline: " + "   " + text, color, GetCurrentAccount().Name);
+            catch (Exception)
+            {
+                //igrored
+            }
         }
+
         public MyExp MyExps = new MyExp();
-        // ReSharper disable once UnusedMember.Global
+
         public void PluginRun()
         {
             try
             {
                 if (GetBotLogin() == "Daredevi1")
+                {
                     AdvancedLog = true;
-                /*var pathItem = "C:\\AllQuestItem" + ClientType + ".txt";
-                 var pathQuest = "C:\\AllQuest" + ClientType + ".txt";
-                 if (File.Exists(pathItem))
-                     File.Delete(pathItem);
-                 if (File.Exists(pathQuest))
-                     File.Delete(pathQuest);
-                 foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
-                 {
-                     if (gameDbQuestTemplate.Value.QuestObjectives != null)
-                         foreach (var valueQuestObjective in gameDbQuestTemplate.Value.QuestObjectives)
-                         {
-                             if (valueQuestObjective.Type == EQuestRequirementType.Item)
-                             {
-                                 File.AppendAllText(pathItem, valueQuestObjective.ObjectID + Environment.NewLine);
-                             }
-                         }
-                     File.AppendAllText(pathQuest, gameDbQuestTemplate.Value.Id + Environment.NewLine);
-                 }*/
+                }
+                //var pathItem = "C:\\AllQuestItem" + ClientType + ".txt";
+                //var pathQuest = "C:\\AllQuest" + ClientType + ".txt";
+                //if (File.Exists(pathItem))
+                //    File.Delete(pathItem);
+                //if (File.Exists(pathQuest))
+                //    File.Delete(pathQuest);
+                //foreach (var gameDbQuestTemplate in GameDB.QuestTemplates)
+                //{
+                //    if (gameDbQuestTemplate.Value.QuestObjectives != null)
+                //        foreach (var valueQuestObjective in gameDbQuestTemplate.Value.QuestObjectives)
+                //        {
+                //            if (valueQuestObjective.Type == EQuestRequirementType.Item)
+                //            {
+                //                File.AppendAllText(pathItem, valueQuestObjective.ObjectID + Environment.NewLine);
+                //            }
+                //        }
+                //    File.AppendAllText(pathQuest, gameDbQuestTemplate.Value.Id + Environment.NewLine);
+                //}
 
                 ClearLogs(GetCurrentAccount().Name);
-
-
-
                 RandGenerator = new Random((int)DateTime.Now.Ticks);
                 while (GameState != EGameState.Ingame)
                 {
@@ -152,44 +159,86 @@ namespace WowAI
                 }
                 var sw = new Stopwatch();
                 if (AdvancedLog)
+                {
                     sw.Start();
+                }
 
                 FormInitialized = false;
 
                 if (!Directory.Exists(AssemblyDirectory + "\\Configs"))
+                {
                     Directory.CreateDirectory(AssemblyDirectory + "\\Configs");
+                }
 
                 if (!Directory.Exists(AssemblyDirectory + "\\Configs\\Default"))
+                {
                     Directory.CreateDirectory(AssemblyDirectory + "\\Configs\\Default");
+                }
 
                 if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\"))
+                {
                     Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\");
+                }
+
+
 
                 if (!Directory.Exists(AssemblyDirectory + "\\Log\\"))
+                {
                     Directory.CreateDirectory(AssemblyDirectory + "\\Log\\");
-
-               
+                }
 
                 if (isReleaseVersion)
                 {
                     PathQuestSet = AssemblyDirectory + "\\Quest\\";
-                    PathGps = AssemblyDirectory + "\\helpGps.db3";
+                    if (!Directory.Exists(AssemblyDirectory + "\\TaxyNodes"))
+                    {
+                        Directory.CreateDirectory(AssemblyDirectory + "\\TaxyNodes\\");
+                    }
+                    PathTaxyNode = AssemblyDirectory + "\\TaxyNodes\\" + Me.Name + "[" + GetCurrentAccount().ServerName + "].json";
+                    if (ClientType == EWoWClient.Classic)
+                    {
+                        PathGps = AssemblyDirectory + "\\helpGpsClassic_" + MapID + ".db3";
+
+                    }
+
+                    else
+                    {
+                        PathGps = AssemblyDirectory + "\\helpGps_" + MapID + ".db3";
+                    }
                     PathGpsCustom = AssemblyDirectory + "\\helpGpsCustom.db3";
                     PathQuestState = AssemblyDirectory + "\\QuestState\\";
                 }
                 else
                 {
                     PathQuestSet = AssemblyDirectory + "\\Plugins\\Quester\\Quest\\";
-                    PathGps = AssemblyDirectory + "\\Plugins\\Quester\\helpGps.db3";
+                    if (!Directory.Exists(AssemblyDirectory + "\\Plugins\\Quester\\TaxyNodes"))
+                    {
+                        Directory.CreateDirectory(AssemblyDirectory + "\\Plugins\\Quester\\TaxyNodes\\");
+                    }
+                    PathTaxyNode = AssemblyDirectory + "\\Plugins\\Quester\\TaxyNodes\\" + Me.Name + "[" + GetCurrentAccount().ServerName + "].json";
+                    if (ClientType == EWoWClient.Classic)
+                    {
+
+                        PathGps = AssemblyDirectory + "\\Plugins\\Quester\\helpGpsClassic_" + MapID + ".db3";
+                    }
+                    else
+                    {
+                        PathGps = AssemblyDirectory + "\\Plugins\\Quester\\helpGps_" + MapID + ".db3";
+                    }
+
                     PathGpsCustom = AssemblyDirectory + "\\Plugins\\Quester\\helpGpsCustom.db3";
                     PathQuestState = AssemblyDirectory + "\\Plugins\\Quester\\QuestState\\";
                 }
 
                 if (!Directory.Exists(PathQuestSet))
+                {
                     Directory.CreateDirectory(PathQuestSet);
-                if (!Directory.Exists(PathQuestState))
-                    Directory.CreateDirectory(PathQuestState);
+                }
 
+                if (!Directory.Exists(PathQuestState))
+                {
+                    Directory.CreateDirectory(PathQuestState);
+                }
 
                 var lastChanged = File.GetLastWriteTime(AssemblyDirectory + "\\WowAI.dll");
                 log("Версия обновлена: " + lastChanged);
@@ -256,14 +305,22 @@ namespace WowAI
 
 
                 if (isReleaseVersion)
+                {
                     _pathNpCjsonCopy = AssemblyDirectory + "\\npcCopy.json";
+                }
                 else
+                {
                     _pathNpCjsonCopy = AssemblyDirectory + "\\Plugins\\Quester\\npcCopy.json";
+                }
 
                 if (isReleaseVersion)
+                {
                     _pathMonsterGroup = AssemblyDirectory + "\\monstergroup.json";
+                }
                 else
+                {
                     _pathMonsterGroup = AssemblyDirectory + "\\Plugins\\Quester\\monstergroup.json";
+                }
 
                 switch (ClientType)
                 {
@@ -310,31 +367,73 @@ namespace WowAI
                 }
 
 
+                MyTaxyNode = (MyTaxyNode)ConfigLoader.LoadConfig(PathTaxyNode, typeof(MyTaxyNode), MyTaxyNode);
+                /* foreach (var myTaxyNode in MyTaxyNode.MyTaxyNodes)
+                 {
+                     log(myTaxyNode.Id + " " + myTaxyNode.Name);
+                 }*/
+
                 if (File.Exists(_pathGameObjectLocs))
+                {
                     MyGameObjectLocss = (MyGameObjectLocs)ConfigLoader.LoadConfig(_pathGameObjectLocs, typeof(MyGameObjectLocs), MyGameObjectLocss);
+                }
                 else
+                {
                     log("Не найден файл PathNpCjson " + _pathGameObjectLocs + "  " + ClientType, LogLvl.Error);
+                }
 
                 if (File.Exists(_pathNpCjson))
                 {
+                    var pathnpcdefault = "";
+                    if (ClientType == EWoWClient.Classic && isReleaseVersion)
+                        pathnpcdefault = AssemblyDirectory + "\\npcClassicDefault.json";
+
+                    if (ClientType == EWoWClient.Classic && !isReleaseVersion)
+                        pathnpcdefault = AssemblyDirectory + "\\Plugins\\Quester\\npcClassicDefault.json";
+
+
+                    var mynpclocdefault = (MyNpcLocs)ConfigLoader.LoadConfig(pathnpcdefault, typeof(MyNpcLocs), MyNpcLocss);
+
+                    // log(mynpclocdefault.NpcLocs.Count +" jkl ");
                     MyNpcLocss = (MyNpcLocs)ConfigLoader.LoadConfig(_pathNpCjson, typeof(MyNpcLocs), MyNpcLocss);
-                    foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
+
+                    foreach (var myNpcLoc in mynpclocdefault.NpcLocs)
                     {
-                        for (var index = 0; index < myNpcLoc.ListLoc.Count; index++)
-                        {
-                            var vector3F = myNpcLoc.ListLoc[index];
-                            if (double.IsNaN(vector3F.X))
-                            {
-                                log("Удаляю кривую координату");
-                                myNpcLoc.ListLoc.RemoveAt(index);
-                                //index = index - 1;
-                            }
-                        }
+                        if (MyNpcLocss.NpcLocs.Any(i => i.Id == myNpcLoc.Id))
+                            continue;
+
+                        MyNpcLocss.NpcLocs.Add(myNpcLoc);
+                        /*if (GetBotLogin() == "Daredevi1")
+                             log("Добавляю");*/
                     }
+
+                    /* foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
+                     {
+                         for (var index = 0; index < myNpcLoc.ListLoc.Count; index++)
+                         {
+                             var vector3F = myNpcLoc.ListLoc[index];
+                             if (double.IsNaN(vector3F.X))
+                             {
+                                 log("Удаляю кривую координату");
+                                 myNpcLoc.ListLoc.RemoveAt(index);
+                                 //index = index - 1;
+                             }
+                         }
+                     }*/
                 }
 
                 else
+                {
+                    var pathnpcdefault = "";
+                    if (ClientType == EWoWClient.Classic && isReleaseVersion)
+                        pathnpcdefault = AssemblyDirectory + "\\npcClassicDefault.json";
+
+                    if (ClientType == EWoWClient.Classic && !isReleaseVersion)
+                        pathnpcdefault = AssemblyDirectory + "\\Plugins\\Quester\\npcClassicDefault.json";
+
+                    MyNpcLocss = (MyNpcLocs)ConfigLoader.LoadConfig(pathnpcdefault, typeof(MyNpcLocs), MyNpcLocss);
                     log("Не найден файл PathNpCjson " + _pathNpCjson + "  " + ClientType, LogLvl.Error);
+                }
 
                 if (AdvancedLog)
                 {
@@ -343,9 +442,13 @@ namespace WowAI
                 }
 
                 if (File.Exists(_pathDropjson))
+                {
                     DropBases = (DropBases)ConfigLoader.LoadConfig(_pathDropjson, typeof(DropBases), DropBases);
+                }
                 else
+                {
                     log("Не найден файл PathDropjson " + _pathDropjson, LogLvl.Error);
+                }
 
                 if (AdvancedLog)
                 {
@@ -356,9 +459,13 @@ namespace WowAI
                 if (ClientType == EWoWClient.Retail)
                 {
                     if (File.Exists(_pathMonsterGroup))
+                    {
                         MonsterGroup = (MonsterGroup2)ConfigLoader.LoadConfig(_pathMonsterGroup, typeof(MonsterGroup2), MonsterGroup);
+                    }
                     else
+                    {
                         log("Не найден файл PathMonsterGroup " + _pathMonsterGroup, LogLvl.Error);
+                    }
                 }
 
 
@@ -375,9 +482,13 @@ namespace WowAI
                 else
                 {
                     if (File.Exists(pathQuestjson))
+                    {
                         MyQuestBases = (MyQuestBase)ConfigLoader.LoadConfig(pathQuestjson, typeof(MyQuestBase), MyQuestBases);
+                    }
                     else
+                    {
                         log("Не найден файл PathQuestjson " + pathQuestjson + ClientType, LogLvl.Error);
+                    }
                 }
 
 
@@ -395,59 +506,55 @@ namespace WowAI
                     ConfigLoader.SaveConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", QuestStates);
                 }
                 else
+                {
                     QuestStates = (QuestStates)ConfigLoader.LoadConfig(PathQuestState + Me.Name + "[" + GetCurrentAccount().ServerName + "].json", typeof(QuestStates), QuestStates);
+                }
 
-
-
-
-
-
-                /*   if (!isReleaseVersion)
-                   {
-                       formThread = new Thread(() =>
-                       {
-                           try
-                           {
-                               SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
-                               MainForm = new Main();
-                               MainForm.Show();
-                               FormInitialized = true;
-                               Dispatcher.Run();
-
-                           }
-                           catch (TaskCanceledException) { }
-                           catch (ThreadAbortException) { }
-                           catch (Exception error)
-                           {
-                               Log(error.ToString());
-                           }
-                       });
-                       formThread.SetApartmentState(ApartmentState.STA);
-                     //  formThread.IsBackground = true;
-                       formThread.Start();
-                   }
-                   else
-                   {
-                       var d = GetMainDispatcher();
-                       if (d == null)
-                       {
-                           Log("Failed to get dispatcher");
-                           return;
-                       }
-                       d.Invoke(() =>
-                       {
-                           try
-                           {
-                               MainForm = new Main();
-                               MainForm.Show();
-                               FormInitialized = true;
-                           }
-                           catch (Exception e)
-                           {
-                               log(e + "");
-                           }
-                       });
-                   }*/
+                //if (!isReleaseVersion)
+                //{
+                //    formThread = new Thread(() =>
+                //    {
+                //        try
+                //        {
+                //            SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+                //            MainForm = new Main();
+                //            MainForm.Show();
+                //            FormInitialized = true;
+                //            Dispatcher.Run();
+                //        }
+                //        catch (TaskCanceledException) { }
+                //        catch (ThreadAbortException) { }
+                //        catch (Exception error)
+                //        {
+                //            Log(error.ToString());
+                //        }
+                //    });
+                //    formThread.SetApartmentState(ApartmentState.STA);
+                //    //  formThread.IsBackground = true;
+                //    formThread.Start();
+                //}
+                //else
+                //{
+                //    var d = GetMainDispatcher();
+                //    if (d == null)
+                //    {
+                //        Log("Failed to get dispatcher");
+                //        return;
+                //    }
+                //    d.Invoke(() =>
+                //    {
+                //        try
+                //        {
+                //            MainForm = new Main();
+                //            MainForm.Show();
+                //            FormInitialized = true;
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            log(e + "");
+                //        }
+                //    });
+                //}
 
 
 
@@ -482,7 +589,9 @@ namespace WowAI
                 }
 
                 while (!FormInitialized)
+                {
                     Thread.Sleep(10);
+                }
 
                 if (AdvancedLog)
                 {
@@ -494,7 +603,10 @@ namespace WowAI
                 MainForm.Host = this;
 
                 if (!LoadSettingsForQp())
+                {
                     return;
+                }
+
                 if (AdvancedLog)
                 {
                     log("Загрузка настроек                               " + sw.ElapsedMilliseconds + " мс");
@@ -517,42 +629,42 @@ namespace WowAI
                     sw.Restart();
                 }
 
-                LoadQuest();
-                if (AdvancedLog)
+                if (ClientType == EWoWClient.Retail)
                 {
-                    log("LoadQuest                              " + sw.ElapsedMilliseconds + " мс");
-                    sw.Restart();
+                    LoadQuest();
+                    if (AdvancedLog)
+                    {
+                        log("LoadQuest                              " + sw.ElapsedMilliseconds + " мс");
+                        sw.Restart();
+                    }
                 }
-                /*   MainForm.NeedApplyDungeonSettings = true;
-                   MainForm.NeedApplyQuestSettings = true;*/
+
+
 
                 MainForm.Dispatcher?.BeginInvoke(new Action(() =>
+                {
+                    try
                     {
-                        try
+                        if (ClientType == EWoWClient.Classic)
                         {
-                            if (ClientType == EWoWClient.Classic)
-                            {
-                                MainForm.ComboBoxAukTime.Visibility = Visibility.Collapsed;
-                            }
-                            else
-                            {
-                                MainForm.ComboBoxAukTimeClassic.Visibility = Visibility.Collapsed;
-                            }
-
-
-                            MainForm.Main1.Title = Me?.Name + " " + GetCurrentAccount().ServerName + " " + Version + " " + isReleaseVersion;
-                            if (CharacterSettings.QuesterLeft > -1)
-                            {
-                                MainForm.Main1.Left = CharacterSettings.QuesterLeft;
-                                MainForm.Main1.Top = CharacterSettings.QuesterTop;
-                            }
+                            MainForm.ComboBoxAukTime.Visibility = Visibility.Collapsed;
                         }
-                        catch (Exception err)
+                        else
                         {
-                            log(err.ToString());
+                            MainForm.ComboBoxAukTimeClassic.Visibility = Visibility.Collapsed;
+                        }
+                        MainForm.Main1.Title = Me?.Name + " " + GetCurrentAccount().ServerName + " " + Version + " " + isReleaseVersion;
+                        if (CharacterSettings.QuesterLeft > -1)
+                        {
+                            MainForm.Main1.Left = CharacterSettings.QuesterLeft;
+                            MainForm.Main1.Top = CharacterSettings.QuesterTop;
                         }
                     }
-                ));
+                    catch (Exception err)
+                    {
+                        log(err.ToString());
+                    }
+                }));
                 if (AdvancedLog)
                 {
                     log("Форма 2                               " + sw.ElapsedMilliseconds + " мс");
@@ -566,20 +678,20 @@ namespace WowAI
                     log("CommonModule                               " + sw.ElapsedMilliseconds + " мс");
                     sw.Restart();
                 }
+
                 FarmModule = new FarmModule();
                 FarmModule.Start(this);
-
                 if (AdvancedLog)
                 {
                     log("FarmModule                               " + sw.ElapsedMilliseconds + " мс");
                     sw.Restart();
                 }
+
                 AutoQuests = new AutoQuests();
                 AutoQuests.Start(this);
-
                 if (AdvancedLog)
                 {
-                    log("Запуск потоков                               " + sw.ElapsedMilliseconds + " мс");
+                    log("AutoQuests                              " + sw.ElapsedMilliseconds + " мс");
                     sw.Stop();
                 }
 
@@ -612,76 +724,111 @@ namespace WowAI
                 GetStartInventory();
                 SetCTMMovement(CharacterSettings.Mode == Mode.Questing);
                 if (ClientType == EWoWClient.Classic)
+                {
                     SetCTMMovement(true);
+                }
 
-
-                //  SetBetaCTMMovement(false);
+                /* if (GetBotLogin() == "Armin")
+                     SetBetaCTMMovement(true);*/
 
 
                 MyExps.TimeWork = DateTime.Now;
 
                 while (!CancelRequested)
                 {
-
-
                     Thread.Sleep(100);
                     if (GameState == EGameState.LoadingGameWorld)
+                    {
                         AutoQuests.IsNeedWaitAfterLoading = true;
+                    }
+
                     timer++;
                     timerDps++;
 
                     if (GameState == EGameState.Offline)
+                    {
                         StopPluginNow();
-
+                    }
 
                     if (MainForm != null && timer > 5)
                     {
                         MainForm?.SetMe();
                         MyCheckNpc();
                         timer = 0;
+                        if (GetBotLogin() == "Daredevi1")
+                        {
+                            CommonModule.MyDraw();
+                        }
                     }
 
                     CheckAttack();
                     if (GameState == EGameState.Ingame && timerDps > 10)
                     {
                         if (CommonModule.InFight() || CheckInvisible())
+                        {
                             TimeInFight++;
+                        }
+
                         timerDps = 0;
                     }
 
                     if (MainForm != null && MainForm.NeedApplySettings)
+                    {
                         ApplySettings();
+                    }
+
                     if (MainForm != null && MainForm.NeedApplyDungeonSettings)
+                    {
                         ApplyDungeonSettings();
+                    }
+
                     if (MainForm != null && MainForm.NeedApplyQuestSettings)
+                    {
                         ApplyQuestSettings();
+                    }
 
                     if (ClientAfk)
+                    {
                         Jump();
+                    }
 
                     if (Me.StandState == EStandState.Sit && MainForm.On)
+                    {
                         if (!MyIsNeedRegen() && CharacterSettings.UseRegen)
+                        {
                             ChangeStandState(EStandState.Stand);
+                        }
+                    }
 
                     if (MainForm.On)
+                    {
                         CheckCount++;
+                    }
                     else
+                    {
                         CheckCount = 0;
+                    }
 
                     if (FarmModule.BestMob != null && Me.IsInCombat)
                     {
                         if (!CharacterSettings.PikPocket)
+                        {
                             NeedWaitAfterCombat = true;
+                        }
                     }
 
 
                     if (CommonModule.InFight())
+                    {
                         CheckCount = 0;
+                    }
 
                     if (Me.IsInFlight)
+                    {
                         CheckCount = 0;
+                    }
 
-                    if (Me != null)
+                    if (Me != null && CharacterSettings.Mode != Mode.QuestingClassic)
                     {
                         if (Me.IsMoving)
                         {
@@ -708,21 +855,31 @@ namespace WowAI
                         }
 
                         if (SpellManager.IsCasting)
+                        {
                             CheckCount = 0;
+                        }
+
                         foreach (var aura in Me.GetAuras())
                         {
                             if (aura.SpellId != 15007)
+                            {
                                 continue;
+                            }
+
                             CheckCount = 0;
                             break;
                         }
                     }
 
                     if (AutoQuests.WaitTeleport)
+                    {
                         CheckCount = 0;
+                    }
 
                     if (CharacterSettings.Mode == Mode.FarmResource)
+                    {
                         CheckCount = 0;
+                    }
 
                     if (CheckCount > 3200)
                     {
@@ -732,7 +889,9 @@ namespace WowAI
                             TerminateGameClient();
                             EventInactiveCount++;
                             if (EventInactiveCount > 1)
+                            {
                                 EventInactive = true;
+                            }
                         }
                         lastLoc = Me.Location;
                         CheckCount = 0;
@@ -814,19 +973,17 @@ namespace WowAI
                         FormThread?.Abort();*/
                 log("Aborted!");
             }
-            catch (ThreadAbortException)
-            {
-
-            }
+            catch (ThreadAbortException) { }
             catch (Exception err)
             {
-
                 log(err.ToString());
             }
             finally
             {
                 if (Me != null)
+                {
                     CancelMoveTo();
+                }
             }
 
 
@@ -905,10 +1062,16 @@ namespace WowAI
                 }
 
                 if (Me != null)
+                {
                     if (isReleaseVersion)
+                    {
                         CfgName = AssemblyDirectory + "\\Configs\\" + Me.Name + "[" + GetCurrentAccount().ServerName + "].json";
+                    }
                     else
+                    {
                         CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\" + Me.Name + "[" + GetCurrentAccount().ServerName + "].json";
+                    }
+                }
 
                 if (File.Exists(CfgName))
                 {
@@ -931,47 +1094,46 @@ namespace WowAI
                         {
                             if (Me != null && file.Name.Contains(Me.Class.ToString()))
                             {
-                                if (file.Name.Contains("Level"))
+                                if (!file.Name.Contains("Level"))
                                 {
-                                    var index = file.Name.IndexOf("[", StringComparison.Ordinal) + 1;
-                                    var lastIndex = file.Name.LastIndexOf("-", StringComparison.Ordinal);
-                                    var leght = lastIndex - index;
-                                    // log(index + " до " + lastIndex);
-                                    var startLevel = Convert.ToInt32(file.Name.Substring(index, leght));
-                                    index = file.Name.IndexOf("-", StringComparison.Ordinal) + 1;
-                                    lastIndex = file.Name.LastIndexOf("]", StringComparison.Ordinal);
-                                    leght = lastIndex - index;
-                                    // log(index + " до " + lastIndex);
-                                    var endLevel = Convert.ToInt32(file.Name.Substring(index, leght));
-                                    // log(startLevel + " до " + endLevel);
-                                    if (Me.Level >= startLevel && Me.Level <= endLevel)
-                                    {
-                                        StartLevel = startLevel;
-                                        EndLevel = endLevel;
-                                        if (isReleaseVersion)
-                                        {
-                                            CfgName = AssemblyDirectory + "\\Configs\\Default\\" + file.Name;
-                                        }
-                                        else
-                                        {
-                                            CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\Default\\" + file.Name;
-                                        }
-                                        CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
-                                        log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
-                                        FileName = file.Name;
-                                        return true;
-                                    }
-
+                                    continue;
                                 }
-
-
-
+                                var index = file.Name.IndexOf("[", StringComparison.Ordinal) + 1;
+                                var lastIndex = file.Name.LastIndexOf("-", StringComparison.Ordinal);
+                                var leght = lastIndex - index;
+                                // log(index + " до " + lastIndex);
+                                var startLevel = Convert.ToInt32(file.Name.Substring(index, leght));
+                                index = file.Name.IndexOf("-", StringComparison.Ordinal) + 1;
+                                lastIndex = file.Name.LastIndexOf("]", StringComparison.Ordinal);
+                                leght = lastIndex - index;
+                                // log(index + " до " + lastIndex);
+                                var endLevel = Convert.ToInt32(file.Name.Substring(index, leght));
+                                // log(startLevel + " до " + endLevel);
+                                if (Me.Level >= startLevel && Me.Level <= endLevel)
+                                {
+                                    StartLevel = startLevel;
+                                    EndLevel = endLevel;
+                                    if (isReleaseVersion)
+                                    {
+                                        CfgName = AssemblyDirectory + "\\Configs\\Default\\" + file.Name;
+                                    }
+                                    else
+                                    {
+                                        CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\Default\\" + file.Name;
+                                    }
+                                    CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
+                                    log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
+                                    FileName = file.Name;
+                                    return true;
+                                }
                             }
                         }
 
+
+
                         foreach (var file in dir.GetFiles())
                         {
-                            if (Me != null && (file.Name.Contains(Me.Class.ToString()) && !file.Name.Contains("Level")))
+                            if (Me != null && (file.Name.Contains(Me.Class.ToString())&& file.Name.Contains("json") && !file.Name.Contains("Level")))
                             {
                                 if (isReleaseVersion)
                                 {
@@ -986,6 +1148,36 @@ namespace WowAI
                                 log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
                                 FileName = file.Name;
                                 return true;
+                            }
+                        }
+
+                        if (Me.Level < 21)
+                        {
+                            path = AssemblyDirectory + "\\Configs\\QuestDefault\\";
+                            if (!isReleaseVersion)
+                            {
+                                path = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\QuestDefault\\";
+                            }
+                            dir = new DirectoryInfo(path);
+
+                            foreach (var file in dir.GetFiles())
+                            {
+                                if (Me != null && file.Name.Contains(Me.Class.ToString()) && file.Name.Contains(Me.Race.ToString()) && !file.Name.Contains("Level") && file.Name.Contains("json"))
+                                {
+                                    if (isReleaseVersion)
+                                    {
+                                        CfgName = AssemblyDirectory + "\\Configs\\QuestDefault\\" + file.Name;
+                                    }
+                                    else
+                                    {
+                                        CfgName = AssemblyDirectory + "\\Plugins\\Quester\\Configs\\QuestDefault\\" + file.Name;
+                                    }
+                                    log("Загружаю настройки из файла: " + CfgName, LogLvl.Ok);
+                                    CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
+
+                                    FileName = file.Name;
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -1021,12 +1213,18 @@ namespace WowAI
             try
             {
                 if (CharacterSettings.Quest == "" || CharacterSettings.Quest.Contains("Не выбрано"))
+                {
                     return;
+                }
+
                 QuestName = PathQuestSet + CharacterSettings.Quest;
                 log("Применяю квест: " + QuestName, LogLvl.Ok);
                 var reader = new XmlSerializer(typeof(QuestSetting));
                 using (var fs = File.Open(QuestName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
                     QuestSettings = (QuestSetting)reader.Deserialize(fs);
+                }
+
                 MainForm.InitFromQuestSettings();
                 MainForm.NeedApplyQuestSettings = false;
             }
@@ -1042,12 +1240,18 @@ namespace WowAI
             try
             {
                 if (CharacterSettings.Script == "" || CharacterSettings.Script.Contains("Не выбрано"))
+                {
                     return;
+                }
+
                 ScriptName = AppDomain.CurrentDomain.BaseDirectory + "Plugins\\Script\\" + CharacterSettings.Script;
                 log("Применяю скрипт: " + ScriptName, LogLvl.Ok);
                 var reader = new XmlSerializer(typeof(DungeonSetting));
                 using (var fs = File.Open(ScriptName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
                     DungeonSettings = (DungeonSetting)reader.Deserialize(fs);
+                }
+
                 MainForm.InitFromDungeonSettings();
                 MainForm.NeedApplyDungeonSettings = false;
             }
@@ -1064,7 +1268,6 @@ namespace WowAI
             {
                 log("Применяю настройки: " + CfgName, LogLvl.Ok);
                 CharacterSettings = (CharacterSettings)ConfigLoader.LoadConfig(CfgName, typeof(CharacterSettings), CharacterSettings);
-
                 MainForm.InitFromSettings();
                 MainForm.NeedApplySettings = false;
             }

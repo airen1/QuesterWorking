@@ -7,5 +7,8 @@
         Complete,
         Grind,
         UseFlyPath,
+        SetHs,
+        UseHs,
+        GetFp
     }
 }

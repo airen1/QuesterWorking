@@ -17,7 +17,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -29,7 +33,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -41,7 +49,11 @@ namespace WowAI
             get => _priority;
             set
             {
-                if (_priority == value) return;
+                if (_priority == value)
+                {
+                    return;
+                }
+
                 _priority = value;
                 NotifyPropertyChanged();
             }

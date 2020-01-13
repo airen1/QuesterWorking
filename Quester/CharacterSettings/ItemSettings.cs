@@ -20,7 +20,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -32,7 +36,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -46,7 +54,11 @@ namespace WowAI
             get => _use;
             set
             {
-                if (_use == value) return;
+                if (_use == value)
+                {
+                    return;
+                }
+
                 _use = value;
                 NotifyPropertyChanged();
             }
@@ -58,7 +70,11 @@ namespace WowAI
             get => _meLevel;
             set
             {
-                if (_meLevel == value) return;
+                if (_meLevel == value)
+                {
+                    return;
+                }
+
                 _meLevel = value;
                 NotifyPropertyChanged();
             }
@@ -70,18 +86,26 @@ namespace WowAI
             get => _class;
             set
             {
-                if (_class == value) return;
+                if (_class == value)
+                {
+                    return;
+                }
+
                 _class = value;
                 NotifyPropertyChanged();
             }
         }
         private EItemQuality _quality;
-        public WoWBot.Core.EItemQuality Quality
+        public EItemQuality Quality
         {
             get => _quality;
             set
             {
-                if (_quality == value) return;
+                if (_quality == value)
+                {
+                    return;
+                }
+
                 _quality = value;
                 NotifyPropertyChanged();
             }

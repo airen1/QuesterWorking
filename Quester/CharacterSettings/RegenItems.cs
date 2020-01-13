@@ -18,7 +18,11 @@ namespace WowAI
             get => _checked;
             set
             {
-                if (_checked == value) return;
+                if (_checked == value)
+                {
+                    return;
+                }
+
                 _checked = value;
                 NotifyPropertyChanged();
             }
@@ -29,7 +33,11 @@ namespace WowAI
             get => _itemId;
             set
             {
-                if (_itemId == value) return;
+                if (_itemId == value)
+                {
+                    return;
+                }
+
                 _itemId = value;
                 NotifyPropertyChanged();
             }
@@ -40,7 +48,11 @@ namespace WowAI
             get => _spellId;
             set
             {
-                if (_spellId == value) return;
+                if (_spellId == value)
+                {
+                    return;
+                }
+
                 _spellId = value;
                 NotifyPropertyChanged();
             }
@@ -51,7 +63,11 @@ namespace WowAI
             get => _name;
             set
             {
-                if (_name == value) return;
+                if (_name == value)
+                {
+                    return;
+                }
+
                 _name = value;
                 NotifyPropertyChanged();
             }

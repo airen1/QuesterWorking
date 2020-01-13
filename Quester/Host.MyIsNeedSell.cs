@@ -17,11 +17,20 @@ namespace WowAI
                 foreach (var npc in CharacterSettings.NpcForActionSettings)
                 {
                     if (npc.MapId != MapID)
+                    {
                         continue;
+                    }
+
                     if (npc.AreaId != Area.Id)
+                    {
                         continue;
+                    }
+
                     if (!npc.IsVendor)
+                    {
                         continue;
+                    }
+
                     if (Me.Distance(npc.Loc) < bestDist)
                     {
                         bestNpc = npc;
@@ -34,9 +43,15 @@ namespace WowAI
                     foreach (var npc in CharacterSettings.NpcForActionSettings)
                     {
                         if (npc.MapId != MapID)
+                        {
                             continue;
+                        }
+
                         if (!npc.IsVendor)
+                        {
                             continue;
+                        }
+
                         if (Me.Distance(npc.Loc) < bestDist)
                         {
                             bestNpc = npc;
@@ -58,7 +73,10 @@ namespace WowAI
             try
             {
                 if (!CharacterSettings.CheckRepairAndSell)
+                {
                     return false;
+                }
+
                 if (MyGetFreeSlot() <= CharacterSettings.InvFreeSlotCount)
                 {
                     log("Необходима продажа " + MyFreeInvSlots() + "/" + MyTotalInvSlot(), LogLvl.Important);
@@ -77,21 +95,17 @@ namespace WowAI
         {
             try
             {
-                if (CharacterSettings.PikPocket)
-                {
-                    foreach (var spell in Me.GetAuras())
-                    {
-                        if (spell.SpellName == "Stealth")
-                            spell.Cancel();
-                    }
-                }
-
-
                 var mountSell = SpellManager.GetSpell(61447); //Тундровый мамонт путешественника
                 if (mountSell == null)
+                {
                     mountSell = SpellManager.GetSpell(61425); //Тундровый мамонт путешественника
+                }
+
                 if (noMount)
+                {
                     mountSell = null;
+                }
+
                 if (mountSell != null && IsOutdoors)
                 {
                     if (CharacterSettings.UseMountMyLoc)
@@ -100,9 +114,12 @@ namespace WowAI
                     else
                     {
                         if (Math.Abs(CharacterSettings.MountLocX) > 0)
-                            if (!MoveTo(CharacterSettings.MountLocX, CharacterSettings.MountLocY,
-                                CharacterSettings.MountLocZ))
+                        {
+                            if (!MoveTo(CharacterSettings.MountLocX, CharacterSettings.MountLocY, CharacterSettings.MountLocZ))
+                            {
                                 return false;
+                            }
+                        }
                     }
 
 
@@ -119,11 +136,16 @@ namespace WowAI
                         return false;
                     }
                     else
+                    {
                         log("Призвал маунта", LogLvl.Ok);
+                    }
 
                     Thread.Sleep(2000);
                     while (SpellManager.IsCasting)
+                    {
                         Thread.Sleep(100);
+                    }
+
                     Thread.Sleep(2000);
                     foreach (var npc in GetEntities<Unit>())
                     {
@@ -135,8 +157,10 @@ namespace WowAI
                                 log("Не смог открыть шоп 7 " + npc.Name + "[" + npc.Id + "]  " + GetLastError(),
                                     LogLvl.Error);
                                 if (InteractionObject != null)
+                                {
                                     log("Открыт диалог с " + InteractionObject.Name + "  " + InteractionObject.Id +
                                         "  " + Me.Distance(InteractionObject.Location) + " " + CurrentInteractionGuid);
+                                }
                                 else
                                 {
                                     log("InteractionNpc = null " + CurrentInteractionGuid);
@@ -148,33 +172,46 @@ namespace WowAI
                                      return false;
                                  }*/
                             }
-                            else
-                            {
-                                log("Открыл шоп");
-                            }
+
 
                             Thread.Sleep(1000);
-
+                            if (CharacterSettings.PikPocket)
+                            {
+                                foreach (var spell in Me.GetAuras())
+                                {
+                                    if (spell.SpellName == "Stealth")
+                                    {
+                                        spell.Cancel();
+                                    }
+                                }
+                            }
                             MySellItems();
                             MyBuyItems();
 
                             Thread.Sleep(1000);
-                            if (CharacterSettings.CheckRepair)
+                            if (CharacterSettings.CheckRepair && npc.IsArmorer)
+                            {
                                 if (!ItemManager.RepairAllItems())
                                 {
                                     log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
                                     if (GetLastError() == ELastError.NoItemForRepair)
+                                    {
                                         return true;
+                                    }
+
                                     Thread.Sleep(10000);
                                     return false;
                                 }
                                 else
                                 {
+                                    AutoQuests.NeedActionNpcRepair = false;
                                     log("Отремонтировал ", LogLvl.Ok);
                                 }
+                               
+                            }
 
                             AutoQuests.NeedActionNpcSell = false;
-                            AutoQuests.NeedActionNpcRepair = false;
+                            
                             CommonModule.MyUnmount();
                             return true;
                         }
@@ -193,45 +230,108 @@ namespace WowAI
                         MyNpcLoc npcLoc = null;
                         foreach (var myNpcLoc in MyNpcLocss.NpcLocs)
                         {
+                            if (myNpcLoc.MapId != MapID)
+                                continue;
                             if (_badNpcForSell.Contains(myNpcLoc.Id))
+                            {
                                 continue;
+                            }
+
                             if (IsBadNpcLocs.Contains(myNpcLoc))
+                            {
                                 continue;
+                            }
+
                             if (!myNpcLoc.IsArmorer)
+                            {
                                 continue;
+                            }
+
                             if (Me.Team == ETeam.Horde && myNpcLoc.Team == ETeam.Alliance)
+                            {
                                 continue;
+                            }
+
                             if (Me.Team == ETeam.Alliance && myNpcLoc.Team == ETeam.Horde)
+                            {
                                 continue;
+                            }
+
+                            if (Area.Id == 215) //Плато Красного облака
+                            {
+                                if (myNpcLoc.Id == 10380)
+                                {
+                                    continue;
+                                }
+                            }
+
+                            if (Me.Race == ERace.Tauren)
+                            {
+                                if (myNpcLoc.Id == 3539)
+                                    continue;
+                                if (myNpcLoc.Id == 3537)
+                                    continue;
+                            }
+
+                            if (CharacterSettings.Mode == Mode.QuestingClassic)
+                            {
+                                if (myNpcLoc.Id == 4188)
+                                    continue;
+                            }
+
                             if (Me.Distance(myNpcLoc.Loc) > bestDist)
+                            {
                                 continue;
+                            }
+
                             bestDist = Me.Distance(myNpcLoc.Loc);
                             npcLoc = myNpcLoc;
                         }
 
                         if (npcLoc != null)
                         {
-                            log("Выбрал нпс " + npcLoc.Id);
+                            log("Выбрал нпс 2 " + npcLoc.Id);
                             if (!CommonModule.MoveTo(npcLoc.Loc, 10))
+                            {
                                 return false;
+                            }
+
                             var listUnit2 = GetEntities<Unit>();
 
                             foreach (var npc in listUnit2.OrderBy(i => Me.Distance(i)))
                             {
                                 if (!npc.IsArmorer)
+                                {
                                     continue;
+                                }
+
                                 if (!CommonModule.MoveTo(npc, 3))
+                                {
                                     return false;
+                                }
+
                                 CanselForm();
+                                if (CharacterSettings.PikPocket)
+                                {
+                                    foreach (var spell in Me.GetAuras())
+                                    {
+                                        if (spell.SpellName == "Stealth")
+                                        {
+                                            spell.Cancel();
+                                        }
+                                    }
+                                }
                                 Thread.Sleep(1000);
                                 if (!OpenShop(npc))
                                 {
                                     log("Не смог открыть шоп 3 " + npc.Name + "[" + npc.Id + "]  " + GetLastError(),
                                         LogLvl.Error);
                                     if (InteractionObject != null)
+                                    {
                                         log("Открыт диалог с " + InteractionObject.Name + "  " + InteractionObject.Id +
                                             "  " + Me.Distance(InteractionObject.Location) + "  " +
                                             CurrentInteractionGuid);
+                                    }
                                     else
                                     {
                                         log("InteractionNpc = null " + CurrentInteractionGuid);
@@ -245,21 +345,63 @@ namespace WowAI
                                         return false;
                                     }
                                 }
-                                else
-                                {
-                                    log("Открыл шоп");
-                                }
+
 
                                 Thread.Sleep(1000);
                                 foreach (var gossipOptionsData in GetNpcDialogs())
                                 {
                                     if (gossipOptionsData.Text.Contains("buy from you"))
+                                    {
                                         SelectNpcDialog(gossipOptionsData);
+                                    }
+
                                     log(gossipOptionsData.Text);
                                 }
 
                                 MySellItems();
+                                Thread.Sleep(1000);
+                                if (CharacterSettings.CheckRepair && npc.IsArmorer)
+                                {
+                                    if (!ItemManager.RepairAllItems())
+                                    {
+                                        log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
+                                        if (GetLastError() == ELastError.NoItemForRepair)
+                                        {
+                                            return true;
+                                        }
+
+                                        Thread.Sleep(10000);
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                        AutoQuests.NeedActionNpcRepair = false;
+                                        log("Отремонтировал ", LogLvl.Ok);
+                                    }
+                               
+                                }
                                 MyBuyItems();
+                                Thread.Sleep(1000);
+                                if (CharacterSettings.CheckRepair && npc.IsArmorer)
+                                {
+                                    if (!ItemManager.RepairAllItems())
+                                    {
+                                        log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
+                                        if (GetLastError() == ELastError.NoItemForRepair)
+                                        {
+                                            return true;
+                                        }
+
+                                        Thread.Sleep(10000);
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                        AutoQuests.NeedActionNpcRepair = false;
+                                        log("Отремонтировал ", LogLvl.Ok);
+                                    }
+                               
+                                }
                                 return true;
                             }
 
@@ -277,53 +419,120 @@ namespace WowAI
                     if (vendor.AreaId != Area.Id || Me.Distance(vendor.Loc) > 1000)
                     {
                         if (!MyUseTaxi(vendor.AreaId, vendor.Loc))
+                        {
                             return false;
+                        }
                     }
 
-
                     if (!CommonModule.MoveTo(vendor.Loc, 5))
+                    {
                         return false;
+                    }
                 }
 
+                if (CharacterSettings.PikPocket)
+                {
+                    foreach (var spell in Me.GetAuras())
+                    {
+                        if (spell.SpellName == "Stealth")
+                        {
+                            spell.Cancel();
+                        }
+                    }
+                }
 
                 var listUnit = GetEntities<Unit>();
 
                 foreach (var npc in listUnit.OrderBy(i => Me.Distance(i)))
                 {
-                    if (!npc.IsVendor)
-                        continue;
-                    if (!CommonModule.MoveTo(npc, 3))
+                    if (armorer != null)
+                    {
+                        if (!npc.IsArmorer)
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!npc.IsVendor)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (!CommonModule.MoveTo(npc.Location, 3))
+                    {
                         return false;
+                    }
+
                     CanselForm();
                     Thread.Sleep(1000);
                     if (!OpenShop(npc))
                     {
                         if (GetLastError() == ELastError.TooFarDistance)
+                        {
                             CommonModule.MoveTo(npc, 0);
+                        }
+
                         log("Не смог открыть шоп 4 " + npc.Name + "[" + npc.Id + "]  " + GetLastError(), LogLvl.Error);
                         if (InteractionObject != null)
+                        {
                             log("Открыт диалог с " + InteractionObject.Name + "  " + InteractionObject.Id + "  " +
                                 Me.Distance(InteractionObject.Location) + "  " + CurrentInteractionGuid);
+                        }
                         else
                         {
                             log("InteractionNpc = null " + CurrentInteractionGuid);
                         }
 
                         Thread.Sleep(5000);
-                        /*   if (GetLastError() != ELastError.ActionNotAllowed)
-                           {
-                               return false;
-                           }*/
-                    }
-                    else
-                    {
-                        log("Открыл шоп");
+
                     }
 
                     Thread.Sleep(1000);
 
                     MySellItems();
+                    if (CharacterSettings.CheckRepair && npc.IsArmorer)
+                    {
+                        if (!ItemManager.RepairAllItems())
+                        {
+                            log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
+                            if (GetLastError() == ELastError.NoItemForRepair)
+                            {
+                                return true;
+                            }
+
+                            Thread.Sleep(10000);
+                            return false;
+                        }
+                        else
+                        {
+                            AutoQuests.NeedActionNpcRepair = false;
+                            log("Отремонтировал ", LogLvl.Ok);
+                        }
+                               
+                    }
                     MyBuyItems();
+                    if (CharacterSettings.CheckRepair && npc.IsArmorer)
+                    {
+                        if (!ItemManager.RepairAllItems())
+                        {
+                            log("Не смог отремонтировать " + GetLastError(), LogLvl.Error);
+                            if (GetLastError() == ELastError.NoItemForRepair)
+                            {
+                                return true;
+                            }
+
+                            Thread.Sleep(10000);
+                            return false;
+                        }
+                        else
+                        {
+                            AutoQuests.NeedActionNpcRepair = false;
+                            log("Отремонтировал ", LogLvl.Ok);
+                        }
+                               
+                    }
                     return true;
                 }
             }
@@ -347,18 +556,92 @@ namespace WowAI
                 foreach (var item in ItemManager.GetItems())
                 {
                     if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 && item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 && item.Place != EItemPlace.InventoryItem)
+                    {
                         continue;
+                    }
+
                     if (item.GetSellPrice() == 0)
+                    {
                         continue;
+                    }
+
+                    if (GetBotLogin() == "zawww2")
+                    {
+                        if (Me.Level > 54 && Me.Class == EClass.Paladin && CharacterSettings.Mode == Mode.FarmMob && item.ItemClass == EItemClass.Armor)
+                        {
+                            if ((EItemSubclassArmor)item.ItemSubClass == EItemSubclassArmor.PLATE || (EItemSubclassArmor)item.ItemSubClass == EItemSubclassArmor.MISCELLANEOUS)
+                            {
+                                var inta = false;
+                                var stamina = false;
+                                foreach (var @sbyte in item.GetStats())
+                                {
+                                    if (@sbyte.Key == EItemModType.INTELLECT)
+                                        inta = true;
+                                    if (@sbyte.Key == EItemModType.STAMINA)
+                                        stamina = true;
+                                }
+
+                                if (inta && stamina)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if (Me.Level > 54 && Me.Class == EClass.Mage && CharacterSettings.Mode == Mode.FarmMob && item.ItemClass == EItemClass.Armor)
+                        {
+                            if ((EItemSubclassArmor)item.ItemSubClass == EItemSubclassArmor.MISCELLANEOUS)
+                            {
+                                var shadow = false;
+
+                                foreach (var @sbyte in item.GetStats())
+                                {
+                                    if (@sbyte.Key == EItemModType.SHADOW_RESISTANCE)
+                                        shadow = true;
+                                }
+
+                                if (shadow)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+
+                    }
+
                     foreach (var characterSettingsMyItemGlobal in CharacterSettings.MyItemGlobals)
                     {
                         if (item.ItemClass == characterSettingsMyItemGlobal.Class && item.ItemQuality == characterSettingsMyItemGlobal.Quality)
                         {
                             var isNosell = false;
+                            if (CharacterSettings.Mode == Mode.QuestingClassic)
+                            {
+
+                                foreach (var quest in GetQuests())
+                                {
+                                    if (quest.Template == null)
+                                        continue;
+                                    if (quest.Template.QuestObjectives == null)
+                                        continue;
+                                    foreach (var templateQuestObjective in quest.Template.QuestObjectives)
+                                    {
+                                        if (item.Id != templateQuestObjective.ObjectID)
+                                            continue;
+                                        isNosell = true;
+                                        log("Не продаю так как " + item.Name + "[" + item.Id + "] Цена:" + (item.GetSellPrice() / 10000f).ToString("F2") + " находится в списке предметов для квеста" + quest.Id, LogLvl.Important);
+                                    }
+                                }
+                            }
+
+
+
                             foreach (var characterSettingsItemSetting in CharacterSettings.ItemSettings)
                             {
-                                if (item.Id != characterSettingsItemSetting.Id) 
+                                if (item.Id != characterSettingsItemSetting.Id)
+                                {
                                     continue;
+                                }
+
                                 if (characterSettingsItemSetting.Use == EItemUse.Nothing
                                     || characterSettingsItemSetting.Use == EItemUse.PutToWarehouse
                                     || characterSettingsItemSetting.Use == EItemUse.Sell
@@ -366,6 +649,7 @@ namespace WowAI
                                     || characterSettingsItemSetting.Use == EItemUse.Use
                                     || characterSettingsItemSetting.Use == EItemUse.SendByMail
                                     || characterSettingsItemSetting.Use == EItemUse.FoodPet
+                                    || characterSettingsItemSetting.Use == EItemUse.NotEquip
                                     || characterSettingsItemSetting.Use == EItemUse.Buy)
                                 {
                                     isNosell = true;
@@ -375,8 +659,11 @@ namespace WowAI
 
                             foreach (var characterSettingsRegenItemse in CharacterSettings.RegenItemses)
                             {
-                                if (item.Id != characterSettingsRegenItemse.ItemId) 
+                                if (item.Id != characterSettingsRegenItemse.ItemId)
+                                {
                                     continue;
+                                }
+
                                 isNosell = true;
                                 log("Не продаю так как " + item.Name + "[" + item.Id + "] Цена:" + (item.GetSellPrice() / 10000f).ToString("F2") + " находится в списке предметов для регена " + characterSettingsRegenItemse.Checked, LogLvl.Important);
                             }
@@ -395,15 +682,21 @@ namespace WowAI
                             {
                                 log("Продаю " + item.Name + "  [" + item.Id + "]  Цена:" + (item.GetSellPrice() / 10000f).ToString("F2"), LogLvl.Ok);
                                 var result = item.Sell();
-                                if (result == ESellResult.Success) 
+                                if (result == ESellResult.Success)
+                                {
                                     continue;
+                                }
+
                                 log("Не смог продать  " + item.Name + "[" + item.Id + "] Цена:" + (item.GetSellPrice() / 10000f).ToString("F2") + "  " + result + " " + " " + GetLastError(), LogLvl.Error);
                                 Thread.Sleep(5000);
                                 if (GetLastError() == ELastError.CantFindNpc)
+                                {
                                     return;
+                                }
+
                                 if (GetLastError() == ELastError.DialongWithNpcNotOpened)
                                 {
-                                    SendKeyPress(0x1b);
+                                    MySendKeyEsc();
                                     return;
                                 }
                             }
@@ -414,10 +707,15 @@ namespace WowAI
                 //Обычная продажа
                 foreach (var item in ItemManager.GetItems())
                 {
-                    if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 && item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 && item.Place != EItemPlace.InventoryItem) 
+                    if (item.Place != EItemPlace.Bag1 && item.Place != EItemPlace.Bag2 && item.Place != EItemPlace.Bag3 && item.Place != EItemPlace.Bag4 && item.Place != EItemPlace.InventoryItem)
+                    {
                         continue;
+                    }
+
                     if (item.GetSellPrice() == 0)
+                    {
                         continue;
+                    }
 
                     foreach (var itemSettingse in CharacterSettings.ItemSettings)
                     {
@@ -431,7 +729,9 @@ namespace WowAI
                                 Thread.Sleep(5000);
                             }
                             if (itemSettingse.MinCount > 0)
+                            {
                                 Thread.Sleep(1000);
+                            }
                         }
                     }
                 }

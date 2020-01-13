@@ -18,7 +18,7 @@ namespace WowAI
 
             if (GetNpcDialogs().Count == 0)
             {
-                SendKeyPress(0x1b);
+                MySendKeyEsc();
                 Thread.Sleep(1000);
                 if (!OpenDialog(npc))
                 {
@@ -35,7 +35,10 @@ namespace WowAI
                 {
                     log("Выбираю диалог");
                     if (!SelectNpcDialog(gossipOptionsData))
+                    {
                         log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                    }
+
                     result = true;
                     break;
                 }
@@ -62,14 +65,18 @@ namespace WowAI
             ForceMoveTo(npc.Location);
             Thread.Sleep(1000);
             if (!OpenDialog(npc))
+            {
                 log("Не смог открыть диалог " + GetLastError(), LogLvl.Error);
+            }
 
             if (GetNpcDialogs().Count == 0)
             {
-                SendKeyPress(0x1b);
+                MySendKeyEsc();
                 Thread.Sleep(1000);
                 if (!OpenDialog(npc))
+                {
                     log("Не смог открыть диалог 2 " + GetLastError(), LogLvl.Error);
+                }
             }
 
 
@@ -78,7 +85,10 @@ namespace WowAI
                 if (gossipOptionsData.Text.Contains("Подгород") || gossipOptionsData.Text.Contains(text))
                 {
                     if (!SelectNpcDialog(gossipOptionsData))
+                    {
                         log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                    }
+
                     result = true;
                 }
 
@@ -95,14 +105,18 @@ namespace WowAI
             ForceMoveTo(npc.Location);
             Thread.Sleep(1000);
             if (!OpenDialog(npc))
+            {
                 log("Не смог открыть диалог " + GetLastError(), LogLvl.Error);
+            }
 
             if (GetNpcDialogs().Count == 0)
             {
-                SendKeyPress(0x1b);
+                MySendKeyEsc();
                 Thread.Sleep(1000);
                 if (!OpenDialog(npc))
+                {
                     log("Не смог открыть диалог 2 " + GetLastError(), LogLvl.Error);
+                }
             }
 
             foreach (var gossipOptionsData in GetNpcDialogs())
@@ -111,15 +125,18 @@ namespace WowAI
                 {
                     log("Выбираю диалог");
                     if (!SelectNpcDialog(gossipOptionsData))
+                    {
                         log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                    }
+
                     result = true;
                 }
 
                 log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " +
-                    gossipOptionsData.ClientOption + "  " + "   ");
+                    gossipOptionsData.ClientOption + "  " + "   " + gossipOptionsData.OptionNPC);
             }
 
-            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929 || npc.Id == 131135 || npc.Id == 137613)
+            if (npc.Id == 127128 || npc.Id == 130905 || npc.Id == 130929 || npc.Id == 131135 || npc.Id == 137613 || npc.Id == 11956)
             {
                 Thread.Sleep(1000);
                 foreach (var gossipOptionsData in GetNpcDialogs())
@@ -127,16 +144,19 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == index)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
                     log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " +
-                        gossipOptionsData.ClientOption + "  " + "   ");
+                        gossipOptionsData.ClientOption + "   " + gossipOptionsData.OptionNPC);
                 }
             }
 
-            if (npc.Id == 130905 || npc.Id == 130929)
+            if (npc.Id == 130905 || npc.Id == 130929|| npc.Id == 11956)
             {
                 Thread.Sleep(1000);
                 foreach (var gossipOptionsData in GetNpcDialogs())
@@ -144,16 +164,19 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == index)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
                     log(" " + gossipOptionsData.Confirm + " " + gossipOptionsData.Text + " " +
-                        gossipOptionsData.ClientOption + "  " + "   ");
+                        gossipOptionsData.ClientOption + "   " + gossipOptionsData.OptionNPC);
                 }
             }
 
-            if (npc.Id == 281536)
+            if (npc.Id == 281536|| npc.Id == 11956)
             {
                 Thread.Sleep(1000);
                 foreach (var gossipOptionsData in GetNpcDialogs())
@@ -161,7 +184,10 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == 4)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
@@ -175,7 +201,10 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == 0)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
@@ -189,7 +218,10 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == 3)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
@@ -203,7 +235,10 @@ namespace WowAI
                     if (gossipOptionsData.ClientOption == 1)
                     {
                         if (!SelectNpcDialog(gossipOptionsData))
+                        {
                             log("Не смог выбрать диалог " + GetLastError(), LogLvl.Error);
+                        }
+
                         result = true;
                     }
 
@@ -244,7 +279,10 @@ namespace WowAI
                     foreach (var entity in GetEntities())
                     {
                         if (entity.Guid != CurrentInteractionGuid)
+                        {
                             continue;
+                        }
+
                         log("Имя: " + entity.Name);
                         CommonModule.MoveTo(entity, 1);
                     }
@@ -253,7 +291,7 @@ namespace WowAI
                     {
                         CommonModule.MoveTo(npc, 0);
                     }
-                    SendKeyPress(0x1b);
+                    MySendKeyEsc();
                     Thread.Sleep(500);
                     return false;
                 }

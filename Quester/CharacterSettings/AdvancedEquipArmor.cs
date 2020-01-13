@@ -19,7 +19,11 @@ namespace WowAI
             get => _use;
             set
             {
-                if (_use == value) return;
+                if (_use == value)
+                {
+                    return;
+                }
+
                 _use = value;
                 NotifyPropertyChanged();
             }
@@ -31,7 +35,11 @@ namespace WowAI
             get => _armorType;
             set
             {
-                if (_armorType == value) return;
+                if (_armorType == value)
+                {
+                    return;
+                }
+
                 _armorType = value;
                 NotifyPropertyChanged();
             }
@@ -43,7 +51,11 @@ namespace WowAI
             get => _buyAuction;
             set
             {
-                if (_buyAuction == value) return;
+                if (_buyAuction == value)
+                {
+                    return;
+                }
+
                 _buyAuction = value;
                 NotifyPropertyChanged();
             }
@@ -65,7 +77,10 @@ namespace WowAI
             set
             {
                 if (_maxPrice == value)
+                {
                     return;
+                }
+
                 _maxPrice = value;
                 NotifyPropertyChanged();
             }

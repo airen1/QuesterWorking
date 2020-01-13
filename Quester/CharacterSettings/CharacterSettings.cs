@@ -9,10 +9,14 @@ namespace WowAI
     [Serializable]
     public class CharacterSettings
     {
+        public bool ApplyMail { get; set; } = true;
+        public bool LearnSpell { get; set; } = true;
+        public ulong StopEquipAucMinGold { get; set; } = 10;
         public bool StopQuesting { get; set; } = true;
-
+        public double EquipArmorCoef { get; set; } = 1;
+        public bool LearnPetSpell { get; set; }
         public bool CheckRepairInCity { get; set; } = true;
-        public bool LearnAllSpell { get; set; } = true;
+        public bool LearnAllSpell { get; set; } = false;
         public bool CraftConjured { get; set; } = true;
         public int CraftConjuredHp { get; set; } = 80;
         public int CraftConjuredMp { get; set; } = 80;
@@ -113,8 +117,8 @@ namespace WowAI
         public bool CheckSellAndRepairScript { get; set; } = false;
         public bool SendMail { get; set; }
         public bool TwoWeapon { get; set; } = false;
-        public TimeSpan SendMailStartTime { get; set; }
-        public TimeSpan SendMailStopTime { get; set; }
+        public TimeSpan SendMailStartTime { get; set; }= new TimeSpan();
+        public TimeSpan SendMailStopTime { get; set; }= new TimeSpan();
         public string SendMailName { get; set; }
         public float SendMailLocX { get; set; } = 0;
         public float SendMailLocY { get; set; } = 0;
@@ -128,7 +132,7 @@ namespace WowAI
         public bool AttackMobForDrop { get; set; } = true;
         public bool ChangeTargetInCombat { get; set; } = false;
         public bool Pvp { get; set; }
-        public Vector3F StoneLoc { get; set; }
+        public Vector3F StoneLoc { get; set; } = new Vector3F();
 
         public int StoneMapId { get; set; }
         public uint StoneAreaId { get; set; }
@@ -172,5 +176,8 @@ namespace WowAI
         public List<LearnTalent> LearnTalents { get; set; } = new List<LearnTalent>();
         public List<LearnSkill> LearnSkill { get; set; } = new List<LearnSkill>();
         public List<SkillSettings> SkillSettings { get; set; } = new List<SkillSettings>();
+        public List<EquipAucMask> EquipAucMasks { get; set; } = new List<EquipAucMask>();
+        public List<EquipAucBag> EquipAucBags { get; set; } = new List<EquipAucBag>();
+        public List<TaxyNodeSettings> TaxyNodeSettingses { get; set; } = new List<TaxyNodeSettings>();
     }
 }

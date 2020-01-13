@@ -18,7 +18,11 @@ namespace WowAI
             get => _class;
             set
             {
-                if (_class == value) return;
+                if (_class == value)
+                {
+                    return;
+                }
+
                 _class = value;
                 NotifyPropertyChanged();
             }
@@ -30,7 +34,11 @@ namespace WowAI
             get => _quality;
             set
             {
-                if (_quality == value) return;
+                if (_quality == value)
+                {
+                    return;
+                }
+
                 _quality = value;
                 NotifyPropertyChanged();
             }
@@ -42,7 +50,11 @@ namespace WowAI
             get => _itemLevel;
             set
             {
-                if (_itemLevel == value) return;
+                if (_itemLevel == value)
+                {
+                    return;
+                }
+
                 _itemLevel = value;
                 NotifyPropertyChanged();
             }

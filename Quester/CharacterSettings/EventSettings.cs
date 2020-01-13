@@ -17,7 +17,11 @@ namespace WowAI
             get => _actionEvent;
             set
             {
-                if (_actionEvent == value) return;
+                if (_actionEvent == value)
+                {
+                    return;
+                }
+
                 _actionEvent = value;
                 NotifyPropertyChanged();
             }
@@ -29,7 +33,11 @@ namespace WowAI
             get => _typeEvents;
             set
             {
-                if (_typeEvents == value) return;
+                if (_typeEvents == value)
+                {
+                    return;
+                }
+
                 _typeEvents = value;
                 NotifyPropertyChanged();
             }
@@ -41,7 +49,11 @@ namespace WowAI
             get => _soundFile;
             set
             {
-                if (_soundFile == value) return;
+                if (_soundFile == value)
+                {
+                    return;
+                }
+
                 _soundFile = value;
                 NotifyPropertyChanged();
             }
@@ -53,7 +65,11 @@ namespace WowAI
             get => _pause;
             set
             {
-                if (_pause == value) return;
+                if (_pause == value)
+                {
+                    return;
+                }
+
                 _pause = value;
                 NotifyPropertyChanged();
             }

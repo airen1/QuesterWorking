@@ -20,7 +20,11 @@ namespace WowAI
             get => _id;
             set
             {
-                if (_id == value) return;
+                if (_id == value)
+                {
+                    return;
+                }
+
                 _id = value;
                 NotifyPropertyChanged();
             }
@@ -32,7 +36,11 @@ namespace WowAI
             get => _loc;
             set
             {
-                if (_loc == value) return;
+                if (_loc == value)
+                {
+                    return;
+                }
+
                 _loc = value;
                 NotifyPropertyChanged();
             }
@@ -44,7 +52,11 @@ namespace WowAI
             get => _mapId;
             set
             {
-                if (_mapId == value) return;
+                if (_mapId == value)
+                {
+                    return;
+                }
+
                 _mapId = value;
                 NotifyPropertyChanged();
             }
@@ -56,7 +68,11 @@ namespace WowAI
             get => _areaId;
             set
             {
-                if (_areaId == value) return;
+                if (_areaId == value)
+                {
+                    return;
+                }
+
                 _areaId = value;
                 NotifyPropertyChanged();
             }
@@ -68,7 +84,11 @@ namespace WowAI
             get => _radius;
             set
             {
-                if (_radius == value) return;
+                if (_radius == value)
+                {
+                    return;
+                }
+
                 _radius = value;
                 NotifyPropertyChanged();
             }
@@ -80,7 +100,11 @@ namespace WowAI
             get => _changeByTime;
             set
             {
-                if (_changeByTime == value) return;
+                if (_changeByTime == value)
+                {
+                    return;
+                }
+
                 _changeByTime = value;
                 NotifyPropertyChanged();
             }
@@ -92,7 +116,11 @@ namespace WowAI
             get => _time;
             set
             {
-                if (_time == value) return;
+                if (_time == value)
+                {
+                    return;
+                }
+
                 _time = value;
                 NotifyPropertyChanged();
             }
@@ -104,7 +132,11 @@ namespace WowAI
             get => _changeByLevel;
             set
             {
-                if (_changeByLevel == value) return;
+                if (_changeByLevel == value)
+                {
+                    return;
+                }
+
                 _changeByLevel = value;
                 NotifyPropertyChanged();
             }
@@ -116,7 +148,11 @@ namespace WowAI
             get => _minLevel;
             set
             {
-                if (_minLevel == value) return;
+                if (_minLevel == value)
+                {
+                    return;
+                }
+
                 _minLevel = value;
                 NotifyPropertyChanged();
             }
@@ -128,7 +164,11 @@ namespace WowAI
             get => _maxLevel;
             set
             {
-                if (_maxLevel == value) return;
+                if (_maxLevel == value)
+                {
+                    return;
+                }
+
                 _maxLevel = value;
                 NotifyPropertyChanged();
             }
@@ -140,7 +180,11 @@ namespace WowAI
             get => _useFilter;
             set
             {
-                if (_useFilter == value) return;
+                if (_useFilter == value)
+                {
+                    return;
+                }
+
                 _useFilter = value;
                 NotifyPropertyChanged();
             }
@@ -152,7 +196,11 @@ namespace WowAI
             get => _listMobs;
             set
             {
-                if (_listMobs == value) return;
+                if (_listMobs == value)
+                {
+                    return;
+                }
+
                 _listMobs = value;
                 NotifyPropertyChanged();
             }
@@ -165,7 +213,11 @@ namespace WowAI
             get => _changeByPlayer;
             set
             {
-                if (_changeByPlayer == value) return;
+                if (_changeByPlayer == value)
+                {
+                    return;
+                }
+
                 _changeByPlayer = value;
                 NotifyPropertyChanged();
             }
@@ -176,7 +228,11 @@ namespace WowAI
             get => _timePlayer;
             set
             {
-                if (_timePlayer == value) return;
+                if (_timePlayer == value)
+                {
+                    return;
+                }
+
                 _timePlayer = value;
                 NotifyPropertyChanged();
             }
@@ -188,7 +244,11 @@ namespace WowAI
             get => _usePoligon;
             set
             {
-                if (_usePoligon == value) return;
+                if (_usePoligon == value)
+                {
+                    return;
+                }
+
                 _usePoligon = value;
                 NotifyPropertyChanged();
             }
@@ -200,11 +260,111 @@ namespace WowAI
             get => _polygoneZone;
             set
             {
-                if (_polygoneZone == value) return;
+                if (_polygoneZone == value)
+                {
+                    return;
+                }
+
                 _polygoneZone = value;
                 NotifyPropertyChanged();
             }
         }
 
+        private bool _changeByDeathPlayer;
+        public bool ChangeByDeathPlayer
+        {
+            get => _changeByDeathPlayer;
+            set
+            {
+                if (_changeByDeathPlayer == value)
+                {
+                    return;
+                }
+
+                _changeByDeathPlayer = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _countDeathByPlayer;
+        public int CountDeathByPlayer
+        {
+            get => _countDeathByPlayer;
+            set
+            {
+                if (_countDeathByPlayer == value)
+                {
+                    return;
+                }
+
+                _countDeathByPlayer = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
+        private Vector3F _locStone;
+        public Vector3F LocStone
+        {
+            get => _locStone;
+            set
+            {
+                if (_locStone == value)
+                {
+                    return;
+                }
+
+                _locStone = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _mapIdStone;
+        public int MapIdStone
+        {
+            get => _mapIdStone;
+            set
+            {
+                if (_mapIdStone == value)
+                {
+                    return;
+                }
+
+                _mapIdStone = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private uint _areaIdStone;
+        public uint AreaIdStone
+        {
+            get => _areaIdStone;
+            set
+            {
+                if (_areaIdStone == value)
+                {
+                    return;
+                }
+
+                _areaIdStone = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool _useStone;
+        public bool UseStone
+        {
+            get => _useStone;
+            set
+            {
+                if (_useStone == value)
+                {
+                    return;
+                }
+
+                _useStone = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 }
