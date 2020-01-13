@@ -22,7 +22,7 @@ namespace WowAI
 {
     internal partial class Host : Core
     {
-        public static bool isReleaseVersion = false;
+        public static bool isReleaseVersion = true;
 
         private const string Ch = "Quester\\";
         public const uint CanSpellAttack = 6603;
@@ -131,6 +131,8 @@ namespace WowAI
                 {
                     AdvancedLog = true;
                 }
+
+               
                 //var pathItem = "C:\\AllQuestItem" + ClientType + ".txt";
                 //var pathQuest = "C:\\AllQuest" + ClientType + ".txt";
                 //if (File.Exists(pathItem))
@@ -255,7 +257,7 @@ namespace WowAI
                     sw.Restart();
                 }
 
-
+               
                 var pathQuestjson = "";
 
                 switch (ClientType)

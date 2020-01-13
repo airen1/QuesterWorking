@@ -848,7 +848,7 @@ namespace WowAI.Module
 
                                     }
                                 }
-                               
+
                             }
                             break;
                         }
@@ -1691,29 +1691,63 @@ namespace WowAI.Module
 
                 if (skill.CombatElementCountLess != 0)
                 {
-                    if (Host.Me.GetPower(alternatePower) > skill.CombatElementCountLess)
+                    if (Host.Me.Class == EClass.Warlock)
                     {
-                        if (useskilllog)
+                        if (Host.MeGetItemsCount(6265) > skill.CombatElementCountLess)
                         {
-                            Host.log("Кол-во AlternatePower больше нужного " + skill.CombatElementCountLess + "/" + Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
-                        }
+                            if (useskilllog)
+                            {
+                                Host.log("Кол-во AlternatePower больше нужного " + skill.CombatElementCountLess + "/" + Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
+                            }
 
-                        return false;
+                            return false;
+                        }
                     }
+                    else
+                    {
+                        if (Host.Me.GetPower(alternatePower) > skill.CombatElementCountLess)
+                        {
+                            if (useskilllog)
+                            {
+                                Host.log("Кол-во AlternatePower больше нужного " + skill.CombatElementCountLess + "/" + Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
+                            }
+
+                            return false;
+                        }
+                    }
+
+
                 }
 
                 if (skill.CombatElementCountMore != 0)
                 {
-                    if (Host.Me.GetPower(alternatePower) < skill.CombatElementCountMore)
+                    if (Host.Me.Class == EClass.Warlock)
                     {
-                        if (useskilllog)
+                        if (Host.MeGetItemsCount(6265) < skill.CombatElementCountMore)
                         {
-                            Host.log("Кол-во AlternatePower меньше нужного " + skill.CombatElementCountMore + "/" +
-                                     Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
-                        }
+                            if (useskilllog)
+                            {
+                                Host.log("Кол-во AlternatePower меньше нужного " + skill.CombatElementCountMore + "/" +
+                                         Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
+                            }
 
-                        return false;
+                            return false;
+                        }
                     }
+                    else
+                    {
+                        if (Host.Me.GetPower(alternatePower) < skill.CombatElementCountMore)
+                        {
+                            if (useskilllog)
+                            {
+                                Host.log("Кол-во AlternatePower меньше нужного " + skill.CombatElementCountMore + "/" +
+                                         Host.Me.GetPower(alternatePower) + " [" + skill.Id + "] " + skill.Name);
+                            }
+
+                            return false;
+                        }
+                    }
+
                 }
 
                 if (Host.Me.GetPet() != null)
@@ -2342,7 +2376,7 @@ namespace WowAI.Module
                                 SetBadTarget(BestMob, 60000);
                                 BestMob = null;
                                 Host.Evade = true;
-                                
+
                             }
                             break;
 
@@ -2463,6 +2497,10 @@ namespace WowAI.Module
                     }
 
                     while (Host.SpellManager.IsCasting)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    while (Host.SpellManager.IsChanneling)
                     {
                         Thread.Sleep(100);
                     }

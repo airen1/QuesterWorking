@@ -273,11 +273,12 @@ namespace WowAI
                                     continue;
                             }
 
-                            if (CharacterSettings.Mode == Mode.QuestingClassic)
+                            if (CharacterSettings.Mode == Mode.QuestingClassic || Area.Id == 148)
                             {
                                 if (myNpcLoc.Id == 4188)
                                     continue;
                             }
+
 
                             if (Me.Distance(myNpcLoc.Loc) > bestDist)
                             {
